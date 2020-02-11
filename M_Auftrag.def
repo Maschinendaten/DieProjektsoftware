@@ -1,0 +1,639 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+Private m_ID As Long
+Private m_ProNr As Long
+Private m_AufBezeichnung As String
+Private m_RAPerson As String
+Private m_LAPerson As String
+Private m_PersonBest As String
+Private m_Liefertermin As Date
+Private m_TextKunde As String
+Private m_TextGF As String
+Private m_Auftragswert As Double
+Private m_Gesperrt As Boolean
+Private m_KalkulationPro As Double
+Private m_KalkulationRisiko As Double
+Private m_Waehrung As String
+Private m_AngelegtVon As String
+Private m_AngelegtAm As Date
+Private m_ZuBeVon As String
+Private m_ZuBeAm As Date
+Private m_ZuBeBez As String
+Private m_AuftragsBeginn As Date
+Private m_AuftragsLaufzeit As Long
+Private m_Aufabgeschlossen As Boolean
+Private m_MatAW As Long
+Private m_ZahlZiel As Long
+Private m_StdSatz As Long
+Private m_Auftragsdauer As Long
+Private m_FixSatz As Long
+Private m_PersAW As Long
+Private m_LieferAdresse As String
+Private m_RechnungsAdresse As String
+Private m_AnschreibenAdresse As String
+Private m_fiLieferAdresse As Long
+Private m_fiAnschreibenAdresse As Long
+Private m_fiRechnungsAdresse As Long
+Private m_AufabgeschlossenAm As Date
+
+Public Property Get ID() As Long:    ID = m_ID: End Property
+Public Property Let ID(WERT As Long):     m_ID = WERT: End Property
+Public Property Get ProNr() As Long:    ProNr = m_ProNr: End Property
+Public Property Let ProNr(WERT As Long):     m_ProNr = WERT: End Property
+Public Property Get AufBezeichnung() As String:    AufBezeichnung = m_AufBezeichnung: End Property
+Public Property Let AufBezeichnung(WERT As String):     m_AufBezeichnung = WERT: End Property
+
+
+Public Property Get PersonBest() As String:    PersonBest = m_PersonBest: End Property
+Public Property Let PersonBest(WERT As String):     m_PersonBest = WERT: End Property
+Public Property Get Liefertermin() As Date:    Liefertermin = m_Liefertermin: End Property
+Public Property Let Liefertermin(WERT As Date):     m_Liefertermin = WERT: End Property
+Public Property Get TextKunde() As String:    TextKunde = m_TextKunde: End Property
+Public Property Let TextKunde(WERT As String):     m_TextKunde = WERT: End Property
+Public Property Get TextGF() As String:    TextGF = m_TextGF: End Property
+Public Property Let TextGF(WERT As String):     m_TextGF = WERT: End Property
+Public Property Get Auftragswert() As Double:    Auftragswert = m_Auftragswert: End Property
+Public Property Let Auftragswert(WERT As Double):     m_Auftragswert = WERT: End Property
+Public Property Get gesperrt() As Boolean:    gesperrt = m_Gesperrt: End Property
+Public Property Let gesperrt(WERT As Boolean):     m_Gesperrt = WERT: End Property
+Public Property Get KalkulationPro() As Double:    KalkulationPro = m_KalkulationPro: End Property
+Public Property Let KalkulationPro(WERT As Double):     m_KalkulationPro = WERT: End Property
+Public Property Get KalkulationRisiko() As Double:    KalkulationRisiko = m_KalkulationRisiko: End Property
+Public Property Let KalkulationRisiko(WERT As Double):     m_KalkulationRisiko = WERT: End Property
+Public Property Get Waehrung() As String:    Waehrung = m_Waehrung: End Property
+Public Property Let Waehrung(WERT As String):     m_Waehrung = WERT: End Property
+Public Property Get AngelegtVon() As String:    AngelegtVon = m_AngelegtVon: End Property
+Public Property Let AngelegtVon(WERT As String):     m_AngelegtVon = WERT: End Property
+Public Property Get AngelegtAm() As Date:    AngelegtAm = m_AngelegtAm: End Property
+Public Property Let AngelegtAm(WERT As Date):     m_AngelegtAm = WERT: End Property
+Public Property Get ZuBeVon() As String:    ZuBeVon = m_ZuBeVon: End Property
+Public Property Let ZuBeVon(WERT As String):     m_ZuBeVon = WERT: End Property
+Public Property Get ZuBeAm() As Date:    ZuBeAm = m_ZuBeAm: End Property
+Public Property Let ZuBeAm(WERT As Date):     m_ZuBeAm = WERT: End Property
+Public Property Get ZuBeBez() As String:    ZuBeBez = m_ZuBeBez: End Property
+Public Property Let ZuBeBez(WERT As String):     m_ZuBeBez = WERT: End Property
+Public Property Get AuftragsBeginn() As Date:    AuftragsBeginn = m_AuftragsBeginn: End Property
+Public Property Let AuftragsBeginn(WERT As Date):     m_AuftragsBeginn = WERT: End Property
+Public Property Get AuftragsLaufzeit() As Long:    AuftragsLaufzeit = m_AuftragsLaufzeit: End Property
+Public Property Let AuftragsLaufzeit(WERT As Long):     m_AuftragsLaufzeit = WERT: End Property
+Public Property Get Aufabgeschlossen() As Boolean:    Aufabgeschlossen = m_Aufabgeschlossen: End Property
+Public Property Let Aufabgeschlossen(WERT As Boolean):     m_Aufabgeschlossen = WERT: End Property
+Public Property Get MatAW() As Long:    MatAW = m_MatAW: End Property
+Public Property Let MatAW(WERT As Long):     m_MatAW = WERT: End Property
+Public Property Get ZahlZiel() As Long:    ZahlZiel = m_ZahlZiel: End Property
+Public Property Let ZahlZiel(WERT As Long):     m_ZahlZiel = WERT: End Property
+Public Property Get StdSatz() As Long:    StdSatz = m_StdSatz: End Property
+Public Property Let StdSatz(WERT As Long):     m_StdSatz = WERT: End Property
+Public Property Get Auftragsdauer() As Long:    Auftragsdauer = m_Auftragsdauer: End Property
+Public Property Let Auftragsdauer(WERT As Long):     m_Auftragsdauer = WERT: End Property
+Public Property Get FixSatz() As Long:    FixSatz = m_FixSatz: End Property
+Public Property Let FixSatz(WERT As Long):     m_FixSatz = WERT: End Property
+Public Property Get PersAW() As Long:    PersAW = m_PersAW: End Property
+Public Property Let PersAW(WERT As Long):     m_PersAW = WERT: End Property
+Public Property Get Lieferadresse() As String:    Lieferadresse = m_LieferAdresse: End Property
+Public Property Let Lieferadresse(WERT As String):     m_LieferAdresse = WERT: End Property
+Public Property Get Rechnungsadresse() As String:    Rechnungsadresse = m_RechnungsAdresse: End Property
+Public Property Let Rechnungsadresse(WERT As String):     m_RechnungsAdresse = WERT: End Property
+Public Property Get AnschreibenAdresse() As String:    AnschreibenAdresse = m_AnschreibenAdresse: End Property
+Public Property Let AnschreibenAdresse(WERT As String):     m_AnschreibenAdresse = WERT: End Property
+Public Property Get fiLieferadresse() As Long:    fiLieferadresse = m_fiLieferAdresse: End Property
+Public Property Let fiLieferadresse(WERT As Long):     m_fiLieferAdresse = WERT: End Property
+Public Property Get fiAnschreibenAdresse() As Long:    fiAnschreibenAdresse = m_fiAnschreibenAdresse: End Property
+Public Property Let fiAnschreibenAdresse(WERT As Long):     m_fiAnschreibenAdresse = WERT: End Property
+Public Property Get fiRechnungsadresse() As Long:    fiRechnungsadresse = m_fiRechnungsAdresse: End Property
+Public Property Let fiRechnungsadresse(WERT As Long):     m_fiRechnungsAdresse = WERT: End Property
+Public Property Get AufAbgeschlossenAm() As Date:    AufAbgeschlossenAm = m_AufabgeschlossenAm: End Property
+Public Property Let AufAbgeschlossenAm(WERT As Date):     m_AufabgeschlossenAm = WERT: End Property
+
+
+
+Public Function Laden(Auftragsnummer As Long) As Long
+'prüft ob Auftrag schon geladen wenn nicht neu laden
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+'Lädt immer neu weil sonst bei Änderungen extra trigger erfolgen muss
+'If m_ID <> Auftragsnummer Then
+'    Laden = 2
+'    Exit Function
+'End If
+
+sSql = "SELECT * FROM tblAufDaten WHERE ID=" & Auftragsnummer
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+    With rs1
+        If Not .EOF Then
+            m_ID = Nz(.Fields("ID").Value)
+            m_ProNr = Nz(.Fields("ProNr").Value)
+            m_AufBezeichnung = Nz(.Fields("AufBezeichnung").Value)
+
+            m_RAPerson = Nz(.Fields("RAPerson").Value)
+
+            m_LAPerson = Nz(.Fields("LAPerson").Value)
+            m_PersonBest = Nz(.Fields("PersonBest").Value)
+            m_Liefertermin = Nz(.Fields("Liefertermin").Value)
+            m_TextKunde = Nz(.Fields("TextKunde").Value)
+            m_TextGF = Nz(.Fields("TextGF").Value)
+            m_Auftragswert = Nz(.Fields("Auftragswert").Value)
+            m_Gesperrt = Nz(.Fields("Gesperrt").Value)
+            m_KalkulationPro = Nz(.Fields("KalkulationPro").Value)
+            m_KalkulationRisiko = Nz(.Fields("KalkulationRisiko").Value)
+            m_Waehrung = Nz(.Fields("Waehrung").Value)
+            m_AngelegtVon = Nz(.Fields("AngelegtVon").Value)
+            m_AngelegtAm = Nz(.Fields("AngelegtAm").Value)
+            m_ZuBeVon = Nz(.Fields("ZuBeVon").Value)
+            m_ZuBeAm = Nz(.Fields("ZuBeAm").Value)
+            m_ZuBeBez = Nz(.Fields("ZuBeBez").Value)
+            m_AuftragsBeginn = Nz(.Fields("AuftragsBeginn").Value)
+            m_AuftragsLaufzeit = Nz(.Fields("AuftragsLaufzeit").Value)
+            m_Aufabgeschlossen = Nz(.Fields("Aufabgeschlossen").Value)
+            m_MatAW = Nz(.Fields("MatAW").Value)
+            m_ZahlZiel = Nz(.Fields("ZahlZiel").Value)
+            m_StdSatz = Nz(.Fields("StdSatz").Value)
+            m_Auftragsdauer = Nz(.Fields("Auftragsdauer").Value)
+            m_FixSatz = Nz(.Fields("FixSatz").Value)
+            m_PersAW = Nz(.Fields("PersAW").Value)
+            m_LieferAdresse = Nz(.Fields("LieferAdresse").Value)
+            m_RechnungsAdresse = Nz(.Fields("RechnungsAdresse").Value)
+            m_AnschreibenAdresse = Nz(.Fields("AnschreibenAdresse").Value)
+            m_fiLieferAdresse = Nz(.Fields("fiLieferAdresse").Value)
+            m_fiAnschreibenAdresse = Nz(.Fields("fiAnschreibenAdresse").Value)
+            m_fiRechnungsAdresse = Nz(.Fields("fiRechnungsAdresse").Value)
+            m_AufabgeschlossenAm = Nz(.Fields("AufabgeschlossenAm").Value)
+            Laden = 1
+        Else
+            Laden = -1
+        End If
+        .Close
+    End With
+End Function
+
+
+Public Function Neu(Projektnummer As Long) As Long
+'Legt einen neuen Auftrag an
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+If Projektnummer < 1 Then
+    Neu = -1
+    Exit Function
+End If
+If MsgBox(LA("Wollen Sie einen neuen Auftrag ") _
+           & vbCrLf & LA("unter der Projektnummer: ") & Projektnummer _
+           & vbCrLf & LA("anlegen?") _
+           , vbYesNo + vbQuestion + vbDefaultButton2, LA("Sicherheitsabfrage")) _
+           <> vbYes _
+    Then
+        Neu = -2
+        Exit Function
+    End If
+    
+    If PS.Projekt.Laden(Projektnummer) < 1 Then
+        Neu = -3
+        Exit Function
+    End If
+    
+    sSql = "SELECT * FROM tblAufDaten WHERE FALSE"
+    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    With rs1
+        .AddNew
+            
+        'Öffnet das Projekt zum Auftrag zur Übergabe der Daten   tblProjekte.ProjektNr AS ProNr,
+''            ps.Auftrag.Neu()
+''            Set Rs2 = CurrentDbC.OpenRecordset("SELECT tblProjekte.*," & _
+''                " tblAdressen.* FROM tblAdressen INNER JOIN tblProjekte ON tblAdressen.AdressNr=tblProjekte.AdressNr" & _
+''                " WHERE (((tblProjekte.ProjektNr) =" & lonProNr & "));")
+''            Dal = Rs2.RecordCount
+            'erstellt einen neuen Auftrag
+            
+
+                'Allgemeine Projektdaten übergeben
+                .Fields("ProNr").Value = PS.Projekt.ProjektNr
+                .Fields("AufBezeichnung").Value = PS.Projekt.Projektbezeichnung
+                .Fields("AuftragsBeginn").Value = Now()
+                'Standart Lieferzeit in KW
+                .Fields("AuftragsLaufzeit").Value = 0
+                'Lieferdatum Auftragsbeginn +  16KW = +118Tage
+                .Fields("Liefertermin").Value = Now()
+                'Finanzen
+                .Fields("Waehrung").Value = "EUR"
+                .Fields("Auftragswert").Value = 0
+                .Fields("KalkulationPro").Value = 0
+                .Fields("KalkulationRisiko").Value = 0
+                .Fields("AngelegtVon").Value = PS.User.Kurzzeichen
+                .Fields("AngelegtAm").Value = Now
+                PS.Adresse.Laden (PS.Projekt.AdressNr)
+                .Fields("Lieferadresse").Value = PS.Adresse.AdresseRTF
+                .Fields("Rechnungsadresse").Value = PS.Adresse.AdresseRTF
+                .Fields("AnschreibenAdresse").Value = PS.Adresse.AdresseRTF
+                .Fields("fiLieferadresse").Value = PS.Adresse.AdressNr
+                .Fields("fiAnschreibenAdresse").Value = PS.Adresse.AdressNr
+                .Fields("fiRechnungsadresse").Value = PS.Adresse.AdressNr
+       
+                Neu = rs1!ID
+                .Update
+          
+          .Close
+        
+End With
+' lädt nach neu anlegen den Auftrag
+If Neu > 0 Then Me.Laden (Neu)
+
+End Function
+
+
+Function zumProjekt(Projektnummer As Long, SicherheitsAbfrage As Boolean) As Boolean
+'Stellt fest ob zu dem Projekt schon ein Auftrag vorliegt
+'Wenn Ja wirgefragt ob zu diesem Auftrag noch ein Projekt angelegt werden soll
+'Wenn True gibt es einen Auftrag zu dem Projekt
+'Wenn False gibt es keinen Auftrag zum Projekt bzw. es wurde die Projektnummer bestätigt
+
+Dim lpn As String
+
+zumProjekt = True
+    
+If Nz(DLookup("ID", "tblAufDaten", "ProNr = " & Projektnummer), "") <> "" Then
+    If SicherheitsAbfrage = True Then
+        lpn = Val(Nz(InputBox("Um zu vermeiden das Aufträge doppelt angelegt werden," & _
+            " geben Sie zur Bestätigung " & vbCrLf & _
+        "die Projektnummer " & Projektnummer & " ein:"), 0))
+    
+        If lpn <> Projektnummer Then Exit Function 'Bricht ab wenn die Werte <>
+    Else
+        Exit Function 'Bricht ab wenn keine Abfrage und Auftrag vorhanden
+    End If
+End If
+    
+  zumProjekt = False
+  
+    
+End Function
+
+
+
+
+'---------------------------------------------------------------------------------------
+' Function  : Erzeugt ein Anschreibne als neues Auftragsdokument
+'             und gibt die Nr des erzeugten Dokumentes zurück
+' DateTime  : 01.03.2003 11:20
+' Author    : mg
+' Purpose   : Ein neues Dokument wird angelegt DokumentType = AB (Auftragsbestätigung)
+'                                              DokumentType = RE (Rechnung)
+'                                              DokumentType = Li (Lieferschein)
+'                                              DokumentType = Gu (Gutschrift)
+'20181024 die Adresse wird aus dem Auftrag entnommen
+'---------------------------------------------------------------------------------------
+Function Neu_Dokument(AuftragNr As Long, DokumentType As DokType, Optional MitDetailDaten As Boolean = True) As Long
+
+Dim rs1 As DAO.Recordset
+Dim Rs2 As DAO.Recordset
+'Dim BN As Long    ' Zwischenspeicher Belegnummer
+'Dim SpPNr As Long ' Zwischenspeicher Projektnummer
+Dim ReBe As Single 'Zwischenspeicher Rechnungsbetrag
+Dim lonReNr As Long 'Speichert die letzte Rechnungsnummer
+Dim sSql As String
+
+'Stop    ' keine Lust mehr Std 20190921
+'Prüfe die Adresse im Auftrag mindestens Anschreiben muss es geben
+   If PS.Adresse.Laden(m_fiAnschreibenAdresse) = False Then
+        MsgBox LA("Die Adresse Anschreiben gibt es nicht")
+        Neu_Dokument = -1
+        Exit Function
+   End If
+'Wenn Rechnung suche letzte Rechnungsnummer
+If DokumentType = DokType.tyrechnung Or DokumentType = DokType.tyGutschrift Then
+    Set rs1 = CurrentDbC.OpenRecordset("SELECT TOP 1 tblRechnung.reBelegNr2 " & _
+    "FROM tblRechnung " & _
+    "ORDER BY tblRechnung.reBelegNr2 DESC;")
+    'Wenn noch keine Rechnung vorhanden ist Startnummer fragen
+    If rs1.RecordCount <> 1 Then
+        lonReNr = Val(InputBox("Bitte geben Sie die Startnummer der Rechnungen ein. Die Nummer lauttet 20040001 für die erste Rechnung im Jahr 2004.", "Eingabe der Startrechnungsnummer", "20040001"))
+    Else
+        'Wenn Rechnung vorhanden Rechnungsnummer auf addieren
+        lonReNr = rs1!ReBelegNr2 + 1
+    End If
+End If
+
+
+    If Me.Laden(AuftragNr) < 1 Then
+        'Fehler Auftrag gibt es nicht
+        MsgBox LA("Es gibt keinen Auftrag!"), , "Info"
+        Exit Function
+    End If
+
+  
+  
+'  Set Rs1 = CurrentDbC.OpenRecordset("SELECT * FROM tblAnschreiben WHERE False")
+'  Rs1.AddNew    'Neuen Datensatz anlegen
+     
+    'Allgemeine Einträge für alles gültig
+    
+    
+    'SpPNr = m_ProNr
+    ReBe = m_Auftragswert
+    PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+    'PS.Anschreiben.Formulartype = "frmAufDokumente"
+    
+    If PS.Anschreiben.Neu(m_ProNr, m_ID, DokumentType, "frmAufDokumente") < 1 Then
+        Neu_Dokument = -2
+        Exit Function
+    End If
+    
+    PS.Anschreiben.Projektnummer = m_ProNr
+    'Rs1!AufNr = P_Auf_Nr
+    
+    'Höchste Nr Suchen oder Vorgabewert
+    'BN = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
+    'PS.Anschreiben.BelegNr = BN
+    PS.Anschreiben.Belegbezeichnung = m_ProNr & "-" & CStr(PS.Anschreiben.BelegNr) & "-" & PS.User.Kurzzeichen & "-A" & CStr(m_ID)
+    PS.Anschreiben.Kopftext = m_TextGF
+    PS.Anschreiben.Textstück = m_TextKunde
+    
+    PS.Anschreiben.Erstelldatum = Now()
+    PS.Anschreiben.AufNr = m_ID
+    
+    'Adresse
+    'Suche Kundennummer der Anschreiben Adresse
+    PS.Anschreiben.UnsereKuNr = PS.Anschreiben.UnsereKuNr '   Nz(DLookup("UnsereKuNr", "tbladressen", "AdressNr=" & Rs2!fiAnschreibenAdresse), "")
+    
+    'Rs1!fiAnschreibenAdresse = Nz(DLookup("fiAnschreibenAdresse", "tblaufdaten", "ID=" & P_Auf_Nr), 0)
+    PS.Anschreiben.Adressnummer = m_fiAnschreibenAdresse 'Rs1!fiAnschreibenAdresse
+    PS.Anschreiben.AnschreibenAdresse = m_AnschreibenAdresse  'DLookup("AnschreibenAdresse", "tblaufdaten", "ID=" & m_ID)
+   
+    
+   
+    'Adresse wurde ganz oben geladen deswegen geht das hier ohne laden
+    
+    PS.Anschreiben.Lieferadresse = m_LieferAdresse
+    PS.Anschreiben.Rechnungsadresse = m_RechnungsAdresse
+    PS.Anschreiben.AnschreibenAdresse = m_AnschreibenAdresse
+    PS.Anschreiben.fiLieferadresse = m_fiLieferAdresse
+    PS.Anschreiben.fiAnschreibenAdresse = m_fiAnschreibenAdresse
+    PS.Anschreiben.fiRechnungsadresse = m_fiRechnungsAdresse
+        
+'   Rs1!Kopftext = Nz(Rs2!TextGF, "")
+'   Rs1!Textstück = Nz(Rs2!TextKunde, "")
+'   rs1!Schlusstext
+        
+    
+  
+'spezielle Einräge für die Dokumente
+Select Case DokumentType
+    Case DokType.tyAuftragsbestaetigung
+       ' Stop
+        PS.Anschreiben.BelegArt = PS.Anschreiben.DokTypeString(tyAuftragsbestaetigung) '  "-Auftragsbestätigung"
+        PS.Anschreiben.Betreff = "AB-" & m_AufBezeichnung
+
+'        If Nz(Rs2!TextGF, "") <> "" And Nz(Rs2!TextKunde, "") <> "" Then
+'            Rs1!Kopftext = Rs2!TextKunde & vbCrLf & Rs2!TextGF
+'        Else
+'            If Nz(Rs2!TextGF, "") <> "" Then Rs1!Kopftext = Rs2!TextGF
+'            If Nz(Rs2!TextKunde, "") <> "" Then Rs1!Kopftext = Rs2!TextKunde
+'        End If
+'        Rs1!Adressnummer = Rs2!fiAnschreibenAdresse
+'        Rs1!AnschreibenAdresse = Rs2!AnschreibenAdresse
+        PS.Anschreiben.Waehrung = funDbText(5, "Waehrung")
+        PS.Anschreiben.Speichern
+        'Rs1.Update
+        'Rs1.Close
+        'Set Rs1 = Nothing
+        'Rs2.Close
+        'Set Rs2 = Nothing
+        
+    Case DokType.tyrechnung  ' "RE"
+        PS.Anschreiben.BelegArt = "-Rechnung"
+        PS.Anschreiben.Betreff = "RE-" + m_AufBezeichnung
+        PS.Anschreiben.Adressnummer = m_fiAnschreibenAdresse
+        PS.Anschreiben.AnschreibenAdresse = m_AnschreibenAdresse
+        PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+        PS.Anschreiben.Speichern
+        
+'        If Nz(Rs2!TextGF, "") <> "" And Nz(Rs2!TextKunde, "") <> "" Then
+'            Rs1!Kopftext = Rs2!TextKunde & vbCrLf & Rs2!TextGF
+'        Else
+'            If Nz(Rs2!TextGF, "") <> "" Then Rs1!Kopftext = Rs2!TextGF
+'            If Nz(Rs2!TextKunde, "") <> "" Then Rs1!Kopftext = Rs2!TextKunde
+'        End If
+
+
+        
+        'Set Rs1 = Nothing
+        'Rs2.Close
+        'Set Rs2 = Nothing
+        
+        
+        'Die Rechnung wird in der Tabelle Rechnunng angelegt
+        sSql = "SELECT * FROM tblRechnung WHERE False"
+        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        
+            rs1.AddNew    'Neuen Datensatz anlegen
+            rs1!BelegNr = PS.Anschreiben.BelegNr
+            rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
+            rs1!ReBelegart = 1 '1 ist Rechnung
+            rs1!AufNr = m_ID  'P_Auf_Nr
+            rs1!ProjekktNr = m_ProNr    ' SpPNr
+            rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
+            rs1!AngelegtAm = Now()
+            rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
+            
+    '#### vorbelegten Textfelder
+            rs1!SummeText = funDbText(5, "SummeText")
+            rs1!MwstText = funDbText(5, "MwstText")
+            rs1!AuftragnettoText = funDbText(5, "SummeText")
+            rs1!BereitsBezahltText = funDbText(5, "BereitsBezahltText")
+            rs1!ZuZahlenderBetragText = funDbText(5, "ZuZahlenderBetragText")
+            rs1!RechnungsbetragText = funDbText(5, "RechnungsbetragText")
+            rs1!MwstWert = Val(funDbText(5, "MwstWert"))
+            rs1!Zahlungsbedingungen = funDbText(5, "Zahlungsbedingungen")
+            rs1!Waehrung = funDbText(5, "Waehrung")
+    '#### vorbelegten Textfelder
+        rs1.Update
+        rs1.Close
+            
+        
+                            
+    Case DokType.tyLieferschein  ' "Li"
+            PS.Anschreiben.BelegArt = "-Lieferschein"
+            PS.Anschreiben.Betreff = "Li-" & m_AufBezeichnung
+            PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+            
+            PS.Anschreiben.Speichern
+'            If Nz(Rs2!TextGF, "") <> "" And Nz(Rs2!TextKunde, "") <> "" Then
+'                Rs1!Kopftext = Rs2!TextKunde & vbCrLf & Rs2!TextGF
+'            Else
+'                If Nz(Rs2!TextGF, "") <> "" Then Rs1!Kopftext = Rs2!TextGF
+'                If Nz(Rs2!TextKunde, "") <> "" Then Rs1!Kopftext = Rs2!TextKunde
+'            End If
+            
+            'Rs1!Adressnummer = Rs2!fiAnschreibenAdresse
+            'Rs1!AnschreibenAdresse = Rs2!AnschreibenAdresse
+'        Rs1.Update
+'        Rs1.Close
+'        Rs2.Close
+               
+        
+    Case DokType.tyGutschrift  ' "Gu"
+            PS.Anschreiben.BelegArt = "-Gutschrift"
+            PS.Anschreiben.Betreff = "Li-" + m_AufBezeichnung
+            PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+            If Nz(m_TextGF, "") <> "" And Nz(m_TextKunde, "") <> "" Then
+                PS.Anschreiben.Kopftext = m_TextKunde & vbCrLf & m_TextGF
+            Else
+                If m_TextGF <> "" Then PS.Anschreiben.Kopftext = m_TextGF
+                If m_TextKunde <> "" Then PS.Anschreiben.Kopftext = m_TextKunde
+            End If
+         PS.Anschreiben.Speichern
+         
+'        Rs1.Update
+'        Rs1.Close
+'        Rs2.Close
+        'Die Gutschrift wird in der Tabelle Rechnunng angelegt
+        sSql = "SELECT * FROM tblRechnung WHERE False"
+        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        If rs1.Updatable Then
+            rs1.AddNew    'Neuen Datensatz anlegen
+                rs1!BelegNr = PS.Anschreiben.BelegNr
+                rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
+                rs1!ReBelegart = 2 '1 ist eine Gutschrift
+                rs1!AufNr = m_ID ' P_Auf_Nr
+                rs1!ProjekktNr = m_ProNr '  SpPNr
+                rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
+                rs1!AngelegtAm = Now
+                rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
+            rs1.Update
+            rs1.Close
+            Set rs1 = Nothing
+        End If
+End Select
+
+'nach dem Erstellen einer Gutschrift Funktion verlassen
+If DokumentType = DokType.tyGutschrift Then GoTo Ende_   'P_DA = "Gu"
+
+'Zuweisen der Unterpunkte von der Auftragsbeschreibung zu der
+'Beschreibung des Dokumentes
+Set rs1 = CurrentDbC.OpenRecordset("SELECT * FROM tblProjektbeschreibungDokumente WHERE FALSE")
+
+'Daten filtern und aus Angebosttabelle auslesen sortiert nach Position
+Set Rs2 = CurrentDbC.OpenRecordset("SELECT  * FROM tblAufPositionen WHERE Auftragsnummer =" & m_ID & " " & _
+            "ORDER BY Pos_Nummer")
+'Stop
+
+'Hier werden die Positionen im Dokument erzeugt
+If MitDetailDaten Then
+    Do Until Rs2.EOF
+        rs1.AddNew    'Neuen Datensatz anlegen
+            rs1!BelegNr = PS.Anschreiben.BelegNr         '  [1] Die Belegnummer ist die Verbindung zum Anschreiben
+            rs1!Projektnummer = m_ProNr '  [2]Hier beginnen die eigentlichen Daten
+            rs1!Pos_Nummer = Rs2!Pos_Nummer
+            rs1!Pos_Bezeichnung = Rs2!Pos_Bezeichnung
+            rs1!Pos_Beschreibung = Rs2!Pos_Beschreibung
+            rs1!ArtikelID = Rs2!ArtikelID
+            
+            'Unterscheiden ob Preis oder ZS
+                rs1!Anzahl_Menge = Rs2!Anzahl_Menge
+                rs1!Einheit = Rs2!Einheit
+                rs1!Preis_VK = Rs2!Preis_VK
+                If Nz(Rs2!Anzahl_Menge, "") = 0 Then
+                    rs1!St_Preis_VK = 0
+                Else
+                    rs1!St_Preis_VK = Rs2!Preis_VK / Rs2!Anzahl_Menge  'Rs2!Preis_einzeln
+                End If
+            
+            
+            rs1!Drucken_Preis = Rs2!Drucken_Preis
+            rs1!Drucken_Menge = Rs2!Drucken_Menge
+            rs1!Drucken_Position = True  'Rs2!Drucken_Position
+        rs1.Update 'Schreiben der Werte in die Datenbank
+    
+        Rs2.MoveNext
+    Loop 'Loop Do Until
+    Rs2.Close
+    Set Rs2 = Nothing
+
+End If
+
+rs1.Close
+Set rs1 = Nothing
+
+'Sprungmarke wenn keine Positionen angelegt werden
+Ende_:
+
+'zuweisen der Belegnummer zur Globalen Variablen
+Neu_Dokument = PS.Anschreiben.BelegNr
+'on error Goto 0
+Exit Function
+
+End Function
+
+
+Function Copy_Dokument(DokNummer As Long, ZielDokType As DokType) As Long
+'Kopiert ein Auftragsdokument komplett und gibt die neue Nummer zurück
+
+Dim tdok As DokType
+Dim idDok As Long
+Dim tID As Long
+Dim QDs As DAO.Recordset
+Dim ZDs As DAO.Recordset
+Dim sSql As String
+Dim A As Long
+
+'Kopiere Erst den Dokumentenkopf
+
+idDok = PS.Anschreiben.copy(DokNummer, ZielDokType)
+
+If idDok = 0 Then
+    Copy_Dokument = 0
+    Exit Function
+End If
+'Hier werden die einzelnne Positionen kopiert
+sSql = "SELECT * FROM tblProjektbeschreibungDokumente WHERE BelegNr=" & DokNummer
+Set QDs = CurrentDb.OpenRecordset(sSql)
+sSql = "SELECT * FROM tblProjektbeschreibungDokumente WHERE FALSE"
+Set ZDs = CurrentDb.OpenRecordset(sSql)
+
+With QDs
+    While Not .EOF
+        ZDs.AddNew
+            For A = 1 To .Fields.Count - 1
+                'ID ist Autowert und muss ausgenommen werden
+                If ZDs.Fields(A).Name = "ID" Then
+                    Debug.Print ZDs.Fields("ID").Value, .Fields("ID").Value
+                Else
+                    ZDs.Fields(A).Value = .Fields(A).Value
+                End If
+            Next A
+            'Was nicht gleich ist
+            ZDs.Fields("BelegNr").Value = idDok
+            ZDs.Fields("fiInEKListe").Value = 0
+        ZDs.Update
+        .MoveNext
+    Wend
+End With
+
+
+'Rausfinden was für ein Dokumenttype und dann die spezifische Tabelle kopieren
+Select Case ZielDokType        'Das gewünschte Ziel muss ausgewählt sein  PS.Anschreiben.BelegArtTyp
+    Case DokType.tyrechnung
+        tID = Nz(DLookup("laufendeNr", "tblRechnung", "BelegNr=" & DokNummer))
+        If tID = 0 Then
+            PS.Rechnung.Neu idDok 'Hier gehts los wenn man von einem Lieferschein oder einer AB kommt Dann muss eine Rechnung neu erzeugt werden
+        Else
+            PS.Rechnung.copy tID, idDok
+        End If
+    Case DokType.tyLieferschein
+        
+    Case DokType.tyAuftragsbestaetigung
+        
+    Case DokType.tyGutschrift
+        
+
+End Select
+Copy_Dokument = idDok
+
+End Function

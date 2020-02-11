@@ -1,0 +1,172 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+'##### Objektbasierte Behandlung der CAD Daten ####
+'MG 20180525 zu Ehren M.Zimmermann
+
+'MG 20191017 Erweiterung zum einlesen von normalen Listen
+
+
+'Diese Abteilung ist für alles was mit CAD zu tun hat
+Private m_Use As Boolean
+Private m_Praefix As String
+Private m_Sufix As String
+Private m_Laenge As String
+
+Private Sub Class_Initialize()
+    m_Use = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadUse'"), 0) = 1
+    If m_Use Then
+        'Liest die DAten aus der Ini Tabelle einstellung über
+        m_Praefix = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadPraefix'"), "")
+        m_Sufix = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadPDFSufix'"), "")
+        m_Laenge = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadLaenge'"), -1)
+    Else
+        'Wenn CAD Präfix Sufix aus ist alles auf 0 oder "" setzen vorsorglich fals verwendet
+        m_Praefix = ""
+        m_Sufix = ""
+        m_Laenge = 0
+       
+    End If
+End Sub
+
+
+
+
+Public Property Get use() As Boolean
+'Zeigt an das eine spezielle Nummereirung für CAD benutzt wird
+use = m_Use
+End Property
+
+Public Property Get Praefix() As String
+Praefix = m_Praefix
+End Property
+
+Public Property Get PraefixLen() As Long
+PraefixLen = Len(m_Praefix)
+End Property
+
+Public Property Get Sufix() As String
+    Sufix = m_Sufix
+End Property
+
+Public Property Get SufixLen() As Long
+    SufixLen = Len(m_Sufix)
+End Property
+
+Public Property Get Laenge() As Long
+    Laenge = m_Laenge
+End Property
+
+
+Public Function FileToID(FileName_ As String) As Long
+'Liest aus dem Filenamen die ID
+
+Dim A As Long
+Dim s1 As String
+
+
+'Suche ein / Zeichen dann Pfad abziehen
+
+For A = Len(FileName_) To 1 Step -1
+    If Mid(FileName_, A, 1) = "\" Then ' Anfang des Dateinamen gefunden
+        s1 = Mid(FileName_, A + 1)
+        If m_Use Then 'Wenn Präfix benutzt wir
+            s1 = Mid(s1, PraefixLen + 1) 'schneidet praefix ab
+        End If
+        FileToID = Val(s1)
+        If FileToID = 0 Then FileToID = -1  'Fehler
+        Exit Function
+    End If
+Next A
+
+
+'Wenn Kein / gefunden wurde keine Pfad Angabe
+FileToID = -1
+
+
+End Function
+
+
+Public Function Dateiname(ArtikelNr As Long) As String
+    'liest den DAteinamen aus
+    Dateiname = Nz(DLookup("Arc_Datei", "tblArtikelCad", "ArC_FiArtikel=" & ArtikelNr), "")
+    
+End Function
+
+Public Function DateiPfadGruppe() As String
+
+DateiPfadGruppe = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadGruppe'"), "")
+End Function
+
+
+Public Function Nummer(ArtikelNr As Long) As String
+'Gibt die Cad Nummer mit Präfix und fester Länge usw mit
+'6.10.2018 Sufix jetzt auch
+Dim Praefix As String
+Dim Sufix As String
+
+ Praefix = Nz(DLookup("Arc_Index", "tblArtikelCad", "ArC_FiArtikel=" & ArtikelNr), "")
+ 
+ If m_Use Then  'Soll Präfix Sufix und Länge benutzt werden
+    Nummer = m_Praefix & String(m_Laenge - Len(CStr(ArtikelNr)), "0") & ArtikelNr & Praefix
+ Else
+    Nummer = ArtikelNr
+ End If
+
+
+End Function
+
+
+Public Function NummerPDF(ArtikelNr As Long) As String
+'Gibt die CAD Nummer mit Sufix und Präfix zurück der Präfix ist die aktuelle Revision
+
+If m_Use Then  'Soll Präfix Sufix und Länge benutzt werden
+    NummerPDF = Nummer(ArtikelNr) ' m_Praefix & String(m_Laenge - Len(CStr(artikelNr)), "0") & artikelNr '& m_Sufix
+ Else
+    NummerPDF = ArtikelNr
+ End If
+
+End Function
+Public Function NummerPDFOK(PDFName As String, Optional AktuelleRevision As String) As String
+'Prüft ob der übergebne Name ein Gültiger PDF Name ist und ob es die aktuellste revision ist
+
+End Function
+
+
+Public Function NummerOK(ArtikelNr As Long) As Boolean
+'Prüft ob es die CAD Nummer im Artikel gibt
+
+NummerOK = Nz(DLookup("ID", "tblArtikel", "id=" & ArtikelNr), 0) = ArtikelNr
+
+
+End Function
+
+Public Function NummerInArtikel(ArtikelNr As Long) As Boolean
+'Prüft ob es die CAD Nummer im Artikel gibt
+
+NummerInArtikel = Nz(DLookup("ID", "tblArtikel", "id=" & ArtikelNr), 0) = ArtikelNr
+
+End Function
+
+Public Function ArtikelNummerVonArtikelNummer2(ArtikelNummer2 As String) As Long
+    'Hier wird gesucht ob der Artikel in Artikelnummer 2 existiert
+    ArtikelNummerVonArtikelNummer2 = Nz(DLookup("ID", "tblArtikel", "ArtNummer2='" & ArtikelNummer2 & "'"), -1)
+End Function
+
+
+Public Function NummerInGruppe(artikelNrKind As Long, artikelNrMutter As Long) As Boolean
+'Prüft ob es die CAD Nummer im Artikel gibt
+If artikelNrKind <= 0 Or artikelNrMutter <= 0 Then Exit Function
+ NummerInGruppe = Nz(DLookup("Artikel_Nr_Kind", "tblArtikelgruppen", "Artikel_Nr_Kind=" & artikelNrKind & " AND Artikel_Nr_Mutter = " & artikelNrMutter), 0) = artikelNrKind
+
+End Function
+
+Public Function MengeInGruppe(artikelNrKind As Long, artikelNrMutter As Long) As Long
+'Prüft ob es die CAD Nummer im Artikel gibt
+ MengeInGruppe = Nz(DLookup("Menge", "tblArtikelgruppen", "Artikel_Nr_Kind=" & artikelNrKind & " AND Artikel_Nr_Mutter = " & artikelNrMutter), 0)
+
+End Function

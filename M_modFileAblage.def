@@ -1,0 +1,53 @@
+Option Compare Database
+Option Explicit
+
+Private Declare PtrSafe Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" _
+  (ByVal Hwnd As Long, ByVal lpOperation As String, _
+  ByVal lpFile As String, ByVal lpParameters As String, _
+  ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+  
+Function funRunDatei(sDateiName As String)
+     Dim rc
+    'SDateiName = "\\path\path\bogdan\test.xlsx"
+    rc = ShellExecute(0, "open", sDateiName, "", "", 1)
+    Debug.Print "funRunDatei:" & sDateiName
+End Function
+
+
+Public Sub ShowFileInfo(filespec)
+    Dim fs, F, S
+    filespec = "c:/bild.jpg"
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    Set F = fs.GetFile(filespec)
+    S = F.DateCreated
+    S = S & F.Name
+    
+    MsgBox S
+End Sub
+
+
+Sub ShowFolderList(folderspec)
+    Dim fs, F, f1, fc, S
+    folderspec = funDirDokuTempAblage()
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    Set F = fs.GetFolder(folderspec)
+    Set fc = F.Files
+    For Each f1 In fc
+        S = S & f1.Name & " " & f1.DateCreated & " " & f1.Size
+        S = S & vbCrLf
+    Next
+    MsgBox S
+End Sub
+
+Function funFileExit(DirFilename As String) As Boolean
+
+
+    If Dir(DirFilename) <> "" Then
+        funFileExit = True
+    Else
+        funFileExit = False
+    End If
+
+
+
+End Function

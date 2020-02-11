@@ -1,0 +1,190 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+Private Const m_allowedTxt As String = "allowed"
+
+Private m_Container As String
+Private m_BenutzerID As Long
+Private m_BenutzerName As String
+Private m_allowed As Long    'Bei 0 ist nichts erlaubt
+Private m_OutputInTextDatei As Boolean
+
+Property Let Container(WERT As String)
+    m_Container = WERT
+End Property
+
+Property Get Container() As String
+    Container = m_Container
+End Property
+
+Property Let BenutzerID(WERT As Long)
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+    On Error Resume Next
+    '#############    HIER muss die Datenbank stehen die zur Anwendung passt #############
+    sSql = "SELECT Rechte, Vorname, Nachname, Kurzzeichen, Rechte FROM tblAdressenPersonal WHERE AdressNr=" & WERT
+    Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+    If Not rs1.EOF Then
+        m_BenutzerID = WERT
+        Me.BenutzerName = Nz(rs1!Vorname, "") & " " & Nz(rs1!Nachname, "")
+        Me.Container = Nz(rs1!Rechte, "")
+        Me.allowed = re(m_allowedTxt)
+        If m_Container = "" Then
+        
+        End If
+    Else
+        m_BenutzerID = 0
+        Me.allowed = 0
+    End If
+    st
+    rs1.Close
+End Property
+
+
+Property Get BenutzerID() As Long
+    BenutzerID = m_BenutzerID
+End Property
+
+Property Get BenutzerName() As String
+    BenutzerName = m_BenutzerName
+End Property
+Property Let BenutzerName(WERT As String)
+    m_BenutzerName = WERT
+End Property
+
+Property Get allowed() As Long
+    allowed = m_allowed
+End Property
+Property Let allowed(WERT As Long)
+    m_allowed = WERT
+End Property
+Property Get OutputInTextDatei() As Boolean
+    OutputInTextDatei = m_OutputInTextDatei
+End Property
+Property Let OutputInTextDatei(WERT As Boolean)
+    m_OutputInTextDatei = WERT
+End Property
+
+Public Function WHERE_(SVariable As String) As String
+'Gibt ein WHERE zurück für eine SQl Abfrage
+'SVariable ist der String der in den Rechten gesucht wird
+'Die Rückgabe schaut z.B. so aus   WHERE Projekt=2345 or ProjektNr=222;
+Dim l1 As Long
+Dim lT As Long
+Dim s1 As String
+Dim sS As String  'Speicher String
+Dim lStart As Long
+Dim lEnde As Long
+
+
+
+'s1 = DLookup("Rechte", "tblAdressenPersonal", "AdressNr=" & funBenutzerNr)
+s1 = Me.Container
+l1 = InStr(1, s1, SVariable & ".WHERE=")
+
+If Me.allowed = 0 Then   'Wenn nichts generell erlaubt ist kann spezielles erlaubt werden
+    While l1 <> 0
+        lStart = l1 + Len(SVariable & ".WHERE=")
+        lEnde = InStr(l1, s1, " ") - (l1 + Len(SVariable & ".WHERE="))
+        lT = InStr(l1, s1, Chr(13)) - (l1 + Len(SVariable & ".WHERE="))
+        If lT < lEnde Then lEnde = lT
+        
+        If sS <> "" Then sS = sS & " OR " Else sS = " WHERE "
+        
+        sS = sS & "(" & SVariable & "=" & Mid(s1, lStart, lEnde) & ") "
+        l1 = InStr(l1 + 4, s1, SVariable & ".WHERE=")
+    Wend
+Else
+    'wenn alles erlaubt ist kein Where
+    WHERE_ = ""
+    Exit Function
+End If
+
+
+
+If s1 = "" Then
+    'Wenn keine Rechte festgelegt nix erlauben
+    WHERE_ = "WHERE 1=0"
+    Exit Function
+End If
+
+
+WHERE_ = sS
+
+
+
+End Function
+
+Public Function FormOpen_(sFormName As String) As Boolean
+'Sorgt für Zweisung von Rechten
+'So sollte der Aufruf BeiLaden aussehen:
+'If funRechteFormOpen(Me.Form.Name, True) = False Then DoCmd.Close: Exit Sub
+
+If Me.allowed = 1 Then
+    FormOpen_ = True           'Grundsätzlich erlaubt
+Else
+    If re(sFormName) = 1 Then FormOpen_ = True  'dieses Formular darf er öffen
+    If re(sFormName) = 0 Then FormOpen_ = False 'dieses Formular darf er nicht öffen
+End If
+
+If FormOpen_ = False And Me.OutputInTextDatei = True Then
+    'MsgBox "Sie haben nicht genug Rechte für :" & Nz(sFormName)
+    'Open FilePath For Append Access Write Lock Write As FileNum
+    Open Application.CurrentProject.Path & "\Rechte.txt" For Append Access Write Lock Write As #1
+    Print #1, Now; Me.BenutzerName; Nz(sFormName) & "=0"
+    Close #1
+    Exit Function
+End If
+
+'Wenn das erlaubt ist und RechteInfo True
+If Me.OutputInTextDatei = True Then
+    Open Application.CurrentProject.Path & "\Rechte.txt" For Append Access Write Lock Write As #1
+    Print #1, Now; Me.BenutzerName; Nz(sFormName) & "=1"
+    Close #1
+End If
+
+End Function
+
+
+
+Public Function Filter_() As String
+
+If Me.allowed = 0 Then Filter_ = "" 'Grundsätzlich alle
+'if re
+
+End Function
+
+
+Private Function re(sAbfrage) As Long
+Dim s1 As String
+Dim l1 As Long
+
+re = -1
+If sAbfrage = "" Then
+    re = False
+    Exit Function
+End If
+
+'s1 = DLookup("Rechte", "tblAdressenPersonal", "AdressNr=" & funBenutzerNr)
+s1 = Me.Container
+l1 = InStr(1, s1, sAbfrage & "=")
+
+If l1 <> 0 Then
+    re = Val(Mid(s1, l1 + Len(sAbfrage) + 1, 8))
+End If
+
+'Debug.Print l1, s1
+
+End Function
+
+
+
+'So schaut ein Eingabefeld aus
+'allowed = 1                          ' 0 es ist grundsätzlich alles verboten was nicht explicit erlaubt ist
+'projekt = 2063                       ' zulässiges Projekt
+'frmAdressenuebersicht = 0            ' Der Benutzer darf das nicht obwohl er sonst alles darf

@@ -1,0 +1,71 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+'Mit Openarg werden mehrerer Paramete beim öffnen eines Form übergeben
+' die Funktion kennt nachfolgende Variablen nach denen Sie den String zerlegt
+' Trennzeichen ist ;
+'Bezeichner
+'PRO= Projektnummer z.B. pro1234
+'Auf= Auftragsnummer z.B. auf589
+'For= Formular Bezeichnung z.B. frmNaviAnfrage
+'DOK= Dokument Nummer Rechnung Angebot Lieferschein  z.B. dok23001
+
+'Die bezeichner dürfen in beliebiger reihenfolge stehen
+
+Private m_ProjektNr As Long
+Private m_AuftragNr As Long
+Private m_FormularBez As String
+Private m_DokumentNr As Long
+Private m_ZurueckFilter As String
+
+Public Property Get ProjektNr() As Long:       ProjektNr = m_ProjektNr: End Property
+Public Property Get AuftragNr() As Long:       AuftragNr = m_AuftragNr: End Property
+Public Property Get FormularBez() As String:       FormularBez = m_FormularBez: End Property
+Public Property Get zurueckFilter() As String:       zurueckFilter = m_ZurueckFilter: End Property
+Public Property Get DokumentNr() As Long:       DokumentNr = m_DokumentNr: End Property
+
+Public Sub Laden(Openarg_ As String)
+
+
+Dim s1
+Dim A As Long
+
+'Beim laden löschen
+m_ProjektNr = 0
+m_AuftragNr = 0
+m_FormularBez = ""
+m_DokumentNr = 0
+
+
+
+s1 = Split(Openarg_, ";")
+
+For A = 0 To UBound(s1)
+
+    Select Case True
+        Case Left(s1(A), 3) = "Pro"       'Projektnummer
+            m_ProjektNr = Val(Mid(s1(A), 4))
+        
+        Case Left(s1(A), 3) = "Auf"    'Auftragsnummer
+            m_AuftragNr = Val(Mid(s1(A), 4))
+            
+        Case Left(s1(A), 3) = "For"  'For und nicht FRM weil sich das beist
+            m_FormularBez = Mid(s1(A), 4)
+        
+        Case Left(s1(A), 3) = "Dok"  'Nummer vom Dokument vorher lonBelegnummer
+            m_DokumentNr = Val(Mid(s1(A), 4))
+            
+        Case Left(s1(A), 3) = "Zfi"
+            m_ZurueckFilter = Val(Mid(s1(A), 4))
+        
+            
+    End Select
+
+
+Next A
+
+
+End Sub

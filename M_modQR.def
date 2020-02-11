@@ -1,0 +1,53 @@
+Option Compare Database
+Option Explicit
+
+Function BildDatei(idTabelle As Long, TypeBarcode As String) As String
+
+
+'Es wird ein QR Code erzeugt der über die Webseite eingelesen werden kann
+' Der Code ist so aufgebaut  YYYTnnnnnnn
+'yyy= Mandant  z.B GFi oder cp- usw.
+'T= die type des Barcode A=Artikel annehmen  B=Beleg annehmen
+'n= die Nummer die im Datensatz gesucht wird immer 7 Zeichen
+
+'Am Anfang steht immer die Adresse der http://www.g001.de/PS.php/YYYTnnnnnnn
+
+
+
+Dim A As Long
+Dim B As Double
+Dim st As String
+Dim P1 As String
+Dim IQR As String  'die ID der Schlüssel in der Datenbank
+Dim TQR As String  'Type des Codes praktisch die Tabelle auf die man sich bezieht
+Dim pqr As String '
+Dim QR As String
+Dim ID As Long
+
+ID = idTabelle
+IQR = String(6 - Len(ID), "0") & ID
+TQR = TypeBarcode '"A"
+pqr = funMandant 'Holt sich das kürzel aus dem Mandant
+pqr = pqr & String(3 - Len(pqr), "x")
+'If Len(pQr) = 2 Then pQr = pQr & "-"  'Immer 3 Zeichen
+
+QR = "http://www.s.g001.de/" & pqr & TQR & IQR
+
+If QR <> "" Then
+
+    ' qrbild.exe erzeugt QRcode
+    
+    st = CurrentProject.Path & "\qrbild.exe" & " " & CurrentProject.Path & "\" & ID & " " & Chr(34) & QR & Chr(34)
+    'Bild erzeugen
+    Shell st
+    
+    'Zeit warten bis Bild erzeugt
+    For A = 0 To 10000
+        B = sIn(121928)
+    Next A
+    
+    BildDatei = CurrentProject.Path & "\" & ID & ".bmp"
+
+End If
+
+End Function

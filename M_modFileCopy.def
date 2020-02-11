@@ -1,0 +1,101 @@
+Option Compare Database
+Option Explicit
+
+'von Olaf Rabbachin28 Nov. 2006, 18:47
+'Newsgroups: microsoft.public.de.Access
+
+'Aufruf der Funktion:
+'
+' evtl. vorhandene Datei wird überschrieben:
+' vbCopyFile "D:\Ordner\DB.mdb", "D:\Ordner\Kopie von DB.mdb", False
+
+' Fehler auslösen, wenn Zieldatei bereits existiert:
+'vbCopyFile "D:\Ordner\DB.mdb", "D:\Ordner\Kopie von DB.mdb", True
+
+
+Public Enum FmtMessageFlagsEnum
+   fmALLOCATE_BUFFER = &H100
+   fmIGNORE_INSERTS = &H200
+   fmFROM_STRING = &H400
+   fmFROM_HMODULE = &H800
+   fmFROM_SYSTEM = &H1000
+   fmARGUMENT_ARRAY = &H2000
+   fmMAX_WIDTH_MASK = &HFF
+End Enum
+
+Private Declare PtrSafe Function CopyFile _
+           Lib "kernel32" Alias "CopyFileA" _
+           (ByVal lpExistingFileName As String, _
+            ByVal lpNewFileName As String, _
+            ByVal bFailIfExists As Long) As Long
+
+Private Declare PtrSafe Function FormatMessage _
+               Lib "kernel32" Alias "FormatMessageA" _
+               (ByVal dwFlags As Long, _
+                lpSource As Any, _
+                ByVal dwMessageId As Long, _
+                ByVal dwLanguageId As Long, _
+                ByVal lpBuffer As String, _
+                ByVal nSize As Long, _
+                Arguments As Long) As Long
+
+Private Declare PtrSafe Function FreeLibrary _
+               Lib "kernel32" _
+               (ByVal hLibModule As Long) As Long
+
+Public Function vbCopyFile(ByVal SourceFile As String, _
+                           ByVal DestinationFile As String, _
+                           ByVal FailIfExists As Boolean, _
+                           Optional ByVal fClearErrors As Boolean = False) As Boolean
+   Dim lngRet As Long
+   Dim strErrDescription As String
+   Dim lngPCallback As Long
+
+   lngRet = CopyFile(SourceFile, DestinationFile, CLng(FailIfExists))
+   If lngRet = 0 Then
+      'signal to caller
+      vbCopyFile = False
+
+      If Not fClearErrors Then
+         ' Fehler
+         lngRet = Err.LastDLLError
+         If lngRet <> 0 Then
+            strErrDescription = GetErrorDescription(lngRet)
+         Else
+            strErrDescription = "Unknown error"
+         End If
+         With Err
+            .Raise vbObjectError Or &H1000 Or lngRet, "vbCopyFile()", _
+              strErrDescription
+         End With
+      End If
+   Else
+      'signal success
+      vbCopyFile = True
+   End If
+End Function
+
+Private Function GetErrorDescription(ByVal ErrNumber As Long) As String
+   Const MsgLen As Long = 512
+   Dim ErrText As String
+   Dim I As Long
+   Dim hSource As Long
+   Dim lngRet As Long
+   Dim Flags As FmtMessageFlagsEnum
+
+   hSource = 0
+   Flags = fmFROM_SYSTEM Or fmMAX_WIDTH_MASK
+
+   ErrText = String(MsgLen, 0)
+   lngRet = FormatMessage(Flags, ByVal 0, ErrNumber, 0&, ErrText, _
+      MsgLen, ByVal 0&)
+
+   If lngRet Then
+      ' nachfolgende vbNullChar in Fehlertext abschneiden
+      GetErrorDescription = Left$(ErrText, lngRet)
+   Else
+      GetErrorDescription = ""
+   End If
+
+   If hSource <> 0 Then FreeLibrary hSource
+End Function

@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<CommandBar name="PS_HamStart">
+  <AdaptiveMenu value="false"/>
+  <Context value=""/>
+  <Description value="PS_HamStart-Menü"/>
+  <Enabled value="true"/>
+  <Position value="5"/>
+  <Protection value="22"/>
+  <RowIndex value="-1"/>
+  <Type value="2"/>
+  <Visible value="false"/>
+  <Controls>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Adressen [F2]"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="1"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="suchen einer Adresse 1754"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmAdressenUebersicht&quot;)"/>
+      <FaceId value="24"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Artikel [F3]"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="2"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Anlegen und verwalten von Artikel"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmArtikel&quot;)"/>
+      <FaceId value="339"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="CAD Nr. Artikel [F4]"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="3"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Erzeugt eine Zeichnungsnummer"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;NaviNeuerArtikelSchnell&quot;)"/>
+      <FaceId value="535"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Alle Dokumente"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="4"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Zeigt alle Dokumente"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmDokuInfoAlle&quot;)"/>
+      <FaceId value="53"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Arbeitszeit"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="5"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Alle Arbeitsstunden zu dem Projekt"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmArbeiten&quot;)"/>
+      <FaceId value="126"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Controlling"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="6"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Auswertung zum Projekt"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmCoAuswahl&quot;)"/>
+      <FaceId value="418"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Auswertung 1"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="7"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Auswertung zum Projekt"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funReportOpen(&quot;berCoAuswertungProjekt01&quot;)"/>
+      <FaceId value="418"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Warenannahme"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="8"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Warenannahme mit der Liefernummer"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmWarenannahme&quot;)"/>
+      <FaceId value="350"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Notizen"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="9"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Notizen Übersicht"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmNotizenN1&quot;)"/>
+      <FaceId value="31"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="EK Rechnung"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="10"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Eingabe und Verwaltung der EK Rechnungen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmfakErListe&quot;)"/>
+      <FaceId value="52"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Service"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="11"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Grundeinstellungen der Projektsoftware"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;NaviStammdaten&quot;)"/>
+      <FaceId value="548"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Stammdaten Benutzer"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="12"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Die Stammdaten des Benutzers"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmPersonal&quot;)"/>
+      <FaceId value="361"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="PS Abmelden"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="13"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Der Benutzer wird abgemeldet"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenAbmelden()"/>
+      <FaceId value="1143"/>
+    </Control>
+  </Controls>
+</CommandBar>

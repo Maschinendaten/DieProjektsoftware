@@ -1,0 +1,299 @@
+Option Compare Database
+Option Explicit
+
+Const conCommandbar = False
+
+Public gloLonLevel As Long     'Die Variable wird benutzt um den Level des Benutzers zu speichern
+                            'Damit ein Menue angezeigt wird muss der Level = oder höher sein wie der
+                            'in der Datenbank gespeicherte
+
+'#If conCommandbar Then
+    Dim CreaBar As CommandBar
+'#End If
+'Dim CreaBarBtn As CommandBarButton
+
+
+Public Function fct_IsFormOpen(ArgName As String)       ' aus der FAQ www.donkarl.com
+    fct_IsFormOpen = SysCmd(acSysCmdGetObjectState, acForm, ArgName)
+End Function
+
+
+
+Public Function BarFind(CreaName As String) As Boolean
+    BarFind = False
+    For Each CreaBar In CommandBars
+        If CreaBar.Name = CreaName Then
+            BarFind = True
+        End If
+    Next CreaBar
+End Function
+
+Function frmOpen(Mode As Integer)
+    Dim X As String
+    
+    
+    
+    On Error Resume Next
+    Mode = 0
+    
+            X = CommandBars.ActionControl.Parameter
+            DoCmd.OpenForm X
+
+End Function
+
+Function TypControl(ByVal TypNr As Integer) As String
+' Prozedur zum identifizieren von CommandBarControls-Typen
+        Select Case TypNr
+                Case msoControlButton
+                        TypControl = "Button"
+                Case msoControlEdit
+                        TypControl = "Eingabefeld"
+                Case msoControlDropdown
+                        TypControl = "DropDownFeld"
+                Case msoControlComboBox
+                        TypControl = "KombinationsFeld"
+                Case msoControlPopup
+                        TypControl = "Popup"
+                Case Else
+                        TypControl = " "
+        End Select
+End Function
+
+Function ObjCtrlCopy(CtrlBar As Integer) As Integer
+    With Application.CommandBars("Form View").Controls(CtrlBar)
+        If .Type = msoControlButton Then
+            .CopyFace
+            ObjCtrlCopy = 1
+        Else
+            MsgBox "Das " & CtrlBar & " .Control (" & TypControl(.Type) & ") Ist keine Schaltfläche."
+            ObjCtrlCopy = 0
+        End If
+    End With
+End Function
+
+Function funMenDB()
+' Basis Von Renate Becker aus CreativBars
+' erstellt aus 3 Tabellen komplette Menueleisten MG 02.03.2005
+
+Dim Auswahl4 As CommandBarButton
+
+Dim Test3 As CommandBar
+Dim Eintrag1 As CommandBarControl
+Dim rs1 As DAO.Recordset
+Dim Rs2 As DAO.Recordset
+Dim Rs3 As DAO.Recordset
+Dim lonZ1 As Long
+Dim lonZ2 As Long
+Dim lonZ3 As Long
+Dim lonRC As Long
+Dim strSp1 As String
+Dim strSql As String
+
+''on error Goto Err_
+
+'Öffnet die Daten der Menueleisten
+
+'gloLonLevel = 255 'xxx zum testen
+Set rs1 = CurrentDbC.OpenRecordset("tblmen", dbOpenDynaset, dbSeeChanges)
+rs1.MoveLast
+lonRC = 1 ' Rs1.RecordCount 'xxxx 1 da die zweite Menueleiste nicht korekt erzeugt wird.
+rs1.MoveFirst
+'Abfrage ob Menueleiste vorhanden
+If rs1.EOF And rs1.BOF Then
+    MsgBox ("Es gibt keine Menueleiste")
+    rs1.Close
+    Set rs1 = Nothing
+    Exit Function
+End If
+
+'Schleife für menueleisten
+For lonZ1 = 1 To lonRC
+    strSp1 = rs1!MeName
+    'Löscht wenn vorhanden die alte Menueleiste
+    If BarFind(strSp1) = True Then
+        'MsgBox "Menüleiste vorhanden - wird gelöscht."
+        CommandBars(strSp1).Delete
+    End If
+
+    'Erzeugt die Menueleiste neu
+    'Set CreaBar = CommandBars.Add(Rs1!mename, Rs1!meart, True, False)
+    Set CreaBar = CommandBars.Add(rs1!MeName, msoBarTop, True, True)
+    CommandBars(strSp1).Visible = True
+    'CommandBars(strSp1).Position = msoBarTop
+    
+   'CommandBars.LargeButtons = False
+ 'CreaBar.DisplayTooltips = True
+    CommandBars.DisplayTooltips = True
+    
+     
+    
+    
+    'Öffnet die Daten der ersten ebene der Menueleiste
+    Set Rs2 = CurrentDbC.OpenRecordset("SELECT tblMenSym.* " & _
+    "FROM tblMenSym WHERE (tblMenSym.MsMeID = " & rs1!MeID & ") ORDER BY tblMenSym.MsID;", dbOpenDynaset, dbSeeChanges)
+    Rs2.MoveFirst 'MoveLast
+    Do While Not Rs2.EOF  ' For lonZ2 = 1 To Rs2.RecordCount
+       
+        Set Test3 = CommandBars.ActiveMenuBar   'verwendet die aktive Menüleiste
+        Set Eintrag1 = Test3.Controls.Add(Type:=msoControlPopup, Temporary:=True)
+        With Eintrag1
+            strSp1 = Rs2!msname
+            Eintrag1.Caption = Rs2!msname   'strSp1
+            Eintrag1.BeginGroup = Rs2!msneuegruppe
+        End With
+
+        'Öffnet die Daten der zweiten Ebene der Menueleiste
+        Set Rs3 = CurrentDbC.OpenRecordset("SELECT tblMenDat.* FROM tblMenDat " & _
+        "WHERE (((tblMenDat.MdMsID) = " & Rs2!msid & ")) ORDER BY tblMenDat.MdID;", dbOpenDynaset, dbSeeChanges)
+        
+        If Rs3.BOF And Rs3.EOF Then GoTo HupfRs3
+        Rs3.MoveFirst
+        Do While Not Rs3.EOF 'For lonZ3 = 1 To Rs3.RecordCount
+            strSp1 = Rs2!msname
+            Set Auswahl4 = CommandBars.ActiveMenuBar.Controls(strSp1).Controls.Add()
+            With Auswahl4
+                .Caption = Nz(Rs3!MdName, "leer")
+                .TooltipText = Nz(Rs3!MdTipp)
+                .FaceId = Rs3!MdIconNr
+                .Style = Rs3!MdArt
+                .Visible = True
+                .BeginGroup = Rs3!MdNeueGruppe
+                .OnAction = Nz(Rs3!MdAktion)
+                If gloLonLevel >= Rs3!MDLevel Then
+                    .Enabled = Rs3!MdAktiv 'Wenn der Benutzerlevel OK ist wird der vorgewählte Zustand genutzt
+                Else
+                    .Enabled = False 'Wenn der Benuzerleve <> OK ist der Menüepunkt gesperrt
+                End If
+            End With
+            If Rs3.EOF <> True Then Rs3.MoveNext
+        Loop  'Next lonZ3
+HupfRs3:  ' Sprungmarke wenn keine Unterdatensätze
+    If Rs2.EOF <> True Then Rs2.MoveNext
+    Loop 'Next lonZ2
+If rs1.EOF <> True Then rs1.MoveNext
+Next lonZ1
+
+rs1.Close
+Set rs1 = Nothing
+Rs2.Close
+Set Rs2 = Nothing
+Rs3.Close
+Set Rs3 = Nothing
+
+
+'CommandBars("PS").BuiltIn .Visible = True  'xxx Aushelfslösung weil wenn mehrerer angezeigt der vorherige immer aus geschalten wird
+'CommandBars("Admin").Visible = True        'xxx hilft a nix wird trotzdem ausgeblendet
+
+Exit Function
+Err_:
+If Err.Number = 5 Then
+    Set CreaBar = CommandBars("PS")
+    Resume Next
+    'MsgBox "Diese Menüleiste besteht bereits. Sie müssen Sie erst löschen, bevor sie neu erstellt werden kann"
+ElseIf Err.Number <> 0 Then
+    MsgErr "mdlCreaDiverse", "funMenDB", Err.Description, Err.Number, Erl()
+    Exit Function
+End If
+' wenn man nicht nach Fehlernummer abfangen will
+'Set CreaBar = CommandBars("Test1")     übergibt den Objektverweis auf die bestehende Menüleiste
+'Resume Next
+
+End Function
+
+Sub subPSMenues()
+
+
+Dim cmbcontrol As Office.CommandBarControl
+Dim cmbRightClick_ As Office.CommandBar
+
+
+
+
+' Prüft ob das Kontextmenü vorhanden ist wenn ja wird dies gelöscht
+        If BarFind("PS_Kontex") = True Then
+            CommandBars("PS_Kontex").Delete
+        End If
+' Erstellt ein neues (leeres) Kontextmenü
+        If BarFind("PS_Kontex") = False Then
+            Set CreaBar = CommandBars.Add("PS_Kontex", msoBarPopup, False, False)
+        End If
+' Die Arbeitsweisen bei Kontextmenüs sind identisch mit den Arbeitsweisen bei Menüs
+' Schreibt die Benutzerdefinierten Felder in das Menü
+    Set CreaBar = CommandBars("PS_Kontex")
+        With CreaBar
+            .Controls.Add msoControlButton, 5905, , , True      ' Suchen
+            .Controls.Add msoControlButton, 21, , , True        ' Ausschneiden
+            .Controls.Add msoControlButton, 19, , , True        ' Kopieren
+            .Controls.Add msoControlButton, 22, , , True        ' Einfügen
+            .Controls.Add msoControlButton, 4, , , True         ' Drucken
+            .Controls.Add msoControlButton, 5, , , True         ' Drucken
+            .Controls.Add msoControlButton, 247, , , True       ' Seite einrichten
+         '  .Controls.Add msoControlButton, 212, , , True       ' Ansicht
+            .Controls.Add msoControlButton, 109, , , True       ' Seitenansicht
+            .Controls.Add msoControlButton, 210, , , True       ' Aufsteigend sortieren
+            .Controls.Add msoControlButton, 211, , , True       ' Absteigend sortieren
+            .Controls.Add msoControlButton, 640, , , True       ' Absteigend sortieren
+            .Controls.Add msoControlButton, 3017, , , True      ' Absteigend sortieren
+            .Controls.Add msoControlButton, 605, , , True       ' Absteigend sortieren
+           ' .Controls.Add msoControlButton, 2938, , , True       ' Exportieren
+        End With
+    Set CreaBar = Nothing
+
+' Prüft ob das Kontextmenü vorhanden ist wenn ja wird dies gelöscht
+        If BarFind("PS_Drucken") = True Then
+            CommandBars("PS_Drucken").Delete
+        End If
+' Erstellt ein neues (leeres) Kontextmenü
+        If BarFind("PS_Drucken") = False Then
+            Set CreaBar = CommandBars.Add("PS_Drucken", msoBarPopup, False, False)
+        End If
+' Die Arbeitsweisen bei Kontextmenüs sind identisch mit den Arbeitsweisen bei Menüs
+' Schreibt die Benutzerdefinierten Felder in das Menü
+    Set CreaBar = CommandBars("PS_Drucken")
+        With CreaBar
+            .Controls.Add msoControlButton, 4, , , True         ' Drucken
+            .Controls.Add msoControlButton, 5, , , True         ' Drucken
+            .Controls.Add msoControlButton, 247, , , True       ' Seite einrichten
+         '  .Controls.Add msoControlButton, 212, , , True       ' Ansicht
+            .Controls.Add msoControlButton, 109, , , True       ' Seitenansicht
+            .Controls.Add msoControlButton, 2938, , , True       ' Exportieren
+        End With
+    Set CreaBar = Nothing
+
+' Prüft ob das Kontextmenü vorhanden ist wenn ja wird dies gelöscht
+        If BarFind("PS_Format") = True Then
+            CommandBars("PS_Format").Delete
+        End If
+' Erstellt ein neues (leeres) Kontextmenü
+        If BarFind("PS_Format") = False Then
+            Set CreaBar = CommandBars.Add("PS_Format", msoBarPopup, False, False)
+        End If
+' Die Arbeitsweisen bei Kontextmenüs sind identisch mit den Arbeitsweisen bei Menüs
+' Schreibt die Benutzerdefinierten Felder in das Menü
+
+    Set CreaBar = CommandBars("PS_Format")
+        With CreaBar
+            .Controls.Add msoControlButton, 21, , , True        ' Ausschneiden
+            '.Controls.Add.Caption
+            .Controls.Add msoControlButton, 19, , , True        ' Kopieren
+            .Controls.Add msoControlButton, 22, , , True        ' Einfügen
+            .Controls.Add msoControlButton, 210, , , True       ' Aufsteigend sortieren
+            .Controls.Add msoControlButton, 211, , , True       ' Absteigend sortieren
+            .Controls.Add msoControlButton, 640, , , True       ' Absteigend sortieren
+            .Controls.Add msoControlButton, 3017, , , True      ' Absteigend sortieren
+            .Controls.Add msoControlButton, 605, , , True       ' Absteigend sortieren
+        End With
+
+    Set CreaBar = Nothing
+'
+'    ' Prüft ob das Kontextmenü vorhanden ist wenn ja wird dies gelöscht
+'
+'
+' 'Erzeugt aus der DB die Icons
+' IconAusDB
+'
+'
+    
+    
+
+End Sub

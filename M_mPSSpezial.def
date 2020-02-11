@@ -1,0 +1,4 @@
+Option Compare Database
+Option Explicit
+'in diesem Modul sollen alle Funktionen stehen die speziell für einen Kunden oder eine spezielle Funktion gemacht werden
+'Wenn das in den Standard übernommen wir sollte ein extra Modul erstellt werden

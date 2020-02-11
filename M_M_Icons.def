@@ -1,0 +1,252 @@
+Option Compare Database
+Option Explicit
+
+'Dieses Modul erzeugt aus den zwei Tabellen t_Menue und t_MenueDat
+
+Dim tCount As Long
+
+Sub testIcon()
+
+  Dim cmbRightClick As Office.CommandBar
+    Dim cmbcontrol As Office.CommandBarControl
+    Dim A As Long
+On Error Resume Next
+'Wenn Command Bar vorhanden erst löschen
+  
+For Each cmbRightClick In CommandBars
+  
+    If InStr(1, cmbRightClick.Name, "Test01_") <> 0 Then
+        Debug.Print cmbRightClick.Name
+         CommandBars(cmbRightClick.Name).Delete
+    End If
+  
+Next cmbRightClick
+
+'Weist der gesamten Datenban ein Kontexmenue zu wenn kenes zugewiesen ist
+'Application.ShortcutMenuBar = "scmenApplication"
+
+
+'funMenDB
+
+   ' Create the shortcut menu.
+   
+   tCount = tCount + 30
+   For A = tCount To tCount + 30
+    Set cmbRightClick = CommandBars.Add("Test01_", msoBarPopup, False, True)
+    With cmbRightClick
+         'Adresse
+         Set cmbcontrol = .Controls.Add(msoControlButton, A, , , True)  ' msoControlButton
+         cmbcontrol.Caption = "Adresse:" & CStr(A - 1)
+         cmbcontrol.OnAction = "ComAdresse"
+    End With
+    Next A
+
+
+
+
+End Sub
+
+
+Public Sub IconAusDB(Optional MenueName As String)
+Dim rs1 As DAO.Recordset
+Dim Rs2 As DAO.Recordset
+
+
+
+
+Dim sSql As String
+'Basierend auf der Tabelle werden die Menues erzeugt
+'Wenn kein Menue Name angegeben ist werden alle erzeugt
+Dim cmb As CommandBar
+'  Dim cmbRightClick As Office.CommandBar
+'    Dim cmbcontrol As Office.CommandBarControl
+'    Dim A As Long
+'On Error Resume Next
+
+
+    'Suche eine Menueleiste
+    If MenueName = "" Then
+        'Alle
+        sSql = "SELECT MeID ,MeName ,MeArt FROM t_Menue WHERE MeAktiv=true   ORDER BY  MeID"
+    Else
+        sSql = "SELECT MeID ,MeName ,MeArt FROM t_Menue WHERE MeAktiv=true And MeName='" & MenueName & "'  ORDER BY  MeID"
+    End If
+    PSDebug sSql
+    Set Rs2 = CurrentDb.OpenRecordset(sSql)
+ 
+    While Not Rs2.EOF '[WEND MENU Name]
+    
+    'Wenn Command Bar vorhanden erst gezielt löschen
+    DelMenue ("PS_" & Rs2!MeName)
+    PSDebug "DelMenue: " & Rs2!MeName & " " & (Timer - gloT)
+    
+    'PSDebug Rs2!MeName
+      ' Symbolleiste erzeugen
+        Set cmb = CommandBars.Add(Name:="PS_" & Rs2!MeName, Position:=msoBarPopup)
+        sSql = "SELECT * FROM t_MenueDat WHERE MDaktiv=True and fiMeiD=" & Rs2!MeID & " ORDER BY fiMeID, MdID"
+        Set rs1 = CurrentDb.OpenRecordset(sSql)
+        
+        'Unterpunkte erzeugen
+        
+            With cmb
+                While Not rs1.EOF '[WEND Menue]
+                    ' Die Symbole einfügen
+                    PSDebug "Not.EOF"
+                    If Rs2!meart = 0 Then
+                        With .Controls.Add(msoControlButton)
+                            .Caption = Nz(rs1!MdName, "nix")
+                            .OnAction = Nz(rs1!MdAktion, "")
+                            .FaceId = rs1!MdIconNr
+                            .Style = msoButtonIconAndCaption
+                            .BeginGroup = Nz(rs1!MdNeueGruppe, False)
+                            .TooltipText = Nz(rs1!MdTipp, "")
+                            .Enabled = rs1!MDEnabled
+                        End With
+                    Else
+                        'Nachfolgend Standart Menues bekommen Ihre Funktionen von MSAccess
+                        With .Controls.Add(msoControlButton, rs1!MdIconNr, , , True)
+                        PSDebug "EOF"
+'                            .Caption = Rs1!MdName
+'                            .OnAction = Nz(Rs1!MdAktion, "")
+'                            .FaceId = Rs1!MdIconNr
+'                            .Style = msoButtonIconAndCaption
+'                            .BeginGroup = Nz(Rs1!MdNeueGruppe, False)
+'                            .TooltipText = Nz(Rs1!MdTipp, "")
+                        End With
+                            
+                    End If
+                    rs1.MoveNext
+                Wend '[WEND Menue]
+                rs1.Close
+            End With
+            
+
+       Rs2.MoveNext
+    Wend '[WEND MENU Name]
+    PSDebug "Menue neu erzeugt: " & (Timer - gloT)
+'    Debug.Print Rs1!MdName, Nz(Rs1!MdAktion, ""), Rs1!MdIconNr
+        
+ 
+ Rs2.Close
+
+End Sub
+
+Public Sub MenueEintragEnablen(MenueName As String, NrReihenfolge As Long, Enabled As Boolean, Optional MenueNeuBauen As Boolean = True)
+'Shaltet den gewählten Menueeintrag mit der NrReihenfolge auf Disable oder Enable MG 2019.04.30 Wien
+'Dadurch bleibt der Menueeintrag sichtbar aber kann nicht ausgewählt werden
+'MenueNeuBauen ist für das Timen wenn nur gezielt aufgerufen nachdem alle Datenbankeintäge gesetzt sind geht es schneller
+'Durch
+
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+
+sSql = "SELECT MDEnabled " & _
+     "FROM t_Menue INNER JOIN t_MenueDat ON t_Menue.MeID = t_MenueDat.fiMeID " & _
+     "WHERE MeName='" & MenueName & "'  AND MdID=" & NrReihenfolge
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+With rs1
+    If Not .EOF Then
+        .Edit
+            .Fields(0).Value = Enabled
+        .Update
+    End If
+    .Close
+End With
+
+'Nach der Änderung wird das Menue neu gebaut
+If MenueNeuBauen Then
+    IconAusDB MenueName
+End If
+End Sub
+
+
+
+
+Sub testMen(KontexMenueName)
+On Error Resume Next
+Application.CommandBars(KontexMenueName).ShowPopup
+
+If Err.Number <> 0 Then MsgBox LA("Menü gibt es nicht")
+End Sub
+
+
+Public Function funFormOpen(NameDesFormulars As String)
+'Öffnet das Form
+'MG 20.2.2019 jetzt mit Mandant Mandant ist schwierig wenn es bezüge auf das Form Gibt ... noch nachdenken
+    DoCmd.OpenForm NameDesFormulars
+    
+    
+
+End Function
+
+
+Public Function funBerichtOpen(NameDesBerichtes As String)
+
+    DoCmd.OpenReport NameDesBerichtes, acViewPreview
+
+End Function
+
+Public Function funReportOpen(NameDesBerichtes As String)
+On Error GoTo Err_
+
+    DoCmd.OpenReport NameDesBerichtes, acViewPreview
+
+Exit Function
+Err_:
+    'Beep
+    If Err.Number <> 2501 Then
+        MsgBox LA("Fehler Bericht:") & NameDesBerichtes
+    End If
+End Function
+
+
+
+Sub DelMenue(MenueName As String)
+'bevor ein Menue erstell werden kann muss ein eventuell vorhandenes gelöscht werden
+
+Dim cmb As CommandBar
+    
+     'CommandBars(MenueName).Delete
+    'Exit Sub
+    For Each cmb In CommandBars
+        If cmb.Name = MenueName Then
+             CommandBars(MenueName).Delete
+            Exit Sub
+        End If
+    Next
+
+
+End Sub
+ 
+
+
+Sub EinIconErzeugen(IconName As String, IconID As Long, Optional IconTipText As String)
+'Es wird ein Menue mit einem Icon erzeugt zum testen und angezeigt
+Dim cmb As CommandBar
+
+    DelMenue ("PS_ICON")
+
+      ' Symbolleiste erzeugen
+       Set cmb = CommandBars.Add(Name:="PS_ICON", Position:=msoBarPopup)
+        
+        'Unterpunkte erzeugen
+        
+            With cmb
+                    ' Die Symbole einfügen
+                    With .Controls.Add(msoControlButton) 'msoControlDropdown
+                        'msoControlComboBox
+                       .Caption = IconName
+                       .OnAction = ""
+                       .FaceId = IconID
+                       .Style = msoButtonIconAndCaption
+                       .BeginGroup = False
+                       .TooltipText = IconTipText
+                    End With
+           
+            End With
+    
+       
+       Application.CommandBars("PS_ICON").ShowPopup
+
+End Sub

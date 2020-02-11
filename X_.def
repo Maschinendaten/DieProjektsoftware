@@ -1,0 +1,12 @@
+DELETE * FROM [MSysIMEXColumns] WHERE SpecID=(SELECT SpecID FROM [MSysIMEXSpecs] WHERE SpecName='');
+DELETE * FROM [MSysIMEXSpecs] WHERE SpecName='';
+INSERT INTO [MSysIMEXSpecs] ([DateDelim],[DateFourDigitYear],[DateLeadingZeros],[DateOrder],[DecimalPoint],[FieldSeparator],[FileType],[SpecName],[SpecType],[StartRow],[TextDelim],[TimeDelim]) VALUES(Chr(46),False,False,0,NULL,Chr(1),0,NULL,0,1,Chr(2),Chr(58));
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Adern',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),44,6);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Bemerkungen',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),82,50);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Kabelnr',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),12,19);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Kabeltyp',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),31,13);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,7,'Länge',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),6,6);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'nach',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),60,17);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,4,'Pos',2,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),1,5);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Querrsch',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),50,10);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'von',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName='''''),77,5);

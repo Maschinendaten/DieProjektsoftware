@@ -1,0 +1,7 @@
+Option Compare Database
+Option Explicit
+
+Public Function funSummeKalkulation()
+funSummeKalkulation = Forms!frmKalkulation!frmProjektbeschreibung_Kalkulation![Summe von Preis_VK].Value
+
+End Function

@@ -1,0 +1,102 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+
+Private m_istGeladen As Boolean
+Private m_ID As Long
+Private m_Kurzzeichen As String
+Private m_Rechte As String
+
+Public Property Get ID() As Long
+    Laden
+    ID = m_ID
+End Property
+
+
+Public Property Get Kurzzeichen() As String
+    Laden
+    Kurzzeichen = m_Kurzzeichen
+End Property
+
+
+Public Property Get Rechte() As String
+    Laden
+    Rechte = m_Rechte
+End Property
+
+Public Sub LadenReset()
+    m_istGeladen = False
+End Sub
+
+
+
+Private Sub Laden()
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+
+m_ID = Form_frmDatenbanknutzer.Nummer
+
+If m_istGeladen Then Exit Sub
+
+sSql = "SELECT * FROM tblAdressenPersonal WHERE AdressNr= " & m_ID
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+With rs1
+    If Not .EOF Then
+    '    .Fields("AdressNr").Value
+    '    .Fields("Adresse").Value
+    '    .Fields("Abteilung").Value
+    '    .Fields("Vorname").Value
+    '    .Fields("Nachname").Value
+    '    .Fields("Straﬂe").Value
+    '    .Fields("PLZ").Value
+    '    .Fields("Ort").Value
+    '    .Fields("Land").Value
+    '    .Fields("Telefon").Value
+    '    .Fields("Fax").Value
+    '    .Fields("Handy").Value
+    '    .Fields("Durchwahl").Value
+    '    .Fields("E-Mail").Value
+    '    .Fields("Webadresse").Value
+    '    .Fields("Bemerkung").Value
+    '    .Fields("Kennwort").Value
+    m_Kurzzeichen = .Fields("Kurzzeichen").Value
+    '    .Fields("Anwesend_syst").Value
+    '    .Fields("Anwesend").Value
+    '    .Fields("Status").Value
+    '    .Fields("Stundensatz_intern").Value
+    '    .Fields("Stundensatz_extern").Value
+    '    .Fields("Unsichtbar").Value
+    '    .Fields("Sicherheitslevel").Value
+    '    .Fields("NrTransponder").Value
+    '    .Fields("BriefAnhang").Value
+    '    .Fields("AbteilungID").Value
+    '    .Fields("StdTag").Value
+    '    .Fields("StdMonat").Value
+    '    .Fields("TageUrlaub").Value
+    '    .Fields("DatumEintritt").Value
+    '    .Fields("DatumAustritt").Value
+    '    .Fields("FixKostenProz").Value
+    m_Rechte = .Fields("Rechte").Value
+    '    .Fields("MailFrom").Value
+    '    .Fields("MailBCC").Value
+    '    .Fields("MailSmtpServer").Value
+    '    .Fields("MailSmtpServerPort").Value
+    '    .Fields("MailUserName").Value
+    '    .Fields("MailPass").Value
+    '    .Fields("MailUse").Value
+    '    .Fields("AnmeldungUser").Value
+    
+        m_istGeladen = True
+    End If
+End With
+
+
+
+
+End Sub

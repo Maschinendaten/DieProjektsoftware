@@ -1,0 +1,248 @@
+Option Compare Database
+Option Explicit
+
+Type tMailServer
+    From As String
+    Bcc As String
+    smtpServer As String
+    smtpServerPort As Long
+    SendUserName As String
+    SendUserPass As String
+    use As Boolean
+End Type
+
+
+
+Public Function funEmailVersand(Empfaenger As String, Anhang As Variant, Betreff As String, Text_ As String, Optional AnCC As String, Optional BenutzerNr As Long) As Boolean
+'Versendet E-Mail ohne Outlook über Smtp
+'Die Parameter sind unter dem User gespeichert
+
+'Anhang ist ein mit ";" getrennter String der auf eine Datei im Verzeichnis verweist
+
+
+Dim OutMail As Object
+Dim schema As String
+Dim Mail_ As tMailServer
+Dim A As Long
+
+Const cdoSendUsingPort = 2 ' send the message using the network (SMTP over the network)
+Const cdoAnonymous = 0     ' do not authenticate
+Const cdoBasic = 1  ' use basic (clear-text) authentication
+
+'MsgBox "Sendmail im Moment deaktiviert!  1998"
+'Exit Function
+
+If BenutzerNr = 0 Then
+    Mail_ = ParameterMailserver(funBenutzerNr)
+Else
+    Mail_ = ParameterMailserver(BenutzerNr)
+End If
+
+If Mail_.use = False Then
+    MsgBox LA("Sie müssen die Mailparameter angeben unter Ihrem Benutzerkonto.")
+    funEmailVersand = False
+    Exit Function
+End If
+
+
+  Set OutMail = CreateObject("CDO.Message")
+  schema = "http://schemas.microsoft.com/cdo/configuration/"
+
+  With OutMail
+    .From = Mail_.From   '"marcus.gut@gf-i.de"
+    .To = Empfaenger
+    If AnCC <> "" Then .cc = AnCC
+    .Bcc = Mail_.Bcc    '"marcus_gut@web.de"
+    .Subject = Betreff
+    'If funFileExit(Anhang) Then Beep '.AddAttachment = Anhang
+    .BodyPart.Charset = "iso-8859-1"
+    .TextBody = Text_
+    
+    'Anhang wird als Array übergeben
+    
+    On Error Resume Next   'Fehler auschalten weil bei keinem Anhang prüfung ander nicht möglich (oder ich kanns nicht)
+    A = UBound(Anhang)
+    If Err.Number = 0 Then
+        For A = 0 To UBound(Anhang)
+            .AddAttachment Anhang(A)
+        Next A
+    End If
+    On Error GoTo 0   'Fehlerbehandlung wieder ein
+    
+'NochMal_:
+'   Select Case MsgBox(LA("Soll noch ein Anhang dazu?"), vbYesNoCancel, LA("Anhang"))
+'        Case vbYes
+'
+'            .AddAttachment funDateiAuswaehlen("*", "*.*")
+'            GoTo NochMal_
+'        Case vbNo
+'            GoTo Fertig_:
+'        Case vbCancel
+'            Exit Function
+'   End Select
+    
+'Stop
+Fertig_:
+    
+    With .Configuration.Fields
+      .Item(schema & "sendusing") = 2 'cdoSendUsingPort
+      .Item(schema & "smtpserver") = Mail_.smtpServer   '"smtp.web.de"
+      .Item(schema & "smtpserverport") = Mail_.smtpServerPort  '25
+      '.Item(schema & "smtpauthenticate") = 1 'cdoAnonymous =0
+      .Item(schema & "smtpauthenticate") = 1    'cdoBasic=1
+      .Item(schema & "smtpconnectiontimeout") = 60
+      .Item(schema & "sendusername") = Mail_.SendUserName  ' "marcus_gut@web.de"
+      .Item(schema & "sendpassword") = Mail_.SendUserPass
+      .Item(schema & "smtpusessl") = True
+      
+      .Update
+    End With
+    .Send
+  End With
+
+  Set OutMail = Nothing
+  funEmailVersand = True
+  Exit Function
+Err_:
+  
+  funEmailVersand = False
+  
+
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : ParameterMailserver
+' Author    : Gut
+' Date      : 30.05.2018
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
+Function ParameterMailserver(UserNummer As Long) As tMailServer
+ 
+ Dim sSql As String
+ Dim rs1 As DAO.Recordset
+ Dim mail As tMailServer
+
+sSql = "SELECT * FROM tblAdressenPersonal WHERE AdressNr= " & UserNummer
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+If Not rs1.EOF Then
+    ParameterMailserver.use = rs1!MailUse
+    ParameterMailserver.From = rs1!MailFrom
+    ParameterMailserver.Bcc = rs1!MailBCC
+    ParameterMailserver.smtpServer = rs1!MailSmtpServer
+    ParameterMailserver.smtpServerPort = rs1!MailSmtpServerPort
+    ParameterMailserver.SendUserName = rs1!MailUserName
+    ParameterMailserver.SendUserPass = rs1!MailPass
+    
+Else
+    ParameterMailserver.use = False
+
+End If
+
+
+
+rs1.Close
+End Function
+
+
+ 
+ 
+
+Sub EMail_Senden_Ohne_Outlook()
+     Dim iNachricht As Object
+     Dim iKonfiguration As Object
+     Dim Felder As Variant
+ 
+     Set iNachricht = CreateObject("CDO.Message")
+     Set iKonfiguration = CreateObject("CDO.Configuration")
+     iKonfiguration.Load -1
+     Set Felder = iKonfiguration.Fields
+     
+     With Felder
+        .Item("http://schemas.microsoft.com/cdo/configuration/smtpusessl") = True
+        .Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate") = 1
+        .Item("http://schemas.microsoft.com/cdo/configuration/sendusername") = "marcus_gut@web.de"  '"Deine E-Mail-Adresse"
+        .Item("http://schemas.microsoft.com/cdo/configuration/sendpassword") = "wmezshaezw"         'Passwort angeben
+        .Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "smtp.web.de"          'Postausgangsserver
+        .Item("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+        .Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 25                 'SMTP-Port
+        .Update
+     End With
+ 
+ 
+     With iNachricht
+         Set .Configuration = iKonfiguration
+         .To = "info@csafe.biz"                 'Empfänger
+         .cc = ""                               'Zur Kenntnis
+         .Bcc = ""                              '.BCC nicht sichtbare Empfänger
+         .From = "marcus_gut@web.de"
+         .Sender = "marcus_gut@web.de"          'Von
+         .Subject = "P2063 Betreff"                   'Betreffzeile
+         .TextBody = "Deine Nachricht!"         'Nachricht
+         '.AddAttachment "C:\Bild.gif"          'Anlage
+         .Send
+     End With
+ 
+ End Sub
+
+
+
+
+
+
+
+Public Sub SendMailHTMLOutlook(Empfaenger As String, Betreff As String, EMailText As String, AnhangDatei As String)
+
+'Von MZ am 26.6.2019
+'Dim olApp       As Outlook.Application
+'Dim olNsp       As Outlook.NameSpace
+'Dim olFld       As Outlook.MAPIFolder
+'Dim olItm       As Outlook.MailItem
+'Dim olIns       As Outlook.Inspector
+'Dim olPge       As Object
+'Dim ctl         As Object
+''Dim olPges       As Outlook.Pages
+''Dim olUpr       As Outlook.UserProperty
+''Dim ans         As VbMsgBoxResult
+'Dim INSText       As String
+'
+'
+'
+'Set olApp = New Outlook.Application
+'Set olNsp = olApp.GetNamespace("MAPI")
+''Set olFld = olNsp.Folders("Outlook@dieprojektsoftware.de") '.Folders("Posteingang").Folders("Entwurf")
+'
+'Set olItm = olApp.CreateItem(olMailItem) 'olFld.Items.Add(olMailItem)
+'
+'    With olItm
+'        Set olIns = .GetInspector     'Standard-Mail-Signatur verwenden!!!
+'        olIns.Display
+'
+'        '.BodyFormat = olFormatHTML
+'        .Subject = Betreff
+'        'Anhänge
+'        .Attachments.Add AnhangDatei
+'        'Empfänger
+'        .Recipients.Add Empfaenger
+'
+''        INSText = _
+''            "<div class=WordSection1>" & _
+''            "<p class=MsoNormal><o:p>Hallo Marcus,</o:p></p>" & _
+''            "<p class=MsoNormal><o:p>&nbsp;</o:p></p>" & _
+''            "<p class=MsoNormal><o:p>anbei sende ich Ihnen nixcherungstechnik im letzten Monat.</o:p></p>"
+'
+'        INSText = EMailText
+'
+'        .HTMLBody = Replace(.HTMLBody, "<div class=WordSection1>", INSText)
+'        'Der gesamte Text steht in dem div-Tag <div class=WordSection1>...</div>
+'        'Dieser Tag ist die erste Zeile im <Body>. Dort kann man daher Text einfügen, der oben beginnt.
+'        '.Send 'direkt senden
+'        .Save
+'    End With
+'
+'
+
+
+End Sub

@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<CommandBar name="PS_Artikel">
+  <AdaptiveMenu value="false"/>
+  <Context value=""/>
+  <Description value="PS_Artikel-Menü"/>
+  <Enabled value="true"/>
+  <Position value="5"/>
+  <Protection value="22"/>
+  <RowIndex value="-1"/>
+  <Type value="2"/>
+  <Visible value="false"/>
+  <Controls>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Refresh"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="1"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Refresht den Artikel aus dem Artikelstamm alles wird überschrieben"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_10()"/>
+      <FaceId value="129"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Erstelle Artikel neu"/>
+      <DescriptionText value=""/>
+      <Enabled value="false"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="2"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Erstellt einen Artikel aus der Zeile Artike ID muss 0 sein"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_11()"/>
+      <FaceId value="535"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Artikel Info"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="3"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Öffnet die Artikel Tabelle"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_12()"/>
+      <FaceId value="18"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Preis Mutte ber."/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="4"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Berechnet der Preis einer Mutter und refresht den Artikel in der EK Liste"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_13()"/>
+      <FaceId value="384"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Alle Kinder anzeigen"/>
+      <DescriptionText value=""/>
+      <Enabled value="false"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="5"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Zeigt alle Kinder an"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_14()"/>
+      <FaceId value="53"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Alle Kinder einfüge"/>
+      <DescriptionText value=""/>
+      <Enabled value="false"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="6"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Fügt  alle Kinder ein"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_16()"/>
+      <FaceId value="536"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Open PDF"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="7"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Offnet ein abgelegtes PDF"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_20()"/>
+      <FaceId value="2928"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Open DFT"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="8"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Öffnet eine Zeichnung 2D Wektadt Zeichnung"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_22()"/>
+      <FaceId value="2928"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Open CAD 3D"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="9"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Öffnet eine Zeichnung den 3D Tel"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funPopUPArtikel_24()"/>
+      <FaceId value="2928"/>
+    </Control>
+  </Controls>
+</CommandBar>

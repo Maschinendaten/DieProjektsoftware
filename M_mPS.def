@@ -1,0 +1,397 @@
+Option Compare Database
+Option Explicit
+Public objArtikelNeu As Artikel
+
+'Hier soll das rein was Datenbankspezifisch in der PS so passiert 2018.05.25
+
+Function ArtikelNeu(LieferantID As Long, Bezeichnung As String, _
+                    Optional ArtId As Long, _
+                    Optional BeschreibungB As String, _
+                    Optional Bemerkung As String, _
+                    Optional bArtKaufteil As Boolean, _
+                    Optional bArtLaserteil As Boolean, _
+                    Optional bArtKantteil As Boolean, _
+                    Optional bArtGewinde As Boolean, _
+                    Optional bArtSchweissen As Boolean, _
+                    Optional bArtDrehen As Boolean, _
+                    Optional bArtFraesen As Boolean, _
+                    Optional bArtSonstiges As Boolean _
+                    ) As Long
+                    
+                    
+'### MG 20180525
+'legt einen neuen Artikel an und gibt die ID des Artikels zurück
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim oCad As CAD
+'Dim sAuto As String
+
+'Erst mal prüfen
+If LieferantID = 0 Then
+    ArtikelNeu = -1
+    Exit Function
+End If
+
+If Nz(Bezeichnung, "") = "" Then
+    ArtikelNeu = -1
+    Exit Function
+End If
+
+'Hier mus auch -1 ansonsten kommt es zu fehler wenn ArtId=-1
+If ArtId <> 0 Then
+    If ArtId = -1 Then
+        ArtikelNeu = -1
+        Bemerkung = Bemerkung & vbCrLf & "Fehler:" & Date
+        Exit Function   'Wenn - beenden
+    End If
+    'Die Artikel ID ist vogegeben prüfen ob sie vorhanden ist wenn ja abbrechen
+    If Nz(DLookup("id", "tblArtikel", "id=" & ArtId), 0) = ArtId Then
+        ArtikelNeu = -1
+        
+        Exit Function
+    End If
+    Bemerkung = Bemerkung & vbCrLf & "Automatisch von Liste erzeugt:" & Date
+    
+Else
+    ArtId = funLetzteDatensatzNr("tblArtikel", "ID")
+    Bemerkung = Bemerkung & vbCrLf & "-"
+End If
+
+
+
+sSql = "SELECT * FROM tblArtikel WHERE False"
+
+    'Es wird ein neuer Datensatz mit einer neuen Dokumentnummer erstellt
+    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        rs1.AddNew    'Neuen Datensatz anlegen
+        
+            rs1!Bezeichnung = Mid(Bezeichnung, 1, 49)
+            rs1!BeschreibungB = BeschreibungB
+            rs1!Bemerkung = Bemerkung
+            rs1!Lieferant = LieferantID
+            rs1!AngelegtDat = Now 'Date
+            rs1!AngelegtVon = funBenutzerKurzzeichen() 'Forms![frmDatenbanknutzer]![Kurzzeichen]
+            'Die letze erzeugte Nr wird gesucht
+            rs1!Liefereinheit = Nz(DLookup("Bezeichnung", "tblEinheiten", "Reihenfolge = 1"), "")
+            rs1!LieferMenge = 1
+            
+            rs1!ArtKaufteil = bArtKaufteil
+            rs1!ArtLaserteil = bArtLaserteil
+            rs1!ArtKantteil = bArtKantteil
+            rs1!ArtGewinde = bArtGewinde
+            rs1!ArtSchweissen = bArtSchweissen
+            rs1!ArtDrehen = bArtDrehen
+            rs1!ArtFraesen = bArtFraesen
+            rs1!ArtSonstiges = bArtSonstiges
+            
+            rs1!ID = ArtId
+            ArtikelNeu = ArtId
+            Set oCad = New CAD
+            rs1!BeschreibungB = rs1!BeschreibungB & vbCrLf & oCad.Nummer(rs1!ID)
+        
+  rs1.Update
+  rs1.Close
+  
+End Function
+
+
+
+Function StatusNeu(ID_Nummer As Long, _
+                    StatusNr As Long, _
+                    Optional Dokumentnummer As Long, _
+                    Optional DokumentFormular As String, _
+                    Optional Bemerkung As String, _
+                    Optional IDWeb As Long, _
+                    Optional DatumWeb As Date) As Long
+                                        
+'legt einen neuen Status an und gibt die Id von diesem zurück MG 2018.06.01
+'Diese Funtion sollte den Status Wildwuchs bekämpfen
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+
+  'Änderung 8.7.2018 Der Status muss eine eindeutige Nummer haben wenn nicht wird in der Tabelle tblAWStstusStueckliste einer erzeugt
+  'Wir sind ja hier in einer Relationalen Datenbank!
+  
+    sSql = "SELECT * FROM tblAWStatusStueckliste WHERE StatusNr=" & StatusNr
+    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    If rs1.EOF Then
+        'Der Stsus ist nicht vorhanden und wird angelegt
+        rs1.AddNew
+            rs1!StatusNr = StatusNr
+            rs1!StatusText = Bemerkung 'Now()
+        rs1.Update
+    End If
+    rs1.Close
+    
+     
+        
+
+    sSql = "SELECT * FROM tblStuecklisteStatus WHERE False" 'Statustabelle der Stückliste
+    
+    Set rs1 = CurrentDbC.OpenRecordset(sSql, dbOpenDynaset, dbSeeChanges)
+
+    If rs1.Updatable Then
+        rs1.AddNew
+            rs1!ID_Nummer = ID_Nummer
+            'Rs1!Status =    'Status kommt von verknüpfter Tabelle
+            rs1!StatusNr = StatusNr
+            rs1!Dat_Status = IIf(IDWeb = 0, Now, (IDWeb / 86400) + 25569) ' Format((IDWeb / 86400) + 25569, "yyyy.mm.dd hh.nn.ss"))
+            'Rs1!Dat_nachfragen
+            rs1!Benutzer = IIf(IDWeb = 0, PS.User.Kurzzeichen(), "WWW")
+            rs1!Dokumentnummer = Dokumentnummer
+            rs1!DokumentFormular = IIf(DokumentFormular = "", Null, DokumentFormular)
+            rs1!SsBem = IIf(Bemerkung = "", Null, Bemerkung)
+            rs1!SsWebid = IIf(IDWeb = 0, rs1!SsId, IDWeb)
+            'StatusNeu = Rs1!SsId  'Rückgabewert die Eindeutige Nummer genau dieses Ststus Eintrags
+        
+        
+        
+        rs1.Update
+       
+    End If
+
+
+    rs1.Close
+    Set rs1 = Nothing
+
+    StatusNeu = StatusNr
+
+End Function
+
+Sub StatusAnpassenStueckliste(ID_Nummer As Long, _
+                              StatusNr As Long, _
+                              Optional WarnungAus As Boolean)
+
+
+'Durch ändern der Auswahl wird der Status in der Einkaufsliste angepasst
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim s1 As String
+
+
+s1 = Nz(DLookup("StatusText", "tblAWStatusStueckliste", "StatusNr=" & StatusNr), "-")
+
+If WarnungAus = False Then
+If MsgBox("Wollen Sie die Artikel in der Einkaufsliste auf Status: " & s1 & " setzen?", vbYesNo) <> vbYes Then Exit Sub
+End If
+sSql = "SELECT Status " & _
+        "FROM tblStueckliste " & _
+        "WHERE ID_Nummer=" & ID_Nummer
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+If Not rs1.EOF _
+    Then
+        rs1.Edit
+            'Setze z.B Status Anfrage in Bestellung gewandelt
+            rs1!Status = StatusNr
+        rs1.Update
+        
+    End If
+rs1.Close
+
+
+End Sub
+
+
+
+
+Public Function funPsDbArtikelKunde(ArtId As Long, ProNr As Long) As String
+'Sucht zu dem Kunden vom Projekt die Artikel ID des Kunden wenn vorhanden
+Dim ANr As Long
+
+ANr = DLookup("AdressNr", "tblProjekte", "ProjektNr=" & ProNr)
+If ANr = 0 Then Exit Function
+
+funPsDbArtikelKunde = Nz(DLookup("AKB_BestNr", "tblArtikelKundeBestNr", "fi_Artikel=" & ArtId & " AND  fi_Adresse= " & ANr), "")
+
+
+
+End Function
+
+Public Function funAressnummerRufname(Adressnummer As Long)
+    
+funAressnummerRufname = Nz(DLookup("Rufname", "tblAdressen", "AdressNr=" & Adressnummer))
+End Function
+
+Public Function funAressnummerRabatt(Adressnummer As Long)
+    
+funAressnummerRabatt = Nz(DLookup("ZahlungRabatt", "tblAdressen", "AdressNr=" & Adressnummer))
+End Function
+
+
+Public Function funAnschreibenRechnungsnummer(Belegnummer As Long, Optional NeueRechnungsnummer As Long)
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+funAnschreibenRechnungsnummer = DLookup("ReBelegNr2", "tblRechnung", "BelegNr=" & Belegnummer)
+
+If NeueRechnungsnummer <> 0 Then
+    If MsgBox(LA("Wollen Sie die Rechnungsnummer: ") & funAnschreibenRechnungsnummer & LA(" Ändern nach :") & NeueRechnungsnummer, vbYesNoCancel, LA("Rechnungsnummer ändern")) = vbYes Then
+        sSql = "SELECT * FROM tblRechnung WHERE BelegNr=" & Belegnummer
+        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        With rs1
+            If Not .EOF Then
+                .Edit
+                    .Fields("ReBelegNr2").Value = NeueRechnungsnummer
+                    funAnschreibenRechnungsnummer = NeueRechnungsnummer
+                .Update
+            End If
+            .Close
+        End With
+    End If
+
+End If
+
+
+
+End Function
+
+
+
+Function funMandant(Optional NeuerMandant As String, Optional MandantNeuAnlegen As Boolean) As String
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+funMandant = Nz(DLookup("Wert2", "tblIni", "Wert1 ='PSM'"), "") 'Holt sich den Mandant aus der Ini Datei
+
+If Not MandantNeuAnlegen Then Exit Function
+
+  If funMandant <> NeuerMandant Then
+        sSql = "SELECT * FROM tblIni WHERE wert1='PSM'"
+        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        If Not rs1.EOF Then
+            rs1.Edit
+            rs1!Wert2 = NeuerMandant
+            rs1.Update
+        End If
+        rs1.Close
+  End If
+
+funMandant = Nz(DLookup("Wert2", "tblIni", "Wert1 ='PSM'"), "") 'Holt sich den Mandant aus der Ini Datei
+
+End Function
+
+
+
+'Function funProjektbeschreibungDokumentBerechnen(BelegNr As Long) As Double
+''Die Funktion berechnet in der Tabelle ProjektbeschreibungDokumente die Felder neu und ermittelt die Summe wenn gewünscht
+'Ersetzt durch Objekt gedöns
+'
+'Dim Rs1 As dao.Recordset
+'Dim sum_VK As Double
+'Dim sum_ZS As Double ' Summe der Werte Verkauf
+''Dim DaNr As Long
+'Dim sSql As String
+'Dim sumP As Double
+'
+''öffnet den Datensatz mit SQL Abfrage
+'
+'sSql = "SELECT * " & _
+'         "FROM tblProjektbeschreibungDokumente WHERE BelegNr = " & BelegNr & " " & _
+'         "ORDER BY Pos_Nummer;"
+'
+'Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+'
+'    Do Until Rs1.EOF
+'        Rs1.Edit
+'        'Bildet die Summe der Position neu 2019 MG
+'        Select Case True
+'            Case modOptionOk(Nz(Rs1!Pos_Bezeichnung, ""))      'Wenn Option
+'                sumP = Nz(Rs1!Anzahl_Menge, 0) * Nz(Rs1!St_Preis_VK)
+'                Rs1!Preis_VK = sumP
+'
+'            Case modZwischensummeOK(Nz(Rs1!Pos_Nummer, 0))    'IF Zwischensumme
+'                Rs1!Preis_VK = sum_ZS
+'                sum_ZS = 0
+'                Rs1!St_Preis_VK = 0
+'                Rs1!Anzahl_Menge = 0
+'
+'            Case modPreisOK(Nz(Rs1!Pos_Nummer, 0)) ' IF Preis
+'                Rs1!Preis_VK = sum_VK
+'                Rs1!St_Preis_VK = 0
+'                Rs1!Anzahl_Menge = 0
+'            Case Else
+'                'Keine Zwischensumme weiter aufsummmieren und zeile berechnen mit %
+'
+'                Rs1!St_Preis_VK = Nz(Rs1!Preis_einzeln, 0) * ((100 + Nz(Rs1!Einzel_Kalkulation, 0)) / 100)
+'                sumP = Nz(Rs1!Anzahl_Menge, 0) * Nz(Rs1!St_Preis_VK)
+'                Rs1!Preis_VK = sumP
+'                sum_ZS = sum_ZS + sumP
+'                sum_VK = sum_VK + sumP
+'        End Select
+'
+'    Rs1.Update
+'    Rs1.MoveNext
+'  Loop 'Loop Do Until
+'Rs1.Close
+'Set Rs1 = Nothing
+'
+'funProjektbeschreibungDokumentBerechnen = sum_VK
+'
+'End Function
+
+
+
+
+
+
+
+Public Function AdresseRufNameVonID(IDAdresse As String) As String
+'Erzeugt aus der ID den Rufnamen
+    AdresseRufNameVonID = Nz(DLookup("Rufname", "tblAdressen", "AdressNr=" & IDAdresse), "")
+'SF "tblAdressen"
+'rs1!AdressNr
+'rs1!Rufname
+End Function
+
+Public Function AdresseIDVonRufname(sRufname As String) As Long
+'Erzeugt aus der ID den Rufnamen
+    AdresseIDVonRufname = Nz(DLookup("AdressNr", "tblAdressen", "Rufname='" & sRufname & "'"), 0)
+'SF "tblAdressen"
+'rs1!AdressNr
+'rs1!Rufname
+End Function
+
+
+Public Function funCheckBeschaffungszeit()
+'Prüft von der geöfneten Einkaufsliste die Beschafungszeit aus dem Artikel und Trägt das in das feld Check ein
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim PNr As String
+
+'MsgBox "funCheckBeschaffungszeit"
+
+
+PNr = Form_frmStueckliste.var_Pnr
+
+'Sucht alle Datensätze mit Artkel ID
+sSql = "SELECT ST_Check,ST_CheckDat,ArtikelID FROM tblStueckliste WHERE Projektnummer=" & PNr
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+With rs1
+    While Not .EOF
+        .Edit
+            If IsNull(.Fields("ArtikelID").Value) Then
+                .Fields("ST_Check").Value = "Be.:= ???"
+                .Fields("ST_CheckDat").Value = Now
+            Else
+                .Fields("ST_Check").Value = "Be.:" & Nz(DLookup("Liefezeit", "tblArtikel", "ID=" & .Fields("ArtikelID").Value), -99)
+                .Fields("ST_CheckDat").Value = Now
+            End If
+        .Update
+        .MoveNext
+    Wend
+    .Close
+End With
+
+
+
+End Function
+
+Public Function funCheckPDFVorhanden()
+'Prüft von der geöfnete Einkaufsliste ob zu de Artikeln PDF vorhanden sind
+MsgBox "funCheckPDFVorhanden"
+End Function

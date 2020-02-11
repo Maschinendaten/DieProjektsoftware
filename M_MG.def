@@ -1,0 +1,411 @@
+Option Compare Database
+Option Explicit
+
+Enum ObjektBlock
+    Def_Variablen = 1
+    Def_LetGet = 2
+    Def_LadenFunction = 3
+    Def_TestDebugPrint = 4
+End Enum
+
+
+
+' MG Datenbank tool alles was man so zum programmieren brauch :-)
+' angefangen am 2015 03 23
+' Es sollte ales in dem Modul sein keine externen Funktionen Forms oder sonstigen (man muss sonst immer den ganzen scheiß kopieren)
+
+
+Function st(Optional sFilter As String, Optional ohneField As Boolean)
+'Function show Tables zeigt alle tabellen in der Aplikation
+
+Dim db As DAO.Database
+Dim tdf As DAO.TableDef
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
+        If Left(tdf.Name, 4) = "MSys" Then 'Alle Systemtabellen aussschliessen
+        Else
+            If InStr(1, tdf.Name, sFilter) <> 0 Or sFilter = "" Then
+                If ohneField = True Then
+                    Debug.Print tdf.Name  ', tdf.DateCreated
+                Else
+                    Debug.Print "sf " & Chr(34) & tdf.Name & Chr(34)
+                End If
+            End If
+        End If
+    Next tdf
+    Set db = Nothing
+
+
+
+
+End Function
+
+Public Sub ti(sFilter As String)
+'Benötigt Verweise: Microsoft Scripting Runtime
+Dim tdf As DAO.TableDef
+Dim ddb As DAO.Database
+Dim fld As DAO.Field
+Dim tmpDesc As String, tmpType As String
+Dim C As Collection
+
+'Dim fso As New Scripting.FileSystemObject, ts As Scripting.TextStream
+
+Set C = New Collection
+
+C.Add "Long", "k4"
+C.Add "Double", "k7"
+C.Add "DateTime", "k8"
+C.Add "Text", "k10"
+C.Add "Boolean", "k1"
+C.Add "Timestamp", "k9"
+C.Add "Memo", "k12"
+C.Add "Single", "k6"
+
+Dim Result As String
+
+Set ddb = CurrentDb()
+
+On Error Resume Next
+
+For Each tdf In ddb.TableDefs
+    If Left(tdf.Name, 4) = "MSys" Then
+            'Alle Systemtabellen aussschliessen
+        Else
+            'Debug.Print tdf.Name
+            If InStr(1, tdf.Name, sFilter) Then
+                Result = Result & "Tabelle: " & tdf.Name & vbCrLf '& vbTab & "Letzte Änderung: " & tdf.LastUpdated & vbCrLf
+                For Each fld In tdf.Fields
+                    tmpDesc = fld.Properties("Description")
+                    tmpType = C("k" & fld.Type)
+                    Result = Result & vbTab & fld.Name & Space(20 - Len(fld.Name)) & tmpType & Space(10 - Len(tmpType)) & vbTab & tmpDesc & vbCrLf
+                    tmpDesc = ""
+                    tmpType = ""
+                Next fld
+            End If
+        End If
+Next tdf
+
+Debug.Print Result
+
+'Set ts = fso.OpenTextFile("C:\mms\NurTabellen.txt", ForWriting, True)
+'ts.Write Result
+'ts.Close
+
+
+End Sub
+
+
+
+
+
+Function SF(sTabelle As String, Optional sPraefix As String, Optional sSufix As String)
+'Function  show fields zeigt alle Felder in der Tabelle
+Dim tdf As DAO.TableDef
+Dim fld As DAO.Field
+Dim db As DAO.Database
+Dim s1 As String
+
+
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
+        If tdf.Name = sTabelle Then
+            For Each fld In tdf.Fields
+                'für eingabe in Code
+                If sPraefix = "" Then
+                    s1 = "rs1!" & fld.Name ', fld.Type, fld.Size
+                Else
+                    s1 = sPraefix & fld.Name ', fld.Type, fld.Size
+                End If
+                If sSufix <> "" Then
+                
+                    s1 = s1 & sSufix
+                End If
+                Debug.Print s1
+            Next fld
+       
+        End If
+     Next tdf
+    Set db = Nothing
+
+
+End Function
+
+Function SFf(sTabelle As String, Optional sPraefix As String, Optional sSufix As String)
+'Function  show fields zeigt alle Felder in der Tabelle mit dem Syntax Fields..
+Dim tdf As DAO.TableDef
+Dim fld As DAO.Field
+Dim db As DAO.Database
+Dim s1 As String
+
+Debug.Print "With rs1"
+Debug.Print "if not .eof then"
+
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
+        If tdf.Name = sTabelle Then
+            For Each fld In tdf.Fields
+                'für eingabe in Code
+                If sPraefix = "" Then
+                    s1 = ".fields(" & Chr(34) & fld.Name & Chr(34) & ").Value"
+                Else
+                    s1 = sPraefix & ".fields(" & Chr(34) & fld.Name & Chr(34) & ").Value"
+                End If
+                If sSufix <> "" Then
+                
+                    s1 = s1 & sSufix
+                End If
+                Debug.Print "    " & s1
+            Next fld
+       
+        End If
+     Next tdf
+    Set db = Nothing
+    
+Debug.Print "end if"
+Debug.Print "end With"
+
+
+End Function
+
+Public Sub ch()
+    'Gibt alle Asc Zeichen mit entsprechendem Code aus
+Dim A As Long
+Dim B As Long
+Dim s1 As String
+
+    For A = 32 To 255
+        B = B + 1
+        s1 = s1 & "H" & Hex(A) & "|" & A & " " & Chr(A) & "  "
+        If B = 5 Then
+            Debug.Print s1
+            s1 = ""
+            B = 0
+        End If
+    Next A
+
+End Sub
+
+
+
+Function SFm(sTabelle As String)
+'Function  show fields zeigt alle felder in der Tabelle
+' z.B m_Lieferant= .fields("Lieferant").value
+Dim tdf As DAO.TableDef
+Dim fld As DAO.Field
+Dim db As DAO.Database
+Dim s1 As String
+
+
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
+        If tdf.Name = sTabelle Then
+            For Each fld In tdf.Fields
+                'für eingabe in Code
+                
+                    s1 = "m_" & fld.Name & "= .fields(" & Chr(34) & fld.Name & Chr(34) & ").value"
+                Debug.Print s1
+            Next fld
+       
+        End If
+     Next tdf
+    Set db = Nothing
+
+
+End Function
+Function SO(sTabelle As String, Optional NurBloeckeAnzeigen As ObjektBlock = 0)
+'Function  show Objekts zeigt alle felder in der Tabelle für die Objektdefinition
+'z.B
+'privat m_Lieferant as long
+'Public Property Get Lieferant() As Long
+'    Lieferant = m_Lieferant
+'End Property
+'
+'Public Property Let Lieferant(Wert As Long)
+'    m_Lieferant = Wert
+'End Property
+
+'Public function Laden() as boolean
+'  m_Lieferant= .fields("Lieferant").value
+
+'    Laden=xxx
+'End Function
+
+
+Dim tdf As DAO.TableDef
+Dim fld As DAO.Field
+Dim db As DAO.Database
+Dim s1 As String
+Dim s2 As String
+Dim s3 As String
+Dim S4 As String
+    
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
+        If tdf.Name = sTabelle Then
+            For Each fld In tdf.Fields
+                'für eingabe in Code
+                s1 = s1 & "Private m_" & fld.Name & " AS " & varType(fld.Type) & vbCrLf
+                
+                s2 = s2 & "Public Property Get " & fld.Name & " () As " & varType(fld.Type) & ":"
+                s2 = s2 & "   " & fld.Name & "= m_" & fld.Name & ":"
+                s2 = s2 & "End Property" & vbCrLf
+                
+                s2 = s2 & "Public Property Let " & fld.Name & " (WERT As " & varType(fld.Type) & ")" & ":"
+                s2 = s2 & "    m_" & fld.Name & "= Wert" & ":"
+                s2 = s2 & "End Property" & vbCrLf
+                
+                
+                s3 = s3 & "m_" & fld.Name & "= nz(.fields(" & Chr(34) & fld.Name & Chr(34) & ").value)"
+                s3 = s3 & vbCrLf
+                
+                S4 = S4 & "Debug.print " & Chr(34) & fld.Name & ": " & Chr(34) & "& ." & fld.Name & vbCrLf
+                
+                
+                
+            Next fld
+        End If
+     Next tdf
+    Set db = Nothing
+
+    Select Case NurBloeckeAnzeigen
+        Case 0
+            Debug.Print s1
+            Debug.Print s2
+            Debug.Print s3
+        Case 1
+            Debug.Print s1
+        Case 2
+            Debug.Print s2
+        Case 3
+            Debug.Print s3
+        Case 4
+            Debug.Print S4
+            
+        
+    End Select
+  
+
+
+
+End Function
+
+Private Function varType(VarNummer As Long) As String
+
+Select Case VarNummer
+    Case 10 'string max 255
+        varType = "String"
+    Case 12 'Memo
+        varType = "String"
+    Case 1
+        varType = "Boolean"
+    Case 4
+        varType = "Long"
+    Case 5
+        varType = "Single"
+    Case 6
+        varType = "Double"
+    Case 8
+        varType = "Date"
+    Case Else
+        varType = "-" & CStr(VarNummer) & "-"
+End Select
+
+End Function
+
+Public Sub ShowDataSheet(ByVal sql As String)
+Call SQ(sql)
+End Sub
+
+' ***********************************************************************************
+' Copyright:    Philipp Stiefel, 2018 - All rights reserved
+' Source:       http://codekabinett.com/rdumps.php?Lang=2&targetDoc=vba-sql-string-tutorial
+' ***********************************************************************************
+' Original Public Sub ShowDataSheet(ByVal sql As String)
+
+
+
+Public Sub SQ(ByVal sql As String)
+    'Erzeugt aus dem SQL eine Abfrage und zeigt dies direkt an
+    On Error GoTo Err_
+    Const QUERY_NAME As String = "qry_dummy_display"
+
+    Dim db As DAO.Database
+    Dim qd As DAO.QueryDef
+    
+    DropQuery QUERY_NAME
+    
+    Set db = CurrentDb
+    Set qd = db.CreateQueryDef(QUERY_NAME, sql)
+     
+    
+    DoCmd.OpenQuery QUERY_NAME
+    
+    If MsgBox("Close Query?", vbYesNo) = vbYes Then
+        DoCmd.Close acQuery, QUERY_NAME, acSaveNo
+        DropQuery QUERY_NAME
+    End If
+    Exit Sub
+Err_:
+Debug.Print "Fehler im SQL" & Err.Description & "Nr:" & Err.Number & vbCrLf & sql
+End Sub
+
+Private Sub DropQuery(ByVal queryName As String)
+    On Error Resume Next
+    CurrentDb.QueryDefs.Delete queryName
+    
+End Sub
+
+Sub sm(Optional sMenueTabelle As String = "")
+'Zeigt die Menues mit den untermenues und den Aufruffunktinen an
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+Dim Rs2 As DAO.Recordset
+Dim s1 As String
+Dim Size As Long
+
+'Ersten 3 Zeichen entfernen PS spezifische Kontexmenues
+If Left(sMenueTabelle, 3) = "PS_" Then sMenueTabelle = Mid(sMenueTabelle, 4)
+
+sSql = "SELECT * FROM t_Menue WHERE MENAme Like '*" & sMenueTabelle & "'"
+    
+    Set rs1 = CurrentDb.OpenRecordset(sSql)
+    
+    With rs1
+        .MoveLast
+        Size = .RecordCount
+        .MoveFirst
+        
+        While Not .EOF
+         s1 = s1 & "SM(""" & .Fields("MeName").Value & vbCrLf
+            If Size <> 1 Then
+                'Es gibt viele Treffer Menues anzeigen
+               
+            Else
+                'Es gibt nur ein Menue die Menueeinträge anzeigen
+                sSql = "SELECT * FROM t_MenueDat WHERE fiMeID=" & .Fields("MeID").Value
+                Set Rs2 = CurrentDb.OpenRecordset(sSql)
+                While Not Rs2.EOF
+                    s1 = s1 & Rs2!MdName & String(25 - Len(Rs2!MdName), " ") & Rs2!MdAktiv & vbTab & Rs2!MdAktion & vbTab & Rs2!MdTipp & vbCrLf
+                    Rs2.MoveNext
+                Wend
+                Rs2.Close
+            End If
+            .MoveNext
+        Wend
+        .Close
+    End With
+    Debug.Print s1
+End Sub
+
+
+
+Function He()
+    Debug.Print "ST  'Show Tabels"
+    Debug.Print "SF  'Show Fields   sf ' Tabelle', 'Präfix',' 'Sufix' "
+    Debug.Print "SFf 'Show Fields Notation .field('Name').value , 'Präfix',' 'Sufix' "
+    Debug.Print "SFm 'Show Field for Objects m_Field = .Fields(' Field').value"
+    Debug.Print "SO  'erzeugt Private m_Felder und Get und let MZ würde :-)"
+    Debug.Print "SQ  'Erzeugt aus dem SQL eine Abfrage und zeigt diese an"
+    Debug.Print "CH  'Gibt alle Asc Codes und die dazugehörigen Nummer aus H ist Hex  "
+    
+End Function

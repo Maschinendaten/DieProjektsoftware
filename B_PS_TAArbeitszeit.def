@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<CommandBar name="PS_TAArbeitszeit">
+  <AdaptiveMenu value="false"/>
+  <Context value=""/>
+  <Description value="PS_TAArbeitszeit-Menü"/>
+  <Enabled value="true"/>
+  <Position value="5"/>
+  <Protection value="22"/>
+  <RowIndex value="-1"/>
+  <Type value="2"/>
+  <Visible value="false"/>
+  <Controls>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Bearbeiten"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="1"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Erfassung der Arbeitszeit bearbeiten"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;frmArbeiten&quot;)"/>
+      <FaceId value="31"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Bericht"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="2"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Bericht der Arbeitszeit drucken"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funBerichtOpen(&quot;berArbeitszeitProjekt&quot;)"/>
+      <FaceId value="4"/>
+    </Control>
+  </Controls>
+</CommandBar>

@@ -1,0 +1,26 @@
+Option Compare Database
+Option Explicit
+
+'##MG 20141018
+' von der Webseite http://www.cls-software.de/cls_software/TippsAccessVBA.aspx?Tipp=EigenerCursor
+' Cursor von http://www.rw-designer.com/gallery?search=dable+klick&by=dls
+
+
+Declare PtrSafe Function LoadCursorFromFileA Lib "user32" ( _
+ByVal lpFileName As String) As Long
+Declare PtrSafe Function SetCursor Lib "user32" (ByVal hCursor As Long) As Long
+ 
+Sub MausHand()
+Dim strPfadCursor As String
+Dim lngCursor As Long
+ 
+strPfadCursor = CurrentProject.Path & "\HANDSCURSOR.cur"
+'strPfadCursor = CurrentProject.Path & "\dbl_click.ani"
+ 
+lngCursor = LoadCursorFromFileA(strPfadCursor)
+If lngCursor = 0 Then
+    Exit Sub
+Else
+    Call SetCursor(lngCursor)
+End If
+End Sub

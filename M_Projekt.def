@@ -1,0 +1,114 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+Private m_ProjektNr As Long
+Private m_Projektbezeichnung As String
+Private m_AngelegtAm As Date
+Private m_AngelegtVon As String
+Private m_Ordner As String
+Private m_Projektleiter As String
+Private m_Endtermin As Date
+Private m_Kosten As Single
+Private m_AdressNr As Long
+Private m_Bemerkung As String
+Private m_Status As String
+Private m_Kalkulation_pro As Double
+Private m_Preis_Risiko As Long
+Private m_Proz_Auftrag As Double
+Private m_Vergabetermin As Date
+Private m_Verzeichnis As String
+Private m_VerzeichnisAnBe As String
+Private m_DateiBestellung As String
+Private m_AnzahlArtikelEK As Long
+
+Public Property Get ProjektNr() As Long:    ProjektNr = m_ProjektNr: End Property
+Public Property Let ProjektNr(WERT As Long):     m_ProjektNr = WERT: End Property
+Public Property Get Projektbezeichnung() As String:    Projektbezeichnung = m_Projektbezeichnung: End Property
+Public Property Let Projektbezeichnung(WERT As String):     m_Projektbezeichnung = WERT: End Property
+Public Property Get AngelegtAm() As Date:    AngelegtAm = m_AngelegtAm: End Property
+Public Property Let AngelegtAm(WERT As Date):     m_AngelegtAm = WERT: End Property
+Public Property Get AngelegtVon() As String:    AngelegtVon = m_AngelegtVon: End Property
+Public Property Let AngelegtVon(WERT As String):     m_AngelegtVon = WERT: End Property
+Public Property Get Ordner() As String:    Ordner = m_Ordner: End Property
+Public Property Let Ordner(WERT As String):     m_Ordner = WERT: End Property
+Public Property Get Projektleiter() As String:    Projektleiter = m_Projektleiter: End Property
+Public Property Let Projektleiter(WERT As String):     m_Projektleiter = WERT: End Property
+Public Property Get EndTermin() As Date:    EndTermin = m_Endtermin: End Property
+Public Property Let EndTermin(WERT As Date):     m_Endtermin = WERT: End Property
+Public Property Get Kosten() As Single:    Kosten = m_Kosten: End Property
+Public Property Let Kosten(WERT As Single):     m_Kosten = WERT: End Property
+Public Property Get AdressNr() As Long:    AdressNr = m_AdressNr: End Property
+Public Property Let AdressNr(WERT As Long):     m_AdressNr = WERT: End Property
+Public Property Get Bemerkung() As String:    Bemerkung = m_Bemerkung: End Property
+Public Property Let Bemerkung(WERT As String):     m_Bemerkung = WERT: End Property
+Public Property Get Status() As String:    Status = m_Status: End Property
+Public Property Let Status(WERT As String):     m_Status = WERT: End Property
+Public Property Get Kalkulation_pro() As Double:    Kalkulation_pro = m_Kalkulation_pro: End Property
+Public Property Let Kalkulation_pro(WERT As Double):     m_Kalkulation_pro = WERT: End Property
+Public Property Get Preis_Risiko() As Long:    Preis_Risiko = m_Preis_Risiko: End Property
+Public Property Let Preis_Risiko(WERT As Long):     m_Preis_Risiko = WERT: End Property
+Public Property Get Proz_Auftrag() As Double:    Proz_Auftrag = m_Proz_Auftrag: End Property
+Public Property Let Proz_Auftrag(WERT As Double):     m_Proz_Auftrag = WERT: End Property
+Public Property Get Vergabetermin() As Date:    Vergabetermin = m_Vergabetermin: End Property
+Public Property Let Vergabetermin(WERT As Date):     m_Vergabetermin = WERT: End Property
+Public Property Get Verzeichnis() As String:    Verzeichnis = m_Verzeichnis: End Property
+Public Property Let Verzeichnis(WERT As String):     m_Verzeichnis = WERT: End Property
+Public Property Get VerzeichnisAnBe() As String:    VerzeichnisAnBe = m_VerzeichnisAnBe: End Property
+Public Property Let VerzeichnisAnBe(WERT As String):     m_VerzeichnisAnBe = WERT: End Property
+Public Property Get DateiBestellung() As String:    DateiBestellung = m_DateiBestellung: End Property
+Public Property Let DateiBestellung(WERT As String):     m_DateiBestellung = WERT: End Property
+Public Property Get AnzahlArtikelEK() As Long:    AnzahlArtikelEK = m_AnzahlArtikelEK: End Property
+Public Property Let AnzahlArtikelEK(WERT As Long):     m_AnzahlArtikelEK = WERT: End Property
+
+
+Public Function Laden(Projektnummer As Long) As Long
+'Hier wird ein Datensatz geladen
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+        
+        sSql = "SELECT * FROM tblprojekte WHERE ProjektNr=" & Projektnummer
+        Set rs1 = CurrentDb.OpenRecordset(sSql)
+        With rs1
+            If .EOF Then
+                Laden = -1  ' Keine daten gefunden
+            Else
+                
+                m_ProjektNr = Nz(.Fields("ProjektNr").Value)
+                Laden = m_ProjektNr
+                m_Projektbezeichnung = Nz(.Fields("Projektbezeichnung").Value)
+                m_AngelegtAm = Nz(.Fields("AngelegtAm").Value)
+                m_AngelegtVon = Nz(.Fields("AngelegtVon").Value)
+                m_Ordner = Nz(.Fields("Ordner").Value)
+                m_Projektleiter = Nz(.Fields("Projektleiter").Value)
+                m_Endtermin = Nz(.Fields("Endtermin").Value)
+                m_Kosten = Nz(.Fields("Kosten").Value)
+                m_AdressNr = Nz(.Fields("AdressNr").Value)
+                m_Bemerkung = Nz(.Fields("Bemerkung").Value)
+                m_Status = Nz(.Fields("Status").Value)
+                m_Kalkulation_pro = Nz(.Fields("Kalkulation_pro").Value)
+                m_Preis_Risiko = Nz(.Fields("Preis_Risiko").Value)
+                m_Proz_Auftrag = Nz(.Fields("Proz_Auftrag").Value)
+                m_Vergabetermin = Nz(.Fields("Vergabetermin").Value)
+                m_Verzeichnis = Nz(.Fields("Verzeichnis").Value)
+                m_VerzeichnisAnBe = Nz(.Fields("VerzeichnisAnBe").Value)
+                m_DateiBestellung = Nz(.Fields("DateiBestellung").Value)
+                m_AnzahlArtikelEK = Nz(.Fields("AnzahlArtikelEK").Value)
+                
+           End If
+        End With
+        
+
+End Function
+
+Public Function Neu()
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+'Neues Projekt anlegen
+
+
+
+End Function

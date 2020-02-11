@@ -1,0 +1,51 @@
+Option Compare Database
+
+Option Explicit
+
+Public Enum SORT_BY
+    Sort_by_None
+    Sort_by_Name
+    Sort_by_Path
+    Sort_by_Size
+    Sort_by_Last_Access
+    Sort_by_Last_Modyfy
+    Sort_by_Date_Create
+End Enum
+
+Public Enum SORT_ORDER
+    Sort_Order_Ascending
+    Sort_Order_Descending
+End Enum
+
+Public Type FILEINFO
+    strFilename As String
+    strPath As String
+    lngSize As Long
+    dmtLastAccess As Date
+    dmtLastModify As Date
+    dmtDateCreate As Date
+End Type
+
+Public Sub test()
+    Dim objFileSearch As clsFileSearch
+    Dim lngIndex As Long
+    Dim z1 As Long
+    
+    Set objFileSearch = New clsFileSearch
+    With objFileSearch
+        .CaseSenstiv = True
+        .Extension = "*.dft"
+        .FolderPath = "N:\AA_MG\Riedham\P2063\Zeichnungen\"
+        .SearchLike = "*"
+        .SubFolders = True
+        If .Execute(Sort_by_Size, Sort_Order_Descending) > 0 Then
+            For lngIndex = 1 To .FileCount
+                With .Files(lngIndex)
+                    z1 = z1 + 1
+                    Debug.Print .strFilename, .lngSize, z1
+                End With
+            Next
+        End If
+    End With
+    Set objFileSearch = Nothing
+End Sub

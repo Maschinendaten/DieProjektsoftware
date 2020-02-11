@@ -1,0 +1,68 @@
+Option Compare Database
+Option Explicit
+'Dieses Modul soll die Starteinstellungen der Anwenung abrufen bzw. setzen
+'Der Benutzer individualisiert somit seine Benutzerumgebung
+'Die Daten werden in der Registry gespeichert dev. 061029/MG
+'unter HKEY_CURRENT_USER\Software\VB and VBA Program Settings\PS1\ ....
+'Mit Regedit können die Werte bearbeitet werden was nix bringt da
+'Das Programm die Werte selber setzt und verändert
+
+
+
+
+
+
+Function funLadeReg(strSektion As String, strvariable As String, strStandard As String) As String
+'Die Sektion gibt sinnigerweise das Modul oder Formular an
+'Die Variable gibt die Variable an wie der Wert heisst
+'Wird der Wert nicht gefunden wird der Standardwert verwendet
+Dim varReg As Variant
+Dim z1 As Long
+
+varReg = GetAllSettings("PS1", strSektion)
+
+'Es wird geprüft ob was ausgelesen wurde
+If IsEmpty(varReg) Then GoTo HupfKD:
+
+For z1 = LBound(varReg) To UBound(varReg)
+    If varReg(z1, 0) = strvariable Then
+        funLadeReg = varReg(z1, 1)
+        Exit Function
+    End If
+Next z1
+
+HupfKD:
+'Zuweisung wenn nix gefunden
+'MsgBox (strSektion & ":" & strvariable & ":" & vbCrLf & "Wurde nicht gefunden bitte anlegen.")
+funLadeReg = strStandard
+
+End Function
+
+Function funSpeicherReg(strSektion As String, strvariable As String, strWert As String)
+'Die Sektion gibt sinniger Weise das Modul oder Formular an
+'Wird der Wert nicht gefunden wird der Standardwert verwendet
+
+SaveSetting "PS1", strSektion, strvariable, strWert
+
+
+End Function
+
+Function funRegInputBox(sHilfe As String, sSektion As String, sVarName As String)
+Dim s1 As String
+Dim s2 As String
+
+'Die Funktion erlaubt einzelne Werte in der Registry zu verändern und an zu legen
+'sHilfe= hier sollte eine Beschreibung stehen was der Wert bedeuten soll
+'sSektion = Gruppe um was es geht der bereich zB. fEingabe oder TelSnom usw.
+'sVarName = der Name der Variablen in der Gruppe
+
+
+s1 = funLadeReg(sSektion, sVarName, "")
+
+
+
+s2 = InputBox(sHilfe, , s1)
+If s2 = "" Then Exit Function
+funSpeicherReg sSektion, sVarName, s2
+
+End Function

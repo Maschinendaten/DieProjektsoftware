@@ -1,0 +1,548 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+'Diese Abteilung ist für alles was mit PopUP  zu tun hat
+Private m_ZielTabelleID As Long
+Private m_ZielTabelleName As String
+Private m_ZielArtikelID As Long
+Private m_ZielAdresseLieferantID As Long
+
+Private m_ID As Long
+Private m_Lieferant As Long
+Private m_Bezeichnung As String
+Private m_Beschreibung As String
+Private m_BeschreibungB As String
+Private m_Bestellnummer As Variant
+Private m_Preis_EK As Single
+Private m_Preis_Rabatt_pro As Double
+Private m_Preis_EK_mit_Rabatt As Single
+Private m_Liefezeit As Double
+Private m_Bemerkung As String
+Private m_Preis_VK As Single
+Private m_Lagerbestand As Long
+Private m_Liefereinheit As String
+Private m_LieferMenge As Double
+Private m_PreisLiefereinheit As Single
+Private m_Mutter As Boolean
+Private m_GeaendertDat As Date
+Private m_AngelegtDat As Date
+Private m_Geaendertvon As String
+Private m_AngelegtVon As String
+Private m_Del As Boolean
+Private m_ArtGruppeNr As Long
+Private m_ArtZeichnung As String
+Private m_ArtDatenblatt As String
+Private m_Gewicht As Double
+Private m_TeilArt As Long
+Private m_ArtKaufteil As Boolean
+Private m_ArtLaserteil As Boolean
+Private m_ArtKantteil As Boolean
+Private m_ArtGewinde As Boolean
+Private m_ArtSchweißen As Boolean
+Private m_ArtDrehen As Boolean
+Private m_ArtFraesen As Boolean
+Private m_ArtSonstiges As Boolean
+
+Private m_ArtMinPreis As Double
+Private m_ArtMaxPreis As Double
+Private m_PreisAuswahl As Long
+
+Private m_Projektnummer As Long
+
+Private m_CAD_Index As String
+
+Public Property Get PreisAuswahl() As Long:
+'0= Preis VK 1=Peis_EK
+PreisAuswahl = m_PreisAuswahl
+End Property
+Public Property Let PreisAuswahl(WERT As Long):     m_PreisAuswahl = WERT: End Property
+
+Public Property Get CAD_Index() As String:    CAD_Index = m_CAD_Index: End Property
+Public Property Let CAD_Index(WERT As String):     m_CAD_Index = WERT: End Property
+
+Public Property Get Projektnummer() As Long:    Projektnummer = m_Projektnummer: End Property
+Public Property Let Projektnummer(WERT As Long):     m_Projektnummer = WERT: End Property
+
+Public Property Get ZielTabelleID() As Long:    ZielTabelleID = m_ZielTabelleID: End Property
+Public Property Let ZielTabelleID(WERT As Long):     m_ZielTabelleID = WERT: End Property
+
+Public Property Get ZielTabelleName() As String:    ZielTabelleName = m_ZielTabelleName: End Property
+Public Property Let ZielTabelleName(WERT As String):     m_ZielTabelleName = WERT: End Property
+
+Public Property Get ZielArtikelID() As Long:    ZielArtikelID = m_ZielArtikelID: End Property
+Public Property Let ZielArtikelID(WERT As Long):     m_ZielArtikelID = WERT: End Property
+
+Public Property Get ZielAdresseLieferantID() As Long:    ZielAdresseLieferantID = m_ZielAdresseLieferantID: End Property
+Public Property Let ZielAdresseLieferantID(WERT As Long):     m_ZielAdresseLieferantID = WERT: End Property
+
+
+Public Property Get ID() As Long:    ID = m_ID: End Property
+Public Property Let ID(WERT As Long):     m_ID = WERT: End Property
+Public Property Get Lieferant() As Long:           Lieferant = m_Lieferant:   End Property
+Public Property Let Lieferant(WERT As Long):     m_Lieferant = WERT:          End Property
+Public Property Get Bezeichnung() As String:     Bezeichnung = m_Bezeichnung: End Property
+Public Property Let Bezeichnung(WERT As String): m_Bezeichnung = WERT: End Property
+Public Property Get Beschreibung() As String:    Beschreibung = m_Beschreibung: End Property
+Public Property Let Beschreibung(WERT As String):     m_Beschreibung = WERT: End Property
+Public Property Get BeschreibungB() As String:    BeschreibungB = m_BeschreibungB: End Property
+Public Property Let BeschreibungB(WERT As String):     m_BeschreibungB = WERT: End Property
+Public Property Get Bestellnummer() As Variant
+    Bestellnummer = m_Bestellnummer
+End Property
+Public Property Let Bestellnummer(WERT As Variant)
+    m_Bestellnummer = WERT
+End Property
+Public Property Get Preis_EK() As Single:    Preis_EK = m_Preis_EK: End Property
+Public Property Let Preis_EK(WERT As Single):     m_Preis_EK = WERT: End Property
+Public Property Get Preis_Rabatt_pro() As Double:    Preis_Rabatt_pro = m_Preis_Rabatt_pro: End Property
+Public Property Let Preis_Rabatt_pro(WERT As Double):     m_Preis_Rabatt_pro = WERT: End Property
+Public Property Get Preis_EK_mit_Rabatt() As Single:    Preis_EK_mit_Rabatt = m_Preis_EK_mit_Rabatt: End Property
+Public Property Let Preis_EK_mit_Rabatt(WERT As Single):     m_Preis_EK_mit_Rabatt = WERT: End Property
+Public Property Get Liefezeit() As Double:    Liefezeit = m_Liefezeit: End Property
+Public Property Let Liefezeit(WERT As Double):     m_Liefezeit = WERT: End Property
+Public Property Get Bemerkung() As String:    Bemerkung = m_Bemerkung: End Property
+Public Property Let Bemerkung(WERT As String):     m_Bemerkung = WERT: End Property
+Public Property Get Preis_VK() As Single:    Preis_VK = m_Preis_VK: End Property
+Public Property Let Preis_VK(WERT As Single):     m_Preis_VK = WERT: End Property
+Public Property Get Lagerbestand() As Long:    Lagerbestand = m_Lagerbestand: End Property
+Public Property Let Lagerbestand(WERT As Long):     m_Lagerbestand = WERT: End Property
+Public Property Get Liefereinheit() As String:    Liefereinheit = m_Liefereinheit: End Property
+Public Property Let Liefereinheit(WERT As String):     m_Liefereinheit = WERT: End Property
+Public Property Get LieferMenge() As Double:    LieferMenge = m_LieferMenge: End Property
+Public Property Let LieferMenge(WERT As Double):     m_LieferMenge = WERT: End Property
+Public Property Get PreisLiefereinheit() As Single:    PreisLiefereinheit = m_PreisLiefereinheit: End Property
+Public Property Let PreisLiefereinheit(WERT As Single):     m_PreisLiefereinheit = WERT: End Property
+Public Property Get Mutter() As Boolean:    Mutter = m_Mutter: End Property
+Public Property Let Mutter(WERT As Boolean):     m_Mutter = WERT: End Property
+Public Property Get GeaendertDat() As Date:    GeaendertDat = m_GeaendertDat: End Property
+Public Property Let GeaendertDat(WERT As Date):     m_GeaendertDat = WERT: End Property
+Public Property Get AngelegtDat() As Date:    AngelegtDat = m_AngelegtDat: End Property
+Public Property Let AngelegtDat(WERT As Date):     m_AngelegtDat = WERT: End Property
+Public Property Get Geaendertvon() As String:    Geaendertvon = m_Geaendertvon: End Property
+Public Property Let Geaendertvon(WERT As String):     m_Geaendertvon = WERT: End Property
+Public Property Get AngelegtVon() As String:    AngelegtVon = m_AngelegtVon: End Property
+Public Property Let AngelegtVon(WERT As String):     m_AngelegtVon = WERT: End Property
+Public Property Get Del() As Boolean:    Del = m_Del: End Property
+Public Property Let Del(WERT As Boolean):     m_Del = WERT: End Property
+Public Property Get ArtGruppeNr() As Long:    ArtGruppeNr = m_ArtGruppeNr: End Property
+Public Property Let ArtGruppeNr(WERT As Long):     m_ArtGruppeNr = WERT: End Property
+Public Property Get ArtZeichnung() As String:    ArtZeichnung = m_ArtZeichnung: End Property
+Public Property Let ArtZeichnung(WERT As String):     m_ArtZeichnung = WERT: End Property
+Public Property Get ArtDatenblatt() As String:    ArtDatenblatt = m_ArtDatenblatt: End Property
+Public Property Let ArtDatenblatt(WERT As String):     m_ArtDatenblatt = WERT: End Property
+Public Property Get Gewicht() As Double:    Gewicht = m_Gewicht: End Property
+Public Property Let Gewicht(WERT As Double):     m_Gewicht = WERT: End Property
+Public Property Get TeilArt() As Long:    TeilArt = m_TeilArt: End Property
+Public Property Let TeilArt(WERT As Long):     m_TeilArt = WERT: End Property
+Public Property Get ArtKaufteil() As Boolean:    ArtKaufteil = m_ArtKaufteil: End Property
+Public Property Let ArtKaufteil(WERT As Boolean):     m_ArtKaufteil = WERT: End Property
+Public Property Get ArtLaserteil() As Boolean:    ArtLaserteil = m_ArtLaserteil: End Property
+Public Property Let ArtLaserteil(WERT As Boolean):     m_ArtLaserteil = WERT: End Property
+Public Property Get ArtKantteil() As Boolean:    ArtKantteil = m_ArtKantteil: End Property
+Public Property Let ArtKantteil(WERT As Boolean):     m_ArtKantteil = WERT: End Property
+Public Property Get ArtGewinde() As Boolean:    ArtGewinde = m_ArtGewinde: End Property
+Public Property Let ArtGewinde(WERT As Boolean):     m_ArtGewinde = WERT: End Property
+Public Property Get ArtSchweißen() As Boolean:    ArtSchweißen = m_ArtSchweißen: End Property
+Public Property Let ArtSchweißen(WERT As Boolean):     m_ArtSchweißen = WERT: End Property
+Public Property Get ArtDrehen() As Boolean:    ArtDrehen = m_ArtDrehen: End Property
+Public Property Let ArtDrehen(WERT As Boolean):     m_ArtDrehen = WERT: End Property
+Public Property Get ArtFraesen() As Boolean:    ArtFraesen = m_ArtFraesen: End Property
+Public Property Let ArtFraesen(WERT As Boolean):     m_ArtFraesen = WERT: End Property
+Public Property Get ArtSonstiges() As Boolean:    ArtSonstiges = m_ArtSonstiges: End Property
+Public Property Let ArtSonstiges(WERT As Boolean):     m_ArtSonstiges = WERT: End Property
+
+
+Public Property Get ArtMinPreis() As Double:    ArtMinPreis = m_ArtMinPreis: End Property
+Public Property Let ArtMinPreis(WERT As Double):     m_ArtMinPreis = WERT: End Property
+Public Property Get ArtMaxPreis() As Double:    ArtMaxPreis = m_ArtMaxPreis: End Property
+Public Property Let ArtMaxPreis(WERT As Double):     m_ArtMaxPreis = WERT: End Property
+
+
+Public Property Get LieferantRufnameEXT() As String
+    'Der Wert wird aus der Adresstabelle geholt
+    LieferantRufnameEXT = Nz(DLookup("Rufname", "tblAdressen", "AdressNr=" & m_Lieferant), "")
+End Property
+
+
+
+
+Public Function Laden(Artikelnummer As Long) As Boolean
+'der Artikel wird in das Objekt geladen
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+
+
+sSql = "SELECT * FROM tblArtikel WHERE ID = " & Artikelnummer
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    Laden = False
+    With rs1
+        If Not .EOF Then
+            m_ID = Nz(.Fields("ID").Value)
+            m_Lieferant = Nz(.Fields("Lieferant").Value)
+            m_Bezeichnung = Nz(.Fields("Bezeichnung").Value)
+            m_Beschreibung = Nz(.Fields("Beschreibung").Value)
+            m_BeschreibungB = Nz(.Fields("BeschreibungB").Value)
+            m_Bestellnummer = Nz(.Fields("Bestellnummer").Value)
+            m_Preis_EK = Nz(.Fields("Preis_EK").Value)
+            m_Preis_Rabatt_pro = Nz(.Fields("Preis_Rabatt_pro").Value)
+            m_Preis_EK_mit_Rabatt = Nz(.Fields("Preis_EK_mit_Rabatt").Value)
+            m_Liefezeit = Nz(.Fields("Liefezeit").Value)
+            m_Bemerkung = Nz(.Fields("Bemerkung").Value)
+            m_Preis_VK = Nz(.Fields("Preis_VK").Value)
+            m_Lagerbestand = Nz(.Fields("Lagerbestand").Value)
+            m_Liefereinheit = Nz(.Fields("Liefereinheit").Value)
+            m_LieferMenge = Nz(.Fields("LieferMenge").Value)
+            m_PreisLiefereinheit = Nz(.Fields("PreisLiefereinheit").Value)
+            m_Mutter = Nz(.Fields("Mutter").Value)
+            m_GeaendertDat = Nz(.Fields("GeaendertDat").Value)
+            m_AngelegtDat = Nz(.Fields("AngelegtDat").Value)
+            m_Geaendertvon = Nz(.Fields("Geaendertvon").Value)
+            m_AngelegtVon = Nz(.Fields("AngelegtVon").Value)
+            m_Del = Nz(.Fields("Del").Value)
+            m_ArtGruppeNr = Nz(.Fields("ArtGruppeNr").Value)
+            m_ArtZeichnung = Nz(.Fields("ArtZeichnung").Value)
+            m_ArtDatenblatt = Nz(.Fields("ArtDatenblatt").Value)
+            m_Gewicht = Nz(.Fields("Gewicht").Value)
+            m_TeilArt = Nz(.Fields("TeilArt").Value)
+            m_ArtKaufteil = Nz(.Fields("ArtKaufteil").Value)
+            m_ArtLaserteil = Nz(.Fields("ArtLaserteil").Value)
+            m_ArtKantteil = Nz(.Fields("ArtKantteil").Value)
+            m_ArtGewinde = Nz(.Fields("ArtGewinde").Value)
+            m_ArtSchweißen = Nz(.Fields("ArtSchweißen").Value)
+            m_ArtDrehen = Nz(.Fields("ArtDrehen").Value)
+            m_ArtFraesen = Nz(.Fields("ArtFraesen").Value)
+            m_ArtSonstiges = Nz(.Fields("ArtSonstiges").Value)
+            
+            m_ArtMinPreis = Nz(.Fields("ArtMinPreis").Value)
+            m_ArtMaxPreis = Nz(.Fields("ArtMaxPreis").Value)
+            'holt sich en Änderungsindex wenn vorhanden nur dieser eine Datensatz wenn mehr Daten Abfrage erweitern 06.2019mg
+            m_CAD_Index = Nz(DLookup("Arc_Index", "tblArtikelCad", "ArC_FiArtikel=" & m_ID), "")
+            
+            Laden = True
+        End If
+        .Close
+    End With
+'PSDebug "Artikel Laden" & (Timer - gloT)
+
+End Function
+
+
+
+Public Function NeuAnlegen() As Long
+'Legt einen neuen Artikel an
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+'prüfen ob Bezeichnung eingegeben
+If Nz(m_Bezeichnung, "") = "" Then
+    NeuAnlegen = -1
+    Exit Function
+End If
+
+'Diesen Kunstgriff wenn das aufgerufen wird über das Menue und ein Artikel aus dem bestehenden Eintrag z.B. der Einkaufliste erstellt werden soll
+If m_ZielAdresseLieferantID <> 0 Then m_Lieferant = m_ZielAdresseLieferantID
+    
+'Prüfen ob es den Lieferant gibt sicher ist sicher
+m_Lieferant = Nz(DLookup("AdressNr", "tblAdressen", "AdressNr=" & m_Lieferant), 0)
+
+If m_Lieferant = 0 Then
+    NeuAnlegen = -2
+    Exit Function
+End If
+
+If m_ID <> 0 Then
+    'Die Artikel ID ist vogegeben prüfen ob sie vorhanden ist wenn ja abbrechen
+    If Nz(DLookup("id", "tblArtikel", "id=" & m_ID), 0) = m_ID Then
+        NeuAnlegen = -3
+        Exit Function
+    End If
+Else
+    'keine Artike Id eine erzeugen
+    m_ID = funLetzteDatensatzNr("tblArtikel", "ID")
+End If
+
+NeuAnlegen = m_ID
+
+
+
+sSql = "SELECT * FROM tblArtikel WHERE FALSE"
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    
+    With rs1
+        .AddNew
+            
+            .Fields("Lieferant").Value = m_Lieferant
+            .Fields("Bezeichnung").Value = m_Bezeichnung
+            .Fields("Beschreibung").Value = m_Beschreibung & " "
+            .Fields("BeschreibungB").Value = m_BeschreibungB & " "
+            .Fields("Bestellnummer").Value = IIf(m_Bestellnummer = "", "-", m_Bestellnummer)
+            .Fields("Preis_EK").Value = m_Preis_EK
+            .Fields("Preis_Rabatt_pro").Value = m_Preis_Rabatt_pro
+            .Fields("Preis_EK_mit_Rabatt").Value = m_Preis_EK_mit_Rabatt
+            .Fields("Liefezeit").Value = m_Liefezeit
+            .Fields("Bemerkung").Value = m_Bemerkung & " "
+            .Fields("Preis_VK").Value = m_Preis_VK
+            .Fields("Lagerbestand").Value = m_Lagerbestand
+            .Fields("Liefereinheit").Value = m_Liefereinheit
+            .Fields("LieferMenge").Value = m_LieferMenge
+            .Fields("PreisLiefereinheit").Value = m_PreisLiefereinheit
+            .Fields("Mutter").Value = m_Mutter
+            .Fields("GeaendertDat").Value = Now
+            .Fields("AngelegtDat").Value = Now
+            .Fields("Geaendertvon").Value = PS.User.Kurzzeichen
+            .Fields("AngelegtVon").Value = PS.User.Kurzzeichen
+            .Fields("Del").Value = m_Del
+            .Fields("ArtGruppeNr").Value = m_ArtGruppeNr
+            .Fields("ArtZeichnung").Value = m_ArtZeichnung
+            .Fields("ArtDatenblatt").Value = m_ArtDatenblatt
+            .Fields("Gewicht").Value = m_Gewicht
+            .Fields("TeilArt").Value = m_TeilArt
+            .Fields("ArtKaufteil").Value = m_ArtKaufteil
+            .Fields("ArtLaserteil").Value = m_ArtLaserteil
+            .Fields("ArtKantteil").Value = m_ArtKantteil
+            .Fields("ArtGewinde").Value = m_ArtGewinde
+            .Fields("ArtSchweißen").Value = m_ArtSchweißen
+            .Fields("ArtDrehen").Value = m_ArtDrehen
+            .Fields("ArtFraesen").Value = m_ArtFraesen
+            .Fields("ArtSonstiges").Value = m_ArtSonstiges
+            
+            .Fields("ArtMinPreis").Value = m_ArtMinPreis
+            .Fields("ArtMaxPreis").Value = m_ArtMaxPreis
+            
+            .Fields("ID").Value = m_ID
+        
+        .Update
+        .Close
+    End With
+
+
+
+End Function
+
+Public Function Kopieren(idArtikelQuelle As Long) As Long
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+
+If Not Laden(idArtikelQuelle) Then
+    Kopieren = -1 '
+    PSDebug "Artikel Quelle Laden geht nicht"
+    Exit Function
+End If
+
+'Selber den letzten Datensatz suchen ermöglicht lücken zu machen
+m_ID = funLetzteDatensatzNr("tblArtikel", "ID")
+Kopieren = m_ID
+
+
+'Hier den vorher geladenen Artikel einfach an den neu erzeugten übergeben
+
+sSql = "SELECT * FROM tblArtikel WHERE FALSE"
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    With rs1
+        .AddNew
+            
+            .Fields("Lieferant").Value = m_Lieferant
+            .Fields("Bezeichnung").Value = m_Bezeichnung
+            .Fields("Beschreibung").Value = m_Beschreibung & " "
+            .Fields("BeschreibungB").Value = m_BeschreibungB & " "
+            .Fields("Bestellnummer").Value = IIf(m_Bestellnummer = "", "-", m_Bestellnummer)
+            .Fields("Preis_EK").Value = m_Preis_EK
+            .Fields("Preis_Rabatt_pro").Value = m_Preis_Rabatt_pro
+            .Fields("Preis_EK_mit_Rabatt").Value = m_Preis_EK_mit_Rabatt
+            .Fields("Liefezeit").Value = m_Liefezeit
+            .Fields("Bemerkung").Value = m_Bemerkung & " "
+            .Fields("Preis_VK").Value = m_Preis_VK
+            .Fields("Lagerbestand").Value = m_Lagerbestand
+            .Fields("Liefereinheit").Value = m_Liefereinheit
+            .Fields("LieferMenge").Value = m_LieferMenge
+            .Fields("PreisLiefereinheit").Value = m_PreisLiefereinheit
+            .Fields("Mutter").Value = m_Mutter
+            .Fields("GeaendertDat").Value = Now
+            .Fields("AngelegtDat").Value = Now
+            .Fields("Geaendertvon").Value = PS.User.Kurzzeichen
+            .Fields("AngelegtVon").Value = PS.User.Kurzzeichen
+            .Fields("Del").Value = m_Del
+            .Fields("ArtGruppeNr").Value = m_ArtGruppeNr
+            .Fields("ArtZeichnung").Value = m_ArtZeichnung
+            .Fields("ArtDatenblatt").Value = m_ArtDatenblatt
+            .Fields("Gewicht").Value = m_Gewicht
+            .Fields("TeilArt").Value = m_TeilArt
+            .Fields("ArtKaufteil").Value = m_ArtKaufteil
+            .Fields("ArtLaserteil").Value = m_ArtLaserteil
+            .Fields("ArtKantteil").Value = m_ArtKantteil
+            .Fields("ArtGewinde").Value = m_ArtGewinde
+            .Fields("ArtSchweißen").Value = m_ArtSchweißen
+            .Fields("ArtDrehen").Value = m_ArtDrehen
+            .Fields("ArtFraesen").Value = m_ArtFraesen
+            .Fields("ArtSonstiges").Value = m_ArtSonstiges
+        
+            .Fields("ID").Value = m_ID
+        
+        .Update
+        .Close
+    End With
+
+End Function
+
+
+
+Public Function PopUpRefresh()
+
+MsgBox "klappt"
+End Function
+
+
+Public Function Speichern() As Long
+'Speichert einen geladenen Artikel
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+'On Error GoTo Err_
+
+'prüfen ob Bezeichnung eingegeben
+If Nz(m_Bezeichnung, "") = "" Then
+    Speichern = -1
+    Exit Function
+End If
+
+'Diesen Kunstgriff wenn das aufgerufen wird über das Menue und ein Artikel aus dem bestehenden Eintrag z.B. der Einkaufliste erstellt werden soll
+'If m_ZielAdresseLieferantID <> 0 Then m_Lieferant = m_ZielAdresseLieferantID
+    
+'Prüfen ob es den Lieferant gibt sicher ist sicher
+'m_Lieferant = Nz(DLookup("AdressNr", "tblAdressen", "AdressNr=" & m_Lieferant), 0)
+
+If m_Lieferant = 0 Then
+    Speichern = -2
+    Exit Function
+End If
+
+
+
+sSql = "SELECT * FROM tblArtikel WHERE ID=" & m_ID
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    
+    With rs1
+        If .EOF Then
+            Speichern = -9
+        Else
+            .Edit
+                
+                .Fields("Lieferant").Value = m_Lieferant
+                .Fields("Bezeichnung").Value = m_Bezeichnung
+                .Fields("Beschreibung").Value = m_Beschreibung & " "
+                .Fields("BeschreibungB").Value = m_BeschreibungB & " "
+                .Fields("Bestellnummer").Value = IIf(m_Bestellnummer = "", "-", m_Bestellnummer)
+                .Fields("Preis_EK").Value = m_Preis_EK
+                .Fields("Preis_Rabatt_pro").Value = m_Preis_Rabatt_pro
+                .Fields("Preis_EK_mit_Rabatt").Value = m_Preis_EK_mit_Rabatt
+                .Fields("Liefezeit").Value = m_Liefezeit
+                .Fields("Bemerkung").Value = m_Bemerkung & " "
+                .Fields("Preis_VK").Value = m_Preis_VK
+                .Fields("Lagerbestand").Value = m_Lagerbestand
+                .Fields("Liefereinheit").Value = m_Liefereinheit
+                .Fields("LieferMenge").Value = m_LieferMenge
+                .Fields("PreisLiefereinheit").Value = m_PreisLiefereinheit
+                .Fields("Mutter").Value = m_Mutter
+                .Fields("GeaendertDat").Value = Now
+                '.Fields("AngelegtDat").Value = m_AngelegtDat
+                .Fields("Geaendertvon").Value = PS.User.Kurzzeichen
+                '.Fields("AngelegtVon").Value = m_AngelegtVon
+                .Fields("Del").Value = m_Del
+                .Fields("ArtGruppeNr").Value = m_ArtGruppeNr
+                .Fields("ArtZeichnung").Value = m_ArtZeichnung
+                .Fields("ArtDatenblatt").Value = m_ArtDatenblatt
+                .Fields("Gewicht").Value = m_Gewicht
+                .Fields("TeilArt").Value = m_TeilArt
+                .Fields("ArtKaufteil").Value = m_ArtKaufteil
+                .Fields("ArtLaserteil").Value = m_ArtLaserteil
+                .Fields("ArtKantteil").Value = m_ArtKantteil
+                .Fields("ArtGewinde").Value = m_ArtGewinde
+                .Fields("ArtSchweißen").Value = m_ArtSchweißen
+                .Fields("ArtDrehen").Value = m_ArtDrehen
+                .Fields("ArtFraesen").Value = m_ArtFraesen
+                .Fields("ArtSonstiges").Value = m_ArtSonstiges
+                
+                .Fields("ArtMinPreis").Value = m_ArtMinPreis
+                .Fields("ArtMaxPreis").Value = m_ArtMaxPreis
+                
+               
+            
+            .Update
+            Speichern = m_ID
+        End If
+        .Close
+    End With
+Exit Function
+Err_:
+
+Speichern = -99
+End Function
+
+
+Public Function MutterBerechnen(ArtikelID As Long, Optional ProjektNrStueckliste As Long) As Long
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+'berechnet den Preis von Müttern in den Artikeln
+'Wenn die Projektnummer angegeben ist wird auch der Preiseintrag in der Stückliste erneuert
+
+'prüfen ob Mutter
+Me.Laden (ArtikelID)
+If m_Mutter <> True Then
+    MutterBerechnen = -1 'Fehlercode
+    Exit Function
+End If
+
+'Summe der Mutter ermittelln
+sSql = " SELECT Artikel_Nr_Mutter, Sum([Preis_EK_mit_Rabatt]*[menge]) AS PEK_, Sum([artminpreis]*[menge]) AS PMin_, Sum([artmaxpreis]*[menge]) AS PMax_ " & _
+        "FROM tblArtikel INNER JOIN tblArtikelgruppen ON tblArtikel.ID = tblArtikelgruppen.Artikel_Nr_Kind " & _
+        "GROUP BY Artikel_Nr_Mutter " & _
+        "HAVING Artikel_Nr_Mutter=" & ArtikelID
+       
+'Ändert den Preis im Artikel
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+With rs1
+    If Not .EOF Then
+        m_Preis_EK = .Fields("PEK_").Value
+        m_Preis_EK_mit_Rabatt = .Fields("PEK_").Value
+        m_ArtMinPreis = .Fields("PMin_").Value
+        m_ArtMaxPreis = .Fields("PMax_").Value
+        PS.PSDebug ("m_Preis_EK_mit_Rabatt=" & m_Preis_EK_mit_Rabatt)
+        PS.PSDebug ("Artid=" & Me.Speichern)
+        MutterBerechnen = 1
+    End If
+End With
+
+'Ändert den Preis in der Einkaufsliste wenn Projektnummer angegeben es muss bechtet werden das der Artikel mehrfach vorkommen kann
+
+'If ProjektNrStueckliste = 0 Then Exit Function
+sSql = "SELECT * FROM tblstueckliste WHERE Projektnummer=" & ProjektNrStueckliste & " and ArtikelID = " & ArtikelID
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+With rs1
+    While Not .EOF
+        .Edit
+            .Fields("PreisStueck").Value = m_Preis_EK
+            .Fields("PreisBrut").Value = m_Preis_EK
+            .Fields("ST_MinKosten").Value = m_ArtMinPreis
+            .Fields("St_MaxKosten").Value = m_ArtMaxPreis
+            .Fields("ST_MinKostenSum").Value = m_ArtMinPreis * .Fields("Menge").Value
+            .Fields("ST_MaxKostenSum").Value = m_ArtMaxPreis * .Fields("Menge").Value
+        .Update
+        .MoveNext
+    Wend
+    .Close
+End With
+
+
+End Function

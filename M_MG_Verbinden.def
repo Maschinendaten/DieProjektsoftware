@@ -1,0 +1,523 @@
+Option Compare Database
+Option Explicit
+
+
+Sub SubPsBackend()
+'----------------------------------------------------------
+'Die Funktion bindet das Backend so ein wie im Moment die Tabelle sind
+'In der Variablen DatName muss der komplette Datenbank Name inkl absolutem Pfad stehen
+' z.B. "C:\programme\ps\PS_DatXP.mdb"
+'Die Funktion gibt die Anzahl der eingebundenen Tabellen zurück bei Fehler wird 0 zurück gegeben
+'abgeändert aus Donkarl.com 3.1
+'----------------------------------------------------------
+
+Dim db As DAO.Database
+Dim Daten As String
+Dim I As Integer
+Dim l_1 As Long
+'on error Goto Err_
+Set db = CurrentDbC()
+
+
+'If modAbfrage("Wollen Sie zur lokalen Datenbank wechseln?") Then
+'    Daten = "C:\programme\ps\PS_DatXP.mdb"
+'Else
+'    If modAbfrage("Wollen Sie zur Netzwerk Datenbank wechseln?") Then
+'        Daten = "Z:\Aa_Gf\Intranet\Projektsoftware\PS_DatXP.mdb"
+'    Else
+'        'Abbrechen wenn keine Auswahl
+'        Exit Sub
+'    End If
+'End If
+
+
+
+Daten = funDateiAuswaehlen("c:\", "*.mdb;*.Accdb ;*.Accdr")
+If Daten <> "" Then
+    DoCmd.OpenForm "frmFortschritt"
+    Form_frmFortschritt.funAnzeige db.TableDefs.Count, 0
+    Screen.MousePointer = 11
+    For I = 0 To db.TableDefs.Count - 1
+       If db.TableDefs(I).Connect <> "" Then
+            If Mid(db.TableDefs(I).Connect, 11) <> Daten Then
+                db.TableDefs(I).Connect = ";database=" & Daten
+                db.TableDefs(I).RefreshLink
+            End If
+       End If
+       l_1 = I
+       Form_frmFortschritt.funAnzeige db.TableDefs.Count, l_1
+       DoEvents
+    Next I
+    
+    Set db = Nothing
+    Screen.MousePointer = 0
+    DoCmd.Close acForm, "frmFortschritt"
+End If
+
+
+Exit_:
+Exit Sub
+Err_:
+Screen.MousePointer = 0
+'    MsgErr "MG_Verbinden", "SubPsBackend", Err.Description, Err.Number, Err.Erl
+'    Resume Exit_
+'Resume Next
+End Sub
+Function funNameBackend() As String
+'----------------------------------------------------------
+'Die Funktion gibt das Verzeichnis der ersten Tabelle wieder 080324 MG
+'----------------------------------------------------------
+
+Dim db As DAO.Database
+Dim Daten As String
+Dim I As Integer
+
+'on error Goto Err_
+Set db = CurrentDbC()
+
+
+For I = 0 To db.TableDefs.Count - 1
+   If db.TableDefs(I).Connect <> "" Then
+    Daten = Mid(db.TableDefs(I).Connect, 11)
+'        If MID(DB.TableDefs(I).Connect, 11) <> Daten Then
+'            DB.TableDefs(I).Connect = ";database=" & Daten
+'            DB.TableDefs(I).RefreshLink
+'        End If
+   End If
+Next I
+
+Set db = Nothing
+
+funNameBackend = Daten
+
+Exit_:
+Exit Function
+Err_:
+    MsgErr "MG_Verbinden", "funNameBackend", Err.Description, Err.Number, Err.Erl
+End Function
+
+
+Function funDelDBName(strDel As String)
+'----------------------------------------------------------
+'Die Funktion löscht die übergebenen Buchstaben am Anfang des Tabellennamens
+'Nützlich für die Einbindung von Tabellen die nach SQl importiert wurden
+'wenn mann aus dbo_tblPack tblPack machen will gibt man ein dbo_
+'wenn ein * eingegeben wird werden alle verbundenen Tabellen gelöscht
+' Tabellen mit temp werden nicht gelöscht
+' 1.11.2005 MG
+'----------------------------------------------------------
+
+Dim db As DAO.Database
+Dim Daten As String
+Dim I As Integer
+Dim strSp1 As String
+
+''on error Goto Err_
+
+If strDel = "" Then
+    strDel = InputBox("Name der Tabellen z.B. tbl* oder * für alle")
+    If strDel = "" Then Exit Function
+End If
+
+Set db = CurrentDb()
+
+Screen.MousePointer = 11
+For I = 0 To db.TableDefs.Count - 1
+    strSp1 = db.TableDefs(I).Name
+    If strDel <> "*" Then
+        If Mid(strSp1, 1, Len(strDel)) = strDel Then
+            db.TableDefs(I).Name = Mid(strSp1, Len(strDel) + 1, 30)
+        End If
+    Else  'Löscht die ganze Tabelle
+        'Systhemtabellen und Tabellen mit tmpTemp werden nicht gelöscht
+        If Left(strSp1, 4) <> "MSys" And _
+            Nz(InStr(1, strSp1, "temp", 1)) = 0 And _
+            Nz(InStr(1, strSp1, "tmp", 1)) = 0 Then
+            'DoCmd.DeleteObject acTable, strSP1
+            DoCmd.RunSQL "DROP TABLE " & strSp1 & ""
+        End If
+    End If
+    
+Next I
+
+
+
+Set db = Nothing
+
+
+Screen.MousePointer = 0
+
+Exit Function
+Err_:
+Screen.MousePointer = 0
+MsgBox "Bei der Installation ist ein Fehler aufgetreten. " & vbCrLf & Err.Description, 16, "FEHLER !"
+
+End Function
+
+Function funCopyBer(strCopy As String)
+'----------------------------------------------------------
+'Die Funktion kopiert Berichte und kann zum umschalten für einen anderen Anwender
+'benutzt werden
+'7.03.2006 MG
+'----------------------------------------------------------
+
+Dim db As DAO.Database
+Dim Daten As String
+Dim I As Integer
+Dim strSp1 As String
+Dim rpt As Report
+
+
+    ' Reports-Auflistung durchlaufen.
+For Each rpt In Reports
+    'Name = rpt.Name
+    'Debug.Print rpt.Name
+Next rpt
+
+GoTo Hupf
+
+DoCmd.CopyObject , "berAufABxy", acReport, "berAufABxy"
+
+'listst alle Berichte auf
+'SELECT * FROM msysobjects WHERE (((msysobjects.Type)=-32764));
+
+''on error Goto Err_
+
+If strCopy = "" Then
+    strCopy = InputBox("Endung der Berichte")
+    If strCopy = "" Then Exit Function
+End If
+
+Set db = CurrentDb()
+
+Screen.MousePointer = 11
+
+
+Screen.MousePointer = 0
+
+Hupf:
+
+Exit Function
+Err_:
+Screen.MousePointer = 0
+MsgBox "Bei der Installation ist ein Fehler aufgetreten. " & vbCrLf & Err.Description, 16, "FEHLER !"
+
+End Function
+
+Function funTabVergleichen(datName As String)
+'funTabVergleichen("C:\PSout.txt")
+'Die Funktion vergleicht Eine externe mit der Lokalen Backen Datei und speichert die Unterschiede in der Datei
+'Die Textdateien wird danach automatisch geöffnet
+
+Dim db As DAO.Database
+Dim SDaten As String
+Dim I As Long
+Dim fs As Long 'Fortschritt
+
+If Nz(datName) = "" Then
+    'MsgBox ("Geben Sie einen Dateinamen an.")
+    'Exit Function
+    datName = CurrentProject.Path & "\PS_Datenbankvergleich_" & Year(Now) & Month(Now) & Day(Now)   '& "_" & Hour(Now) & Minute(Now)
+    
+    
+    
+End If
+
+'Die externe Backend Datei auswählen
+SDaten = funDateiAuswaehlen(CurrentProject.Path, ".acdb")
+
+
+If Len(SDaten) < 5 Then
+    MsgBox LA("Sie müssen eine Dateinamen angeben!")
+    Exit Function
+End If
+
+Set db = CurrentDbC()
+
+Open datName & "out.txt" For Output As #1    ' Datei zur Ausgabe öffnen.
+Write #1, "###################################################"
+Write #1, "# Es werden zwei Tabbelen miteinander verglichen. #"
+Write #1, "# Erst die Externe mit der Lokalen und dann,      #"
+Write #1, "# die Lokale mit der Externen,                    #"
+Write #1, "# Externe Tabelle : " & SDaten & "#"
+Write #1, "# Lokale Tabelle  : " & CurrentProject.FullName & " #"
+Write #1, "# " & SDaten & " mit der " & CurrentProject.FullName & " #"
+Write #1, "###################################################"
+
+
+Close #1    ' Datei schließen.
+
+DoCmd.OpenForm "frmFortschritt"
+
+Form_frmFortschritt.funAnzeige db.TableDefs.Count - 1, 1
+
+
+For I = 0 To db.TableDefs.Count - 1
+   If db.TableDefs(I).Connect <> "" Then
+        If Mid(db.TableDefs(I).Connect, 11) <> SDaten Then
+            'DB.TableDefs(I).Connect = ";database=" & Daten
+            'DB.TableDefs(I).RefreshLink
+            'Debug.Print DB.TableDefs(i).Name
+            If fs >= 10 Then
+                Form_frmFortschritt.funAnzeige db.TableDefs.Count - 1, I
+                DoEvents
+                fs = 0
+            End If
+            fs = fs + 1
+             funField "", db.TableDefs(I).Name, datName & "Loc.txt"  '"c:\PSLoc.txt"
+        End If
+   End If
+Next I
+
+
+For I = 0 To db.TableDefs.Count - 1
+   If db.TableDefs(I).Connect <> "" Then
+        If Mid(db.TableDefs(I).Connect, 11) <> SDaten Then
+            'DB.TableDefs(I).Connect = ";database=" & Daten
+            'DB.TableDefs(I).RefreshLink
+            'Debug.Print DB.TableDefs(i).Name
+            If fs >= 10 Then
+                Form_frmFortschritt.funAnzeige db.TableDefs.Count - 1, I
+                DoEvents
+                fs = 0
+            End If
+            fs = fs + 1
+             funField SDaten, db.TableDefs(I).Name, datName & "Ext.txt"   '"C:\PSout.txt"
+        End If
+  End If
+Next I
+DoCmd.Close acForm, "frmFortschritt"
+
+'Vergleicht die beiden Dateien
+funDatVer datName
+
+
+
+Shell "notepad.exe " & datName & "out.txt", 3
+
+
+
+
+End Function
+
+
+Sub funField(NameDB As String, NameTabelle As String, NameDatei As String)
+
+Dim Dbs As DAO.Database
+Dim rst As DAO.Recordset
+Dim fldTableDef As DAO.Field
+Dim fldQueryDef As DAO.Field
+Dim fldRecordset As DAO.Field
+Dim fldRelation As DAO.Field
+Dim fldIndex As DAO.Field
+Dim prpLoop As DAO.Property
+Dim I As Integer
+
+On Error Resume Next
+ 
+
+If NameDB <> "" Then
+    Set Dbs = OpenDatabase(NameDB)
+Else
+    Set Dbs = CurrentDb()
+End If
+
+
+Set rst = Dbs.OpenRecordset(NameTabelle)
+
+'Ein Field-Objekt aus verschiedenen Fields-
+'Auflistungen Objektvariablen zuweisen.
+'Set fldTableDef = DBs.TableDefs(0).Fields(0)
+'Set fldQueryDef = DBs.QueryDefs(0).Fields(0)
+'Set fldRecordset = Rst.Fields(1)
+'Set fldRelation = DBs.Relations(0).Fields(0)
+'Set fldIndex = DBs.TableDefs(0).Indexes(0).Fields(0)
+
+'Bericht ausgeben.
+'FieldOutput "TableDef", fldTableDef
+'FieldOutput "QueryDef", fldQueryDef
+'FieldOutput "Recordset", fldRecordset
+'FieldOutput "Relation", fldRelation
+'FieldOutput "Index", fldIndex
+
+For I = 0 To rst.Fields.Count - 1
+               FieldOutput "Recordset", rst.Fields(I), NameDatei
+           '  Debug.Print DB.TableDefs(i).Name
+Next I
+
+rst.Close
+Dbs.Close
+
+'Print st
+
+Exit Sub
+Err_:
+   Resume Next
+
+End Sub
+
+Sub FieldOutput(strTemp As String, fldTemp As DAO.Field, NameDatei As String)
+
+Dim prpLoop As DAO.Property
+Dim sZ As String
+Dim SType As String
+Dim LType As Long
+Dim sName As String
+Dim SSize As String
+Dim lSize As Long
+Dim sTable As String
+
+
+
+Open NameDatei For Append As #1    ' Datei zur Ausgabe öffnen.
+
+'Debug.Print "Gültige Field-Eigenschaft in " & strTemp
+
+' Enumeration der Properties-Auflistung des
+' übergebenen Field-Objekts.
+For Each prpLoop In fldTemp.Properties
+   ' Einige Eigenschaften sind in bestimmten
+   ' Zusammenhängen unzulässig(z.B. die
+   ' Value-Eigenschaft in einer Fields-
+   ' Auflistung eines TableDef-Objekts). Versuche,
+   ' eine unzulässige Eigenschaft zu verwenden,
+   ' lösen Fehler aus.
+   On Error Resume Next
+   
+ Select Case prpLoop.Name
+     Case "Type"
+         SType = Format(prpLoop.Value, "0000") & "  "
+         LType = Val(prpLoop.Value)
+     Case "Name"
+         sName = prpLoop.Value '& String(25 - Len(prpLoop.Value), " ")
+     Case "Size"
+         SSize = Format(prpLoop.Value, "0000") & "  "
+         lSize = Val(prpLoop.Value)
+     Case "SourceTable"
+         sTable = prpLoop.Value '& String(25 - Len(prpLoop.Value), " ")
+         'STable = STable
+         sZ = "  " & sTable & sName & SType & SSize
+         Write #1, 1, sTable, sName, LType, lSize ' Die geschriebenen Daten
+         'Debug.Print sz
+ End Select
+     
+   ' Debug.Print prpLoop.Name & "= " & prpLoop.Value
+     
+    ' 'on error Goto 0
+
+Next prpLoop
+
+Close #1    ' Datei schließen.
+
+End Sub
+
+Function funDatVer(datName As String)
+'List zwei Textdateien ein und vergleicht diese
+'fundatver "c:\PSLoc.txt","c:\PSext.txt"
+'Das ergebnis wir in die Datei (Name)
+
+Dim LType As Long
+Dim sName As String
+Dim lSize As Long
+Dim sTable As String
+Dim LType2 As Long
+Dim SName2 As String
+Dim Lsize2 As Long
+Dim STable2 As String
+Dim Lstat As Long
+Dim bG As Boolean
+Dim St1 As String
+Dim l_ist As Long
+Dim l_len As Long
+
+
+'on error Goto Err_
+   
+Open datName & "out.txt" For Append As #3    ' Datei zur Ausgabe öffnen.
+'Write #3, STable, SName, LType, Lsize ' Die geschriebenen Daten
+
+Open datName & "Loc.txt" For Input As #1    ' Datei zum Einlesen öffnen.
+
+DoCmd.OpenForm "frmFortschritt"
+l_len = FileLen(datName & "Loc.txt")
+Form_frmFortschritt.funAnzeige l_len, l_ist
+
+
+
+Do While Not EOF(1)    ' Schleife bis Dateiende.
+    Input #1, Lstat, sTable, sName, LType, lSize    ' Daten in zwei Variablen einlesen.
+    If Lstat = 1 Then 'nur prüfen wenn 1
+        l_ist = l_ist + 1
+        Form_frmFortschritt.funAnzeige l_len, l_ist
+        DoEvents
+        Open datName & "Ext.txt" For Input As #2    ' Datei zum Einlesen öffnen.
+        Do While (Not EOF(2)) And (Not bG)      ' Schleife bis Dateiende.
+            Input #2, Lstat, STable2, SName2, LType2, Lsize2    ' Daten in zwei Variablen einlesen.
+            
+            If STable2 <> sTable Then ' Namen vergleichen
+                St1 = "Tabelle<> :"
+            End If
+            If SName2 <> sName Then
+                St1 = "Name<>:"
+            End If
+            If LType2 <> LType Then
+                St1 = "Type<>:"
+            End If
+            If Lsize2 <> lSize Then
+                St1 = "Größe<>:"
+            End If
+            
+            If (STable2 = sTable) And _
+            (SName2 = sName) And _
+            (LType2 = LType) And _
+            (Lsize2 = lSize) Then bG = True
+            
+            
+            
+        Loop
+        Close #2    ' Datei schließen.
+    End If
+    If bG = False Then
+        Debug.Print sTable, sName, LType, lSize, St1 & " Loc > Ext"
+        Write #3, sTable, sName, LType, lSize, St1 & " Loc > Ext"  ' Die geschriebenen Daten
+        St1 = ""
+    End If
+    bG = False
+    
+Loop
+Close #1    ' Datei schließen.
+DoCmd.Close acForm, "frmFortschritt"
+
+Open datName & "Ext.txt" For Input As #1    ' Datei zum Einlesen öffnen.
+
+Do While Not EOF(1)    ' Schleife bis Dateiende.
+    Input #1, Lstat, sTable, sName, LType, lSize    ' Daten in zwei Variablen einlesen.
+
+    Open datName & "Loc.txt" For Input As #2    ' Datei zum Einlesen öffnen.
+    Do While (Not EOF(2)) And (Not bG)      ' Schleife bis Dateiende.
+        Input #2, Lstat, STable2, SName2, LType2, Lsize2    ' Daten in zwei Variablen einlesen.
+        If (STable2 = sTable) And _
+            (SName2 = sName) And _
+            (LType2 = LType) And _
+            (Lsize2 = lSize) Then bG = True
+    Loop
+    Close #2    ' Datei schließen.
+    
+    If bG = False Then
+        Debug.Print sTable, sName, LType, lSize
+        Write #3, sTable, sName, LType, lSize ' Die geschriebenen Daten
+
+    End If
+    bG = False
+    
+Loop
+Close #1    ' Datei schließen.
+Close #3    ' Datei schließen.
+
+Exit Function
+Err_:
+Resume Next
+
+
+
+End Function

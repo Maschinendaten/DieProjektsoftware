@@ -1,0 +1,669 @@
+Option Compare Database
+Option Explicit
+Public Enum enWindowVisibility
+  wvHide = &H80
+  wvShow = &H40
+End Enum
+
+Public Enum enWindowAxis
+  saVertical = 0
+  saHorizontal = 1
+End Enum
+
+'############ Konstante #######################
+Public Const SW_SHOWNORMAL = 1
+Public Const SWP_NOZORDER = &H4
+Public Const IMAGE_ICON = 1
+Public Const LR_LOADFROMFILE = &H10
+Public Const WM_SETICON = &H80
+Public Const ICON_SMALL = 0
+Public Const SM_CXSCREEN = 0
+Public Const SM_CYSCREEN = 0
+
+Public Const HKEY_CURRENT_USER = &H80000001
+
+Public Const REG_SZ = &H1
+Public Const REG_EXPAND_SZ = &H2
+Public Const REG_BINARY = &H3
+Public Const REG_DWORD = &H4
+Public Const REG_DWORD_LITTLE_ENDIAN = &H4
+Public Const REG_DWORD_BIG_ENDIAN = &H5
+Public Const REG_LINK = &H6
+Public Const REG_MULTI_SZ = &H7
+
+Public Const REG_OPTION_NON_VOLATILE = &H0
+
+
+
+
+Public Type tpRect
+  lngLeft As Long
+  lngTop As Long
+  lngRight As Long
+  lngBottom As Long
+End Type
+
+Public Enum enRegistryValueTypes
+  rvtSZ = REG_SZ
+  rvtExpandSZ = REG_EXPAND_SZ
+  rvtBinary = REG_BINARY
+  rvtDWord = REG_DWORD
+  rvtDWordLittleEndian = REG_DWORD_LITTLE_ENDIAN
+  rvtDWordBigEndian = REG_DWORD_BIG_ENDIAN
+  rvtMultiSZ = REG_MULTI_SZ
+End Enum
+
+
+Public Declare PtrSafe Function GetDesktopWindow _
+  Lib "user32" () As Long
+  
+Public Declare PtrSafe Sub GetWindowRect _
+  Lib "user32" ( _
+  ByVal Hwnd As Long, _
+  lpRect As tpRect)
+  
+Public Declare PtrSafe Function ShowWindow _
+  Lib "user32" ( _
+  ByVal Hwnd As Long, _
+  ByVal nCmdShow As Long) As Long
+  
+Public Declare PtrSafe Function SetWindowPos _
+  Lib "user32" ( _
+  ByVal Hwnd As Long, _
+  ByVal hWndInsertAfter As Long, _
+  ByVal X As Long, _
+  ByVal Y As Long, _
+  ByVal cx As Long, _
+  ByVal cy As Long, _
+  ByVal wFlags As Long) As Long
+  
+Public Declare PtrSafe Function LoadImage Lib "user32" _
+   Alias "LoadImageA" _
+   (ByVal hInst As Long, _
+   ByVal lpsz As String, _
+   ByVal un1 As Long, _
+   ByVal n1 As Long, _
+   ByVal n2 As Long, _
+   ByVal un2 As Long) _
+   As Long
+   
+Public Declare PtrSafe Function SendMessage Lib "user32" _
+   Alias "SendMessageA" _
+   (ByVal Hwnd As Long, _
+   ByVal wMsg As Long, _
+   ByVal wParam As Long, _
+   lParam As Any) _
+   As Long
+   
+Public Declare PtrSafe Function FindWindow _
+  Lib "user32" Alias "FindWindowA" ( _
+  ByVal lpClassName As String, _
+  ByVal lpWindowName As String) As Long
+  
+Public Declare PtrSafe Sub keyboard_event _
+  Lib "user32" Alias "keybd_event" ( _
+  ByVal bVk As Byte, _
+  ByVal bScan As Byte, _
+  ByVal dwFlags As Long, _
+  ByVal dwExtraInfo As Long)
+  
+Public Declare PtrSafe Function GetSystemMetrics _
+  Lib "user32" ( _
+  ByVal lngIndex As Long) As Long
+  
+  Public Declare PtrSafe Function MoveWindow _
+  Lib "user32" ( _
+  ByVal Hwnd As Long, _
+  ByVal X As Long, _
+  ByVal Y As Long, _
+  ByVal nWidth As Long, _
+  ByVal nHeight As Long, _
+  ByVal bRepaint As Long) As Long
+  
+  Public Declare PtrSafe Function IsZoomed _
+  Lib "user32" ( _
+  ByVal Hwnd As Long) As Long
+  
+  Public Declare PtrSafe Function GetParent _
+  Lib "user32" ( _
+  ByVal Hwnd As Long) As Long
+  
+  Public Declare PtrSafe Function GetClientRect _
+  Lib "user32" ( _
+  ByVal Hwnd As Long, _
+  lpRect As tpRect) As Long
+  
+  Public Declare PtrSafe Function IsIconic _
+  Lib "user32" ( _
+  ByVal Hwnd As Long) As Long
+  
+  Public Declare PtrSafe Function SetWindowText _
+  Lib "user32" Alias "SetWindowTextA" ( _
+  ByVal Hwnd As Long, _
+  ByVal lpString As String) As Long
+
+
+
+
+'* WD15 ****************************************************v
+'Description: Zeigt ein Formular über allen anderen
+'             Windows-Fenstern an
+'Parameters:  frm, bolTop
+'API-Calls:
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:
+'Return:
+'* WD15 ****************************************************v
+Public Function TopMostForm( _
+  ByVal frm As Form)
+
+  DoCmd.SelectObject acForm, frm.Name
+  'BringWindowToTop frm.hwnd  'ist auch möglich
+  
+End Function
+
+'* WD16 ****************************************************v
+'Description: Setzt das Icon eines (Formular)-Fensters auf die
+'             angegebene Datei
+'Parameters:  lngHWnd, strIconFile
+'API-Calls:   LoadImage, SendMessage (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:   IMAGE_ICON, LR_LOADFROMFILE, WM_SETICON
+'Return:
+'* WD16 ****************************************************v
+Public Function SetIcon( _
+  ByVal lngHWnd As Long, _
+  ByVal strIconFile As String) As Boolean
+
+  Dim lngIcon As Long
+
+  lngIcon = LoadImage(0, strIconFile, IMAGE_ICON, 16, 16, _
+    LR_LOADFROMFILE)
+
+  If lngIcon <> 0 Then
+    
+    Call SendMessage(lngHWnd, WM_SETICON, ICON_SMALL, _
+      ByVal lngIcon)
+  
+  End If
+      
+End Function
+
+'* WD12 ****************************************************
+'Description:  Versteckt oder zeigt die Windows-Taskbar
+'Parameters:   lngVisibility
+'API-Calls:    FindWindow, SetWindowPos (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:        enWindowsVisibility
+'Constants:
+'Return:
+'* WD12 ****************************************************
+
+Public Function ShowHideTaskbar( _
+  ByVal lngVisibility As enWindowVisibility)
+
+  Dim lngHWnd As Long
+
+  lngHWnd = FindWindow("Shell_traywnd", "")
+  Call SetWindowPos(lngHWnd, 0, 0, 0, 0, 0, lngVisibility)
+
+End Function
+
+'* WD10 ****************************************************
+'Description:  Minimiert alle Windows-Fenster
+'Parameters:
+'API-Calls:    keyboard_event (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:
+'Return:
+'* WD10 ****************************************************
+Public Function MinimizeAllWindows()
+
+  Call keyboard_event(91, 0, 0, 0) 'WIN
+  Call keyboard_event(77, 0, 0, 0) 'M
+  Call keyboard_event(91, 0, 2, 0) 'WIN KeyUp
+
+End Function
+
+'* WD11 ****************************************************
+'Description:  Öffnet an aktueller Stelle das Kontextmenü
+'Parameters:
+'API-Calls:    keyboard_event (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:
+'Return:
+'* WD11 ****************************************************
+Public Function OpenContextMenu()
+
+  Call keyboard_event(93, 0, 0, 0) 'Context menu
+  Call keyboard_event(93, 0, 2, 0) 'Context menu KeyUp
+
+End Function
+
+'* WD02 ****************************************************
+'Description:  Die aktuelle Bildschirmauflösung überprüfen
+'Parameters:   intNeededWidth, intNeededHeight
+'API-Calls:    GetSystemMetrics (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:    SM_CXSCREEN, SM_CYSCREEN
+'Return:       Boolean
+'* WD02 ****************************************************
+Public Function CheckScreenResolution( _
+  ByVal intNeededWidth As Integer, _
+  ByVal intNeededHeight As Integer) As Boolean
+
+  Dim intScreenWidth As Integer
+  Dim intScreenHeight As Integer
+  
+  'Ermittlung der Breite...
+  intScreenWidth = GetSystemMetrics(SM_CXSCREEN)
+  '... und der Höhe des Bildschirms
+  intScreenHeight = GetSystemMetrics(SM_CYSCREEN)
+
+  'Vergleich der übergebenen Werte mit den
+  'ermittelten Werten
+
+  If intScreenWidth >= intNeededWidth _
+     And intScreenHeight >= intNeededHeight Then
+    CheckScreenResolution = True
+  End If
+
+End Function
+
+'* WD05 ****************************************************
+'Description:  Legt die Grösse des Access-Fenster fest
+'Parameters:   lngHeight, lngWidth
+'API-Calls:    ShowWindow, GetWindowRect, MoveWindow (User32)
+'References:
+'Functions:
+'Classes:
+'Types:        tpRect
+'Enums:
+'Constants:
+'Return:
+'* WD05 ****************************************************
+Public Function SizeAccessWindow( _
+  ByVal lngHeight As Long, _
+  ByVal lngWidth As Long)
+
+  Dim lngTop As Long
+  Dim lngLeft As Long
+  Dim lngRet As Long
+  Dim lngHWnd As Long
+  Dim typRectForm As tpRect
+  
+  On Error Resume Next
+  
+  'Access-WindowHandle ermitteln
+  lngHWnd = Application.hWndAccessApp
+  
+  'Access-Fenster im normalem Modus darstellen
+  lngRet = ShowWindow(lngHWnd, SW_SHOWNORMAL)
+  
+  'Grösse des Access-Fensters ermitteln
+  Call GetWindowRect(lngHWnd, typRectForm)
+
+  lngTop = typRectForm.lngTop
+  lngLeft = typRectForm.lngLeft
+
+  'Access-Fenster verschieben
+  Call MoveWindow(lngHWnd, lngLeft, _
+    lngTop, lngWidth, lngHeight, True)
+
+End Function
+
+'* WD04 ****************************************************
+'Description: Positioniert das Access-Fenster
+'Parameters:  lngHeight, lngLeft, lngTop, lngWidth
+'API-Calls:   MoveWindow (User32)
+'References:
+'Functions:
+'Classes:
+'Types:       tpRect
+'Enums:
+'Constants:
+'Return:
+'* WD04 ****************************************************
+Public Function MoveAccessWindow( _
+  ByVal lngLeft As Long, _
+  ByVal lngTop As Long, _
+  Optional ByVal lngHeight As Long, _
+  Optional ByVal lngWidth As Long)
+
+  Dim lngHWnd As Long
+  Dim typRectForm As tpRect
+  
+  On Error Resume Next
+  
+  'Access-WindowHandle ermitteln
+  lngHWnd = Application.hWndAccessApp
+  
+  'Grösse des Access-Fensters ermitteln
+  If lngHeight = 0 Or lngWidth = 0 Then
+    Call GetWindowRect(lngHWnd, typRectForm)
+  End If
+
+  If lngHeight = 0 Then
+    lngHeight = typRectForm.lngBottom - typRectForm.lngTop
+  End If
+  
+  If lngWidth = 0 Then
+    lngWidth = typRectForm.lngRight - typRectForm.lngLeft
+  End If
+
+  'Access-Fenster verschieben
+  Call MoveWindow(lngHWnd, lngLeft, _
+    lngTop, lngWidth, lngHeight, True)
+
+End Function
+
+'* WD14 ****************************************************
+'Description:  Einpassen eines Formulars innerhalb des Access-Fensters
+'Parameters:   frm
+'API-Calls:    IsZoomed, ShowWindow, GetClientRect, MoveWindow
+'References:
+'Functions:
+'Classes:
+'Types:        tpRect
+'Enums:
+'Constants:    SW_SHOWNORMAL
+'Return:
+'* WD14 ****************************************************
+Public Function MaximizeForm(frm As Form)
+
+  Dim typRect As tpRect
+
+  'Formular im normalem Modus darstellen
+  If IsZoomed(frm.Hwnd) <> 0 Then
+    Call ShowWindow(frm.Hwnd, SW_SHOWNORMAL)
+  End If
+
+  'Grösse des sichtbaren Access-Bereichs ermitteln
+  Call GetClientRect(GetParent(frm.Hwnd), typRect)
+  
+  'Formular auf diese Grösse verschieben
+  Call MoveWindow(frm.Hwnd, 0, 0, _
+    typRect.lngRight - typRect.lngLeft, _
+    typRect.lngBottom - typRect.lngTop, True)
+
+End Function
+
+'* WD08 ****************************************************
+'Description:  Speicher die aktuelle Grösse des Access-Fensters
+'              in der Registry
+'Parameters:
+'API-Calls:    GetWindowRect (User32)
+'References:
+'Functions:
+'Classes:      clsRegistry
+'Types:        tpRect
+'Enums:
+'Constants:    HKEY_CURRENT_USER
+'Return:
+'* WD08 ****************************************************
+'MG ausgeschalten wegen Set
+
+'Public Function SaveAccessWindowDefaults()
+'
+'  Const CB_REG_CLASS As Long = HKEY_CURRENT_USER
+'  Const CB_REG_SUBKEY As String = "Software\CodeBook"
+'
+'  Dim typRectForm As tpRect
+'
+'  'Grösse des Access-Fensters ermitteln...
+'  Call GetWindowRect(Application.hWndAccessApp, typRectForm)
+'
+'  '... und der Werte in der Registry speichern
+'  Call SetValue(typRectForm.lngRight - typRectForm.lngLeft, _
+'    CB_REG_CLASS, CB_REG_SUBKEY, "WindowWidth", rvtSZ)
+'
+'  Call SetValue(typRectForm.lngBottom - typRectForm.lngTop, _
+'    CB_REG_CLASS, CB_REG_SUBKEY, "WindowHeight", rvtSZ)
+'
+'  Call SetValue(typRectForm.lngTop, _
+'    CB_REG_CLASS, CB_REG_SUBKEY, "WindowTop", rvtSZ)
+'
+'  Call SetValue(typRectForm.lngLeft, _
+'    CB_REG_CLASS, CB_REG_SUBKEY, "WindowLeft", rvtSZ)
+'
+'End Function
+
+'* WD09 ****************************************************
+'Description:  Stellt die Grösse des Access-Fensters auf Grundlage
+'              der in der Registry gespeicherten Werte wieder her
+'Parameters:   [bolPosition]
+'API-Calls:    ShowWindow, GetWindowRect, MoveWindow (User32)
+'References:
+'Functions:
+'Classes:      clsRegistry
+'Types:        tpRect
+'Enums:
+'Constants:    HKEY_CURRENT_USER
+'Return:
+'* WD09 ****************************************************
+
+'MG ausgeblendet
+
+'Public Function RestoreAccessWindowDefaults( _
+'  Optional ByVal bolPosition As Boolean)
+'
+'  Const CB_REG_CLASS As Long = HKEY_CURRENT_USER
+'  Const CB_REG_SUBKEY As String = "Software\CodeBook"
+'
+'  Dim lngWidth As Long
+'  Dim lngHeight As Long
+'  Dim lngTop As Long
+'  Dim lngLeft As Long
+'  Dim lngRet As Long
+'  Dim lngHWnd As Long
+'  Dim typRectForm As tpRect
+'
+'  On Error Resume Next
+'
+'  'Access-WindowHandle ermitteln
+'  lngHWnd = Application.hWndAccessApp
+'
+'  'Höhe und Breite bestimmen
+'  lngHeight = CLng(GetValue(CB_REG_CLASS, _
+'    CB_REG_SUBKEY, "WindowHeight"))
+'
+'  lngWidth = CLng(GetValue(CB_REG_CLASS, _
+'    CB_REG_SUBKEY, "WindowWidth"))
+'
+'  'Access-Fenster im normalem Modus darstellen
+'  lngRet = ShowWindow(lngHWnd, SW_SHOWNORMAL)
+'
+'  'Grösse des Access-Fensters ermitteln
+'  Call GetWindowRect(lngHWnd, typRectForm)
+'
+'  'Wenn Position auch wiederhergestellt werden soll...
+'  If bolPosition = True Then
+'
+'    'Werte aus der Registry auslesen...
+'    lngTop = CLng(GetValue(CB_REG_CLASS, _
+'      CB_REG_SUBKEY, "WindowTop"))
+'
+'    lngLeft = CLng(GetValue(CB_REG_CLASS, _
+'      CB_REG_SUBKEY, "WindowLeft"))
+'
+'  Else
+'    '...oder die aktuelle Position übernehmen
+'    lngTop = typRectForm.lngTop
+'    lngLeft = typRectForm.lngLeft
+'
+'  End If
+'
+'  'Access-Fenster verschieben
+'  Call MoveWindow(lngHWnd, lngLeft, _
+'    lngTop, lngWidth, lngHeight, True)
+'
+'End Function
+
+'* WD03 ****************************************************
+'Description:  Ermittelt die Grösse des Access-Fensters
+'Parameters:   lngAxis
+'API-Calls:    GetWindowRect (User32)
+'References:
+'Functions:
+'Classes:
+'Types:        tpRect
+'Enums:
+'Constants:
+'Return:       Long
+'* WD03 ****************************************************
+Public Function GetAccessWindowSize( _
+  ByVal lngAxis As enWindowAxis) As Long
+
+  Dim typRectForm As tpRect
+  
+  'Grösse des Access-Fensters ermitteln
+  Call GetWindowRect(Application.hWndAccessApp, typRectForm)
+
+  'Wenn Übergabe = vertikale Achse...
+  If lngAxis = 1 Then
+    
+    'Breite...
+    GetAccessWindowSize = typRectForm.lngRight - typRectForm.lngLeft
+  
+  Else
+    
+    '... oder Höhe zurückgeben
+    GetAccessWindowSize = typRectForm.lngBottom - typRectForm.lngTop
+  
+  End If
+
+End Function
+
+'* WD06 ****************************************************
+'Description:  Ermitteln ob das Access-Fenster maximiert ist
+'Parameters:
+'API-Calls:    IsZoomed (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:
+'Return:       Boolean
+'* WD06 ****************************************************
+Public Function IsAccessMaximized() As Boolean
+
+  If IsZoomed(Application.hWndAccessApp) <> 0 Then
+    IsAccessMaximized = True
+  End If
+
+End Function
+
+'* WD07 ****************************************************
+'Description:  Ermitteln ob das Access-Fenster minimiert ist
+'Parameters:
+'API-Calls:    IsIconic (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:
+'Return:       Boolean
+'* WD07 ****************************************************
+Public Function IsAccessMinimized() As Boolean
+
+  If IsIconic(Application.hWndAccessApp) <> 0 Then
+    IsAccessMinimized = True
+  End If
+
+End Function
+
+'* WD01 ****************************************************
+'Description:  Zentrieren das Access-Fensters auf dem Desktop
+'Parameters:
+'API-Calls:    GetWindowRect, GetDesktopWindow, ShowWindow, SetWindowPos (User32)
+'References:
+'Functions:
+'Classes:
+'Types:        tpRect
+'Enums:
+'Constants:    SW_SHOWNORMAL, SWP_NOZORDER
+'Return:
+'* WD01 ****************************************************
+Public Function CenterAccessWindow()
+
+  Dim typRectDesk As tpRect
+  Dim typRectAcc As tpRect
+  Dim lngWidthAcc As Long
+  Dim lngHeightAcc As Long
+  Dim lngWidthDesk As Long
+  Dim lngHeightDesk As Long
+  
+  'Grösse des Desktops ermitteln
+  Call GetWindowRect(GetDesktopWindow(), typRectDesk)
+  
+  'Fenster im normalem Modus darstellen
+  Call ShowWindow(Application.hWndAccessApp, SW_SHOWNORMAL)
+  
+  'Grösse des Access-Fensters ermitteln
+  Call GetWindowRect(Application.hWndAccessApp, typRectAcc)
+  
+  lngWidthAcc = typRectAcc.lngRight - typRectAcc.lngLeft
+  lngHeightAcc = typRectAcc.lngBottom - typRectAcc.lngTop
+  lngWidthDesk = typRectDesk.lngRight - typRectDesk.lngLeft
+  lngHeightDesk = typRectDesk.lngBottom - typRectDesk.lngTop
+  
+  'Position und Dimension des Access-Fensters setzen
+  Call SetWindowPos(Application.hWndAccessApp, ByVal 0, _
+     typRectDesk.lngLeft + (lngWidthDesk - lngWidthAcc) / 2, _
+     typRectDesk.lngTop + (lngHeightDesk - lngHeightAcc) / 2, _
+     lngWidthAcc, lngHeightAcc, SWP_NOZORDER)
+
+End Function
+
+'* WD13 ****************************************************
+'Description:  Ändert den Text der Access-Titelzeile
+'Parameters:   lngHWnd, strTitle
+'API-Calls:    SetWindowText (User32)
+'References:
+'Functions:
+'Classes:
+'Types:
+'Enums:
+'Constants:
+'Return:
+'* WD13 ****************************************************
+Public Function ChangeAccessWindowCaption( _
+  ByVal lngHWnd As Long, _
+  ByVal strTitle As String)
+
+  If lngHWnd = 0 Then
+    lngHWnd = Application.hWndAccessApp
+  End If
+
+  'NUL an Titel anhängen
+  strTitle = strTitle & vbNullChar
+  
+  'Titelleistentext setzen
+  Call SetWindowText(lngHWnd, strTitle)
+
+End Function

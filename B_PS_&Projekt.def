@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<CommandBar name="PS_&amp;Projekt">
+  <AdaptiveMenu value="false"/>
+  <Context value=""/>
+  <Description value="PS_&amp;Projekt-Menü"/>
+  <Enabled value="true"/>
+  <Position value="5"/>
+  <Protection value="22"/>
+  <RowIndex value="-1"/>
+  <Type value="2"/>
+  <Visible value="false"/>
+  <Controls>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Terminplanung"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="1"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Die Termine für alle Projekte und Aufträge werden überwacht"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenTerminplanung()"/>
+      <FaceId value="1"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Ordnerbeschriftung"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="2"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Orderbeschriftung verwalten"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenOrdner()"/>
+      <FaceId value="1111"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="ToDo Liste"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="3"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="&quot;To Do Liste des Projektes bearbeiten&quot;"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenToDo()"/>
+      <FaceId value="1111"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Kurzbrief"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="4"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Einen Kurzbrief zum Projekt erstellen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=menFunKurzbrief()"/>
+      <FaceId value="1111"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Anfrage"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="5"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Eine Anfrage zum Projekt erstellen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenAnfrag()"/>
+      <FaceId value="1111"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Bestellung"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="6"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Eine Bestellung zum Projekt erstellen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenBestellung()"/>
+      <FaceId value="1111"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Rechnung Projekt"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="7"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Rechnung zum Projekt"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenProRechnung()"/>
+      <FaceId value="1111"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Verzeichnis neu"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="8"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Ein Verzeichnis zum Projekt ändern oder neu anlegen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenDirNew()"/>
+      <FaceId value="1111"/>
+    </Control>
+  </Controls>
+</CommandBar>

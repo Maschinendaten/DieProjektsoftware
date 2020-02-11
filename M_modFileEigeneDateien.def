@@ -1,0 +1,40 @@
+Option Compare Database
+Option Explicit
+
+
+Private Declare PtrSafe Function SHGetFolderPath Lib "shell32.dll" Alias "SHGetFolderPathA" (ByVal hwndOwner As Long, ByVal nFolder As Long, ByVal hToken As Long, ByVal dwFlags As Long, ByVal lpszPath As String) As Long
+Private Declare PtrSafe Function SHGetSpecialFolderPath Lib "shell32.dll" Alias "SHGetSpecialFolderPathA" (ByVal hwndOwner As Long, ByVal lpszPath As String, ByVal nFolder As Long, ByVal fCreate As Long) As Long
+ 
+'SHGetFolderPath dwFlags-Konstanten
+Private Const SHGFP_TYPE_CURRENT = 0 'Aktueller Verzeichnispfad des virtuellen Verzeichnisses
+Private Const SHGFP_TYPE_DEFAULT = 1 'Standardpfad des virtuellen Verzeichnisses
+ 
+'SHGetFolderPath Rückgabe-Konstanten
+Private Const S_OK = &H0 'Die Funktion war erfolgreich
+Private Const S_FALSE = &H1 'Die Funktion ist gescheitert
+Private Const E_INVALIDARG = &H80070057 'Es wurden ungültige Parameter übergeben
+ 
+
+Private Const CSIDL_PERSONAL = &H5 'Ermittelt das Verzeichnis "Eigene Dokumente"
+
+
+Function funPfadEigeneDateien() As String
+Dim RetVal As Long, buffer As String
+   
+   'on error Goto Err_
+   
+   buffer = Space(256)
+   RetVal = -1
+   RetVal = SHGetFolderPath(0&, CSIDL_PERSONAL, 0&, SHGFP_TYPE_CURRENT, buffer)
+   
+   'Fehlgeschlagen oder Falsches Betriebsystem ?
+   If RetVal <> S_OK Then
+      RetVal = SHGetSpecialFolderPath(0&, buffer, CSIDL_PERSONAL, 0&)
+   End If
+   
+   funPfadEigeneDateien = Left$(buffer, InStr(1, buffer, vbNullChar) - 1)
+Exit Function
+Err_:
+    MsgErr "modFileEigeneDateien", "funEigeneDateien", Err.Description, Err.Number, 0
+    Resume Next
+End Function

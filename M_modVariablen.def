@@ -1,0 +1,270 @@
+Option Compare Database
+Option Explicit
+
+
+Type cAsm                                        'Liste von Asm aus CAD System wir gehen von einer Mengenstückliste aus
+
+    o01PosNr        As Long                      '1) Positionsnummer
+    o02Menge        As Long                      '2) Menge
+    o03sDatei       As String                    '3) Dateiname kann die Zeichnungsnummer enthalten
+    o04sBezeich     As String                    '4) Feld Bezeichnung aus
+    o05sMaterial    As String                    '5) Materialbezeichnung
+    o06Datum        As String                    '6) Datum der Datei erstellung oder Stand
+    o07sArt         As String                    '7) Wenn der Dateiname nicht die Zeichnungsnummer dann hier
+    o08sArtKunde    As String                    '8) die Artikelbezeichnung des Kunden >Kunde bestNr
+    o09sOption1     As String                    '9) Option1 > Bemerkung
+    o10sOption2     As String                    '10)Option2 > Bemerkung
+    o11sOption3     As String                    '11)Option3 > Bemerkung
+    o12sOption4     As String                    '11)Option3 > Bemerkung
+    o13sOption5     As String                    '11)Option3 > Bemerkung
+    Zeile           As String                    ' die unveränderte Zeile aus Textfile
+    Spalten         As Long                      ' Anzahl der Spalten in der Zeile
+    idArt           As Long                      ' ID aus der Datenbank
+    BezArt          As String                    ' Der Dateiname
+    '    idOK            As Boolean  ' True wenn die ermittelte id in der Datenbank vorhanden ist
+    InGruppe        As Boolean                   ' Zeichnung ist schon in der Gruppe
+    inArtikel       As Boolean                   ' Ersetzt idOK ist logischer
+End Type
+
+Public strTexstinhalt As String
+Public varGFArtikelnummer As String
+Public varGFBestellnummer As String
+Public varGFArtikelBezeichnung As String
+Public VarGFArtikelbeschreibung As String
+Public VarGFArtikelPreis As String
+Public VarGFArtikelPreis_EK_mit_Rabatt
+Public VarGFArtikelAufschlag As Long
+Public VarPSMemofeld As String
+Public VarGFRufname As String
+Public VarGFLieferzeit As String
+Public VarNichtSchliessen As Boolean
+
+Public lonPersonalnummer As Long
+Public lonBelegnummer As Long
+'Public lonProjektnummer As Long
+Public gloProjektNummer As Long
+Public lonArtikelID As Long                      ' Artikelnummer
+Public lonAdressNr As Long
+Public lonNotizNr As Long
+Public varFakErNr As Long                        'Für die Übergabe der Rechnungsnummer zu Eingabe oder Änderung
+Public lonNummer As Long                         ' Nummer wird verwendet um eine allgemeine Datensaznummer zu übergeben
+Public VarNaviKalkUn As Long                     'gibt die Unternummer der ausgewählten Kalkulation zurück
+Public varDatum As Date                          'Übergabe von Datum für Datumsfunktion
+Public varAufNr As Long                          'varAufNr Gibt die Auftragsnummer des Ausgewählten Projektes an
+Public gloStrPSVersion As String                 'gibt die aktuelle Software Verssion an wird beim Start Code mässig eingetragen
+Public VarEventZaehler As Long                   'Wird als Zähler verwendet um Aktionen aus zu lösen
+Public VarSuchzeit As Long
+Public gloDebug As Boolean                       'Wenn Debugen dann diesen Wert auf 1
+Public Const varAdminPass = "9001"
+Public Const gloCxPosExplorer = 0                '2100
+Public Const gloCyPosExplorer = 0
+
+
+Public gloBerProNr As Long                       'Globale Projektnummer für Berichte
+Public gloLonBelegNr As Long                     ' Globale Belegnummer für Ausdruck
+Public gloLonProNr As Long                       ' Globale Projektummer
+Public gloStrEMailAn As String                   'Für die Speicherung der E-Mail Adressen
+Public gloStrEMailCC As String                   'Für die Speicherung der E-Mail Adressen
+Public gloBolExit As Boolean                     'merkt sich das Schließen gedrückt wurde.
+Public gloTempProNr As Long                      'temporäre Projektnummer nur ein Befehl für Abfragen
+Public gloTempAufNr As Long                      'temporäre Projektnummer nur ein Befehl für Abfragen
+Public gloTempAbf1 As String                     ' temporär für Abfrage
+Public gloTempAbf2 As String                     ' temporär für Abfrage
+Public gloPersonId As Long                       'Globale id Nr der Person für Auswahl
+Public gloAuftragsNummer As Long                 'Auftragsnummer bei der Menueauswahl
+
+Public gloT As Double                            'globaler Timer für Zeit stoppen
+
+Public Const OnErrResume = True                  ' if OnErrResume Then On Error Resume Next
+
+Function funPersonID(Optional lPersonID As Long) As Long
+    If lPersonID = 0 Then
+        funPersonID = gloPersonId
+    Else
+        funPersonID = lPersonID
+        gloPersonId = lPersonID
+    End If
+    'funPersonID = 1849
+End Function
+
+Function funTempAbf1() As String
+    funTempAbf1 = gloTempAbf1
+End Function
+
+Function funTempAbf2() As String
+    funTempAbf2 = gloTempAbf2
+End Function
+
+Function funTempProNr() As Long
+    funTempProNr = gloTempProNr
+End Function
+
+Function funTempAufNr() As Long
+    funTempAufNr = gloTempAufNr
+End Function
+
+Public Function funPSVersion() As String
+    gloStrPSVersion = "001.01"
+    funPSVersion = gloStrPSVersion
+End Function
+
+Function funLonBelegNr() As Long
+    funLonBelegNr = gloLonBelegNr
+End Function
+
+Function funBelegNr() As Long
+    'on error Goto Err_
+    funBelegNr = Form_frmAnfragenBestellungen![BelegNr]
+    Exit Function
+Err_:
+    funBelegNr = 0
+
+End Function
+
+Function funLonProNr() As Long
+    funLonProNr = gloLonProNr
+    If MenFormularOpen("f_AblageTemp") Then
+        Form_f_AblageTemp.funStartAblage
+        Form_f_AblageTemp.varProNr = gloLonProNr
+        'Form_f_AblageTemp.varOKProNr = True
+    End If
+End Function
+
+Public Function funProjektNummer(Optional lProjektnummer As Long) As Long
+    
+    If lProjektnummer <> 0 Then
+        Form_frmStartAuftrag.varProjektnummer.Value = lProjektnummer
+       'Form_frmStartAuftrag.Requery
+    End If
+        
+        
+    funProjektNummer = Nz(Form_frmStartAuftrag.varProjektnummer.Value, 0)
+    
+    
+    Exit Function  'zum test 2019 07 19
+    
+    If MenFormularOpen("frmStartAuftrag") Then
+        If Nz(Form_frmStartAuftrag.varProjektnummer) <> 0 And lProjektnummer = 0 Then
+            funProjektNummer = Form_frmStartAuftrag.varProjektnummer
+            Exit Function
+        End If
+    End If
+    
+ 
+    If MenFormularOpen("frmStart") Then
+        If Nz(Form_frmStart.varProjektnummer) <> 0 And lProjektnummer = 0 Then
+            funProjektNummer = Form_frmStart.varProjektnummer
+            Exit Function
+        End If
+    End If
+    
+    If lProjektnummer = 0 Then
+        funProjektNummer = gloProjektNummer
+    Else
+        gloProjektNummer = lProjektnummer
+        
+        
+        funProjektNummer = gloProjektNummer
+        '        If Not gobjRibbon Is Nothing Then
+        '            gobjRibbon.InvalidateControl "ebx1" 'Löst das Ereignis aus das die Projektummer im Ribbon setzt in GetTextEditBox
+        '        Else
+        '            'Call OnRibbonLoad
+        '            'Set gobjRibbon = ribbon
+        '        End If
+    End If
+    
+    'Form_frmStart.varProjektnummer = funProjektNummer
+    
+End Function
+
+Function funBerProNr() As Long
+    funBerProNr = gloBerProNr
+End Function
+
+Public Function funProNr() As Long
+
+    funProNr = funProjektNummer
+
+End Function
+
+Public Function varFakErNr_() As Long
+
+    varFakErNr_ = varFakErNr
+
+End Function
+
+Public Function VarPersonalnummer_() As Long
+
+    VarPersonalnummer_ = lonPersonalnummer
+
+End Function
+
+Public Function VarBelegnummer_() As Long
+
+    VarBelegnummer_ = lonBelegnummer
+
+End Function
+
+Public Function VarSuchzeit_() As Long
+
+    VarSuchzeit_ = VarSuchzeit
+
+End Function
+
+Public Function VarUnternummer_() As Long
+
+    VarUnternummer_ = lonNummer
+
+End Function
+
+Public Function VarAdressNr_() As Long
+
+    VarAdressNr_ = lonAdressNr
+
+End Function
+
+Public Function VarNotizNr_() As Long
+
+    VarNotizNr_ = lonNotizNr
+
+End Function
+
+Public Function VarNaviKalkUn_() As Long
+
+    VarNaviKalkUn_ = VarNaviKalkUn
+
+End Function
+
+Public Function VarAufNr_() As Long
+
+    VarAufNr_ = varAufNr
+
+End Function
+
+Function funBenutzerLevel() As Long
+    gloLonLevel = Nz(Forms![frmdatenbanknutzer]![Sicherheitslevel])
+    funBenutzerLevel = gloLonLevel
+End Function
+
+Function funBenutzerNr() As Long
+    If OnErrResume Then On Error Resume Next
+
+    funBenutzerNr = Nz(Forms!frmdatenbanknutzer!Nummer, -1)
+
+End Function
+
+Public Function funBenutzerKurzzeichen() As String
+    On Error Resume Next
+    funBenutzerKurzzeichen = Nz(Forms![frmdatenbanknutzer]![Kurzzeichen], "")
+End Function
+
+Function funfrmCoProNr()
+
+End Function
+
+Function funAuftragsNummer() As Long
+    If gloAuftragsNummer = 0 Then
+        gloAuftragsNummer = Form_frmStartAuftrag.varAuftrag
+    End If
+    funAuftragsNummer = gloAuftragsNummer
+End Function

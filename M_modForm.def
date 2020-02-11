@@ -1,0 +1,198 @@
+Option Compare Database
+Option Explicit
+
+Function funOpenFormAnschreiben(DokuNr As Long, HerkunftFrm As String, closeMe As Boolean)
+'Die Funktion öffnet das mit Doku Nr übergebene Dokument mit dem richtigen Formular.
+
+'DokuNr       = Eindeitige Dokumentennummer
+'HerkunftFrm  = Name des Forulars von dem aus die Fuktion aufgerufen wurde um wieder zurück zu können.
+'closeMe      = Wenn true wird das Formular von dem aus aufgerufen wurde gesclossen
+
+Dim stDocName As String
+Dim stLinkCriteria As String
+ 
+ 'es wird ermittelt welches Formular zu dem Dokument gehört
+ 'das Dokument wird mit dem richtigen Formular angezeigt
+ stDocName = DLookup("Formulartype", "tblAnschreiben", "BelegNr = " & Str(DokuNr))
+ If stDocName = "" Then Exit Function
+ 
+ 'zuweisen der Belegnummer zur Globalen Variablen
+ lonBelegnummer = DokuNr
+ 
+stLinkCriteria = DokuNr
+If closeMe = True Then DoCmd.Close
+
+'Schließ das Dokument wenn geöffnet
+If MenFormularOpen(stDocName) Then
+    DoCmd.Close acForm, stDocName
+End If
+DoCmd.OpenForm stDocName, , , , , , HerkunftFrm
+
+End Function
+
+
+Function MenFormularOpen(ArgName As String) As Boolean
+'Die Funktion prüft ob ein Formular mit dem Angegebenem Namen geöffnet ist.
+Dim sP1 As Long
+
+'on error Goto Err_
+'----------------------------------------
+MenFormularOpen = False
+sP1 = SysCmd(acSysCmdGetObjectState, acForm, ArgName)
+If sP1 > 0 Then MenFormularOpen = True
+'----------------------------------------
+
+End Function
+
+
+
+Function funFormFarben()
+Dim Frm_ As Form
+Dim c1 As Long
+
+Exit Function
+
+On Error GoTo Err_
+    Set Frm_ = Screen.ActiveForm
+    c1 = RGB(&H0, &H0, &H0)
+    '#000000 = SChwarz
+    ' RGB(&HE2, &HE6, &HEB)= blau
+    'Farbe MS Access Hintergrund 15460066  oder RGB(&HE2, &He6, &Heb)
+    
+    'Section 0 ist Detailbereich
+    Frm_.Section(0).BackColor = RGB(&HEC, &HEC, &HEC)   'c1 'vbWhite 'RGB(&HAD, &HC0, &HD9)
+    Frm_.Section(0).AlternateBackColor = Val("&HBFBFBF") ' RGB(&HA5, &HA5, &HA5) '#A5A5A5
+    'Section 1 ist Kopf im Formular wenn aktiviert
+    Frm_.Section(1).BackColor = c1  'RGB(&H56, &H76, &H9F)
+
+    'Section 2 ist Fuss im Formular
+    Frm_.Section(2).BackColor = c1  'RGB(&H56, &H76, &H9F)
+            
+    'Frm_.Repaint
+Err_:
+    
+End Function
+
+Public Sub FormDesign(frm As Form)
+'Öffnet alle Forms in der Design Ansicht 25.11.2018
+'Öffnet ein Form und durchläuft die Auflistung der Objekte
+'Die Objekte haben ein Marke je nach Marke wird das Design geladen
+'SchriftFarbe, HintergrundFarbe, usw. Größe
+'Für die MArke muss es ein sinniges System geben.
+
+
+DoCmd.OpenForm "frmAufDaten", acDesign
+
+
+funFormFarben
+DoCmd.Close acForm, "frmAufDaten", acSaveYes
+
+
+
+End Sub
+
+
+Public Function FieldInFormExists(frm As Form, FieldName As String) As Boolean
+'Prüft ob das Feld mit dem angegebenen Namen existiert
+Dim A As Long
+Dim ctl As Control
+On Error GoTo Err_
+
+For Each ctl In frm.Controls
+    If ctl.Name = FieldName Then
+        FieldInFormExists = True
+        Exit Function
+    End If
+
+Next
+
+FieldInFormExists = False
+
+Err_:
+MsgBox (Err.Number)
+
+End Function
+
+'Die funktion liest alle Felder eines Formulars ein und Liest die Daten aus der Steuerung aus
+'Wobe davon ausgegangen wird das die Steuerung über die Tabelle SPSin ausgelesen wird
+'Der Syntax für die Dateinamen Lautet:
+'S7DB600DBX001.0  S7DB600DBW001
+
+' S7DB  für Datenbaustein ersten 4 Zeichen
+' 001_  Nr des DB 3 Zeichen + Unterstrich
+' 001_  Anfangsadresse des Feldes 3 Zeichen + Unterstrich
+' DD    DatenType DD = Doppelwort 32 Bit
+' X0    DatenType x = 1 Bit Merker Bit 0-7 an der Anfangsadresse ( Bei Bit Farbwechsel 0= schwarz 1=grün )
+' M0    Merker
+' E0    Eingang
+' A0    Ausgang
+' B     DatenType B = Byte
+
+'Das einlesen basiert auf dem vorherigen einlesen in die Datenbank
+
+
+'Bei einem Fehle gibt die Funktion ein String zurück in dem das Feld steht das den Fehler verursacht hat
+
+' 1234567890123
+' S7DB001_001DD
+
+
+Sub FormFarbenAuslesen()
+
+Dim Datentype As String
+Dim strSp1 As String
+Dim DBAdr As String
+Dim ByteAdr As Long
+Dim BitAdr As Long
+Dim intSp1 As Long
+Dim lPr As Long
+Dim Type_ As String
+Dim s1 As String
+Dim l1 As Long
+Dim z1 As Long
+Dim z2 As Long
+Dim rs1 As DAO.Recordset
+Dim Rs2 As DAO.Recordset
+Dim sSql As String
+
+
+    Dim frm As Form
+    Dim ctl As Control
+    
+    Set frm = Screen.ActiveForm
+    
+'Kennung 109
+'Wert1 109
+'Wert2 109
+'Freitext 109
+'Befehl40 104
+'TasteSpeichern               104          no
+'TasteVerteilen               104          no
+'Komb 111
+'Bez44 100
+'Liste 110
+'Bez46 100
+'Recht 101
+'Register 123
+'Seite50 124
+'Seite51 124
+'Kontr52 106
+'Bez53 100
+'Attachment54 126
+'Bezeichnungsfeld55 100
+'Option56 105
+'Bez67 100
+    
+    For Each ctl In frm.Controls
+        'Wenn die ersten vier Buchstaben und die Länge dann
+        Debug.Print ctl.Name, ctl.ControlType, ctl.Tag
+        
+        'Textliste gefunden
+         If ctl.ControlType = 100 Then 'Bezeichnungsfeld
+         End If  'Stop  'ctl.ForeColor = Rs2!TeFarbe  'gilt für Bezeichnungsfelder
+'        If ctl.ControlType = 101 Then ctl.BackColor = Rs2!TeFarbe  'gilt für rechteck
+'        If ctl.ControlType = 109 Then ctl.Value = Rs2!TeText   'gilt für Textfelder
+        
+    Next ctl
+    
+End Sub

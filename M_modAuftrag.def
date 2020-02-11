@@ -1,0 +1,144 @@
+Option Compare Database
+Option Explicit
+
+Public Function SucheNaechsteNummer(AufNr As Long, PosNr As String) As String
+'9.10.2018 es wird versucht die nächste Numme rin der Position zu finden
+' der syntax der Positionen ist xx.nn die nn Nummer wird hochgezählt
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim z1 As Long
+Dim s1 As String
+
+sSql = "SELECT * FROM tblAufPositionen WHERE " & _
+    "Auftragsnummer=" & AufNr & _
+    " AND " & "Pos_Nummer like '" & Left(PosNr, 2) & "*'" & _
+    " Order By Pos_Nummer"
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+With rs1
+    If .EOF Then
+        SucheNaechsteNummer = "01.00"
+    Else
+        .MoveLast
+        z1 = Val(Right(!Pos_Nummer, 2))
+        z1 = z1 + 1
+        If z1 > 99 Then z1 = 99
+        If z1 < 1 Then z1 = 1
+        
+        If z1 > 9 Then
+            s1 = Left(!Pos_Nummer, 2) & "." & z1
+        Else
+            s1 = Left(!Pos_Nummer, 2) & ".0" & z1
+        End If
+        SucheNaechsteNummer = s1
+    End If
+    .Close
+
+End With
+
+End Function
+
+
+Public Function NeueAuftragsPosition(Auftragsnummer As Long, _
+            Pos_Nummer As String, _
+            Optional ArtikelID As Long = 0, _
+            Optional Pos_Bezeichnung As String = "leer", _
+            Optional Pos_Beschreibung As String = "", _
+            Optional Anzahl_Menge As Double = 1, _
+            Optional Einheit As String = "St", _
+            Optional Preis_einzeln As Double = 1, _
+            Optional Einzel_Kalkulation As Double = 0, _
+            Optional Drucken_Pos As Boolean = True, _
+            Optional Drucken_Preis As Boolean = True, _
+            Optional Drucken_Menge As Boolean = True) As Long
+         
+'Legt eine neue Auftragsposition in einem bestehenden Auftrag an
+'Die übergeben auftragsnummer muss vorhanden sein
+
+Dim Rs2 As DAO.Recordset
+Dim strSql As String
+Dim z1 As Long
+    
+'Auftragsnummer für nachfolgende Berechnungen
+'varAufNr = Me!ID
+
+''Projektnummer für nachfolgende Berechnungen
+'funProjektNummer (Me!ProNr)
+   
+   
+    strSql = "SELECT * FROM tblAufPositionen WHERE FALSE"
+    Set Rs2 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+    With Rs2
+        .AddNew
+        .Fields("Auftragsnummer").Value = Auftragsnummer
+        .Fields("Pos_Nummer").Value = modAuftrag.SucheNaechsteNummer(Auftragsnummer, Pos_Nummer)  '(Form_frmAufDaten.ID, Form_frmAufDaten.Pos_Nummer)
+        .Fields("Pos_Bezeichnung").Value = Pos_Bezeichnung
+        .Fields("Pos_Beschreibung").Value = Pos_Beschreibung
+        .Fields("Anzahl_Menge").Value = Anzahl_Menge
+        .Fields("Einheit").Value = Einheit
+        .Fields("Preis_einzeln").Value = Preis_einzeln
+        .Fields("Einzel_Kalkulation").Value = Einzel_Kalkulation
+        .Fields("Drucken_Pos").Value = Drucken_Pos
+        .Fields("Drucken_Preis").Value = Drucken_Preis
+        .Fields("Drucken_Menge").Value = Drucken_Menge
+        .Fields("ArtikelID").Value = ArtikelID
+        z1 = .Fields("ID").Value   'Achtung bei SQL server
+        Rs2.Update
+        Rs2.Close
+    End With
+    NeueAuftragsPosition = z1
+
+End Function
+
+'Public Sub UpdateAuftragsPosition(AufPoNr As Long)
+'Dim oArtikel As Artikel
+'Dim sSql As String
+'Dim Rs1 As DAO.Recordset
+'
+'sSql = "SELECT * FROM tblAufPositionen WHERE ID=" & AufPoNr
+'Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+'
+'
+'
+'With Rs1
+'    If Not .EOF Then
+'        If .Fields("ArtikelID").Value = 0 Then
+'            Rs1.Close
+'            MsgBox "Keine gültige Artikelnummer"
+'            Exit Sub
+'        Else
+'            .Edit
+'                Set oArtikel = New Artikel
+'                oArtikel.Laden (.Fields("ArtikelID").Value)
+'                .Fields("Pos_Bezeichnung").Value = oArtikel.Bezeichnung
+'                .Fields("Pos_Beschreibung").Value = oArtikel.Beschreibung
+'                .Fields("Einheit").Value = oArtikel.Liefereinheit
+'                .Fields("Preis_einzeln").Value = oArtikel.Preis_VK
+'            .Update
+'        End If
+'    End If
+'    .Close
+'End With
+'
+'
+'End Sub
+
+Public Function AuftragZumProjekt(ProjektNr) As Long
+'Sucht den Auftrag zum Projekt wenn es mehr wie einen gibt kommt 0 zurück
+'Weil keine vorauswahl möglich ist
+Dim nD As Long
+
+
+nD = DCount("ID", "tblAufDaten", "ProNr" = ProjektNr)
+
+
+If nD = 1 Then
+    AuftragZumProjekt = DLookup("ID", "tblAufDaten", "ProNr" = ProjektNr)
+Else
+    AuftragZumProjekt = 0
+End If
+
+
+End Function

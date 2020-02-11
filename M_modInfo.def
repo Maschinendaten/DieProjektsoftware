@@ -1,0 +1,138 @@
+Option Compare Database
+Option Explicit
+
+'Das Modul soll Informationen zum Projekt oder Auftrag liefern
+
+
+Function InfoProjekt(ProNr As Long) As String
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim s1 As String
+
+sSql = "SELECT ProjektNr, Projektbezeichnung, AngelegtAm, Projektleiter, Rufname, Status " & _
+        "FROM tblAdressen INNER JOIN tblProjekte ON tblAdressen.AdressNr = tblProjekte.AdressNr WHERE ProjektNr=" & ProNr
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+With rs1
+    If Not .EOF Then
+            s1 = s1 & "<div><font face=Calibri size=3><strong>" & _
+                LA("Projekt: ") & .Fields("ProjektNr").Value & _
+                "</strong></font></div>"
+            s1 = s1 & "<div><font face=Calibri size=3><strong>" & _
+                .Fields("Rufname").Value & _
+                "</strong></font></div>"
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
+                .Fields("Projektbezeichnung").Value & _
+                "</font></div>"
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
+                LA("Angelegt ") & Format(.Fields("AngelegtAm").Value, "yyyy.mm.dd") & _
+                "</font></div>"
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
+                LA("Status      ") & .Fields("Status").Value & _
+                "</font></div>"
+    Else
+        s1 = "--"
+    End If
+
+    .Close
+End With
+        
+        
+InfoProjekt = s1
+End Function
+
+
+Function InfoAuftrag(ProNr As Long, AlleAuftraegeAnzeigen As Boolean) As String
+'Information alle Aufträge im Projekt
+'AlleAuftraegeAnzeigen wenn true zeigt alle Aufträge an
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim s1 As String
+
+If AlleAuftraegeAnzeigen Then
+    sSql = "SELECT ID, ZuBeVon,ZuBeAm,ZuBeBez, Liefertermin, Auftragswert, AuftragsBeginn, AufBezeichnung , Aufabgeschlossen " & _
+    "From tblAufDaten " & _
+    "WHERE ProNr=" & ProNr & _
+    " ORDER BY ID Desc"
+Else
+    sSql = "SELECT ID, ZuBeVon,ZuBeAm,ZuBeBez, Liefertermin, Auftragswert, AuftragsBeginn, AufBezeichnung , AufabgeschlossenAm " & _
+    "From tblAufDaten " & _
+    "WHERE ProNr=" & ProNr & " AND isnull(AufabgeschlossenAm) " & _
+    "ORDER BY ID Desc"
+End If
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+With rs1
+    If Not .EOF Then
+        While Not .EOF
+
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
+                "------------------------------" & _
+                "</strong></font></div>"
+            s1 = s1 & "<div><font face=Calibri size=3><strong>" & _
+                LA("Aufrag: ") & .Fields("ID").Value & _
+                "</strong></font></div>"
+            s1 = s1 & "<div><font face=Calibri size=1><strong>" & _
+                .Fields("ZuBeVon").Value & " " & .Fields("ZuBeBez").Value & _
+                "</strong></font></div>"
+            If Nz(.Fields("Liefertermin").Value, "1.1.1967") < Now() Then
+                s1 = s1 & "<div><font face=Calibri size=2 color=red><strong>" & _
+                    LA("LT: ") & Format(.Fields("Liefertermin").Value, "yyyy.mm.dd") & _
+                    "</strong></font></div>"
+            Else
+                s1 = s1 & "<div><font face=Calibri size=2 color=green><strong>" & _
+                    LA("LT: ") & Format(.Fields("Liefertermin").Value, "yyyy.mm.dd") & _
+                    "</strong></font></div>"
+            End If
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
+                .Fields("AufBezeichnung").Value & _
+                "</font></div>"
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
+                LA("Angelegt ") & Format(.Fields("AuftragsBeginn").Value, "yyyy.mm.dd") & _
+                "</font></div>"
+'            S1 = S1 & "<div><font face=Calibri size=1>" & _
+'                LA("Status      ") & Format(.Fields("Aufabgeschlossen").Value, "yyyy.mm.dd") & _
+'                "</font></div>"
+         .MoveNext
+         Wend
+    Else
+        s1 = "--"
+    End If
+
+    .Close
+End With
+        
+        
+InfoAuftrag = s1
+
+
+
+
+
+
+End Function
+
+
+Function InfoDokumente() As String
+
+
+
+
+
+
+End Function
+
+
+
+
+Function InfoAlles(ProNr As Long, AlleAuftraegeAnzeigen As Boolean) As String
+
+InfoAlles = InfoProjekt(ProNr) & InfoAuftrag(ProNr, AlleAuftraegeAnzeigen)
+
+
+
+
+End Function

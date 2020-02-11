@@ -1,0 +1,142 @@
+Option Compare Database
+Option Explicit
+
+Private sRecht As String
+Private Const RechteInfo  As Boolean = True
+
+Function funRechteWHERE(SVariable As String) As String
+'Gibt ein WHERE zurück für eine SQl Abfrage
+'SVariable ist der String der in den Rechten gesucht wird
+'Die Rückgabe schaut z.B. so aus   WHERE Projekt=2345 or ProjektNr=222;
+Dim l1 As Long
+Dim lT As Long
+Dim s1 As String
+Dim sS As String  'Speicher String
+Dim lStart As Long
+Dim lEnde As Long
+
+
+If SVariable = "" Then
+    funRechteWHERE = "'= '*'"
+    Exit Function
+End If
+
+l1 = funBenutzerNr
+s1 = Nz(DLookup("Rechte", "tblAdressenPersonal", "AdressNr=" & l1), "")
+If s1 = "" Then
+    funRechteWHERE = "WHERE false "
+    Exit Function
+End If
+
+
+l1 = InStr(1, s1, SVariable & ".WHERE=")
+
+If re("allowed") = 0 Then
+    While l1 <> 0
+        lStart = l1 + Len(SVariable & ".WHERE=")
+        lEnde = InStr(l1, s1, " ") - (l1 + Len(SVariable & ".WHERE="))
+        lT = InStr(l1, s1, Chr(13)) - (l1 + Len(SVariable & ".WHERE="))
+        If lT < lEnde Then lEnde = lT
+        
+        If sS <> "" Then sS = sS & " OR " Else sS = " WHERE "
+        
+        sS = sS & "(" & SVariable & "=" & Mid(s1, lStart, lEnde) & ") "
+        l1 = InStr(l1 + 4, s1, SVariable & ".WHERE=")
+    Wend
+End If
+
+
+funRechteWHERE = sS
+
+
+
+
+
+End Function
+
+
+
+Function funRechteFormOpen(sFormName As String, allowedIstOk As Boolean, Optional MsgBoxAnzeigen As Boolean = True) As Boolean
+'Mit allowedIstOk wird festgelegt das alles erlaubt ist wenn allowedIstOK TRUE ist
+' wenn allowedIstOk=FALSE dann muss explicit zugestimmt sein
+
+'Sorgt für Zweisung von Rechten
+'So sollte der Aufruf BeiLaden aussehen:
+'If funRechteFormOpen(Me.Form.Name, True) = False Then DoCmd.Close: Exit Sub
+
+funRechteFormOpen = False
+
+If allowedIstOk = True Then
+    If re("allowed") = 1 Then funRechteFormOpen = True  'Grundsätzlich erlaubt
+End If
+If re(sFormName) = 1 Then funRechteFormOpen = True  'dieses Formular darf er öffen
+If re(sFormName) = 0 Then funRechteFormOpen = False  'dieses Formular darf er nicht öffen
+
+If funRechteFormOpen = False And RechteInfo = True Then
+    If MsgBoxAnzeigen Then InputBox LA("Sie haben nicht genug Rechte für :") & Nz(sFormName), "INFO", Nz(sFormName)
+    'Open FilePath For Append Access Write Lock Write As FileNum
+    Open Application.CurrentProject.Path & "\PS_Rechte.txt" For Append Access Write Lock Write As #1
+    Print #1, Now; funBenutzerKurzzeichen(); Nz(sFormName) & "=0"
+    Close #1
+    Exit Function
+End If
+
+'Wenn das erlaubt ist und RechteInfo True
+If RechteInfo = True Then
+    Open Application.CurrentProject.Path & "\PS_Rechte.txt" For Append Access Write Lock Write As #1
+    Print #1, Now; funBenutzerKurzzeichen(); Nz(sFormName) & "=1"
+    Close #1
+End If
+
+
+End Function
+
+Function funReProjektFilter() As String
+
+If re("allowed") = 0 Then funReProjektFilter = ""  'Grundsätzlich alle
+'if re
+
+End Function
+
+Function funRecht(AngefragtesRecht) As Boolean
+Dim l1 As Long
+
+
+l1 = re(AngefragtesRecht)
+funRecht = IIf(l1 = 0, False, True)
+
+
+End Function
+
+
+Private Function re(sAbfrage) As Long
+Dim s1 As String
+Dim l1 As Long
+
+If OnErrResume Then On Error Resume Next
+
+re = 0
+If sAbfrage = "" Then
+    re = False
+    Exit Function
+End If
+
+s1 = Nz(DLookup("Rechte", "tblAdressenPersonal", "AdressNr=" & funBenutzerNr), "")
+l1 = InStr(1, s1, sAbfrage & "=")
+
+If l1 = 0 Then
+    'Keine zutreffende regel gefunden
+Else
+    re = Val(Mid(s1, l1 + Len(sAbfrage) + 1, 8))
+End If
+
+'Debug.Print l1, s1
+
+End Function
+
+
+
+'So schaut ein Eingabefeld aus
+'allowed = 1                          ' 0 es ist grundsätzlich alles verboten was nicht explicit erlaubt ist
+'projekt = 2063                       ' zulässiges Projekt
+'frmAdressenuebersicht = 0            ' Der Benutzer darf das nicht obwohl er sonst alles darf

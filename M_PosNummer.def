@@ -1,0 +1,102 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+'Vereinheitlicht die Eingabe von Positionsnummern
+'Die Positionsnummer hat eine Funktion bei der Berechnung und der Darstellung
+'Folgende Funktionen sind vorhanden
+'00.00 ist Ziel
+'10.xx ist hauptposition überschrift
+'xx.ZS ist die Zwischensumme bis zu diesem Punkt
+'Preis ist der Gesamtpreis
+'ZB.xx sind die Zahlungsbedingungen diese können ein Artikel sein und kommen aus der Ini Datenbank Idee Popup Menue
+
+
+Private m_Pos_Bezeichnung As String
+Private m_Drucken_Preis As Boolean
+Private m_Drucken_Menge As Boolean
+Private m_Drucken_Position As Boolean
+Private m_Pos_Nummer As String
+Private m_ArtikelID As Long
+
+
+Public Property Get Drucken_Preis() As Boolean
+    Drucken_Preis = m_Drucken_Preis
+End Property
+
+Public Property Get Drucken_Menge() As Boolean
+    Drucken_Menge = m_Drucken_Menge
+End Property
+Public Property Get Drucken_Position() As Boolean
+    Drucken_Position = m_Drucken_Position
+End Property
+Public Property Get ArtikelID() As Long
+    ArtikelID = m_ArtikelID
+End Property
+Public Property Get Pos_Bezeichnung() As String
+    Pos_Bezeichnung = m_Pos_Bezeichnung
+End Property
+
+
+Public Property Get Pos_Nummer() As Variant
+    Pos_Nummer = m_Pos_Nummer
+End Property
+
+Public Property Let Pos_Nummer(WERT As Variant)
+    
+    'Wenn die Positionsnummer übergeben wird erfolgt die Auswertung
+    m_Pos_Nummer = Nz(WERT, "")
+    
+    If m_Pos_Nummer = "" Then Exit Property
+
+    Select Case True
+        Case m_Pos_Nummer = "preis"
+            m_Pos_Bezeichnung = "Komplettpreis ohne Optionen"
+            m_Drucken_Preis = True
+            m_Drucken_Menge = False
+            m_Drucken_Position = True
+            m_Pos_Nummer = "Preis"
+
+        Case m_Pos_Nummer = "00.00"
+            m_Pos_Bezeichnung = "Ziel"
+            m_Drucken_Preis = False
+            m_Drucken_Menge = False
+            m_Drucken_Position = True
+
+        Case Left(m_Pos_Nummer, 3) = "ZB." 'Zahlungsbedingungen aus der Artikeldatenbank
+            m_ArtikelID = Val(funAWArtikel(m_Pos_Nummer))
+            If m_ArtikelID = 0 Then
+                m_Pos_Bezeichnung = "!! Unbekannte ZB. Menue>Service>Ini"
+            Else
+                m_Pos_Bezeichnung = "Zahlungsbedingung"
+            End If
+            m_Drucken_Preis = False
+            m_Drucken_Menge = False
+            m_Drucken_Position = True
+        
+        Case Right(m_Pos_Nummer, 2) = "zs" 'Zwischensumme anzeigen
+            m_Drucken_Preis = True
+            m_Drucken_Menge = False
+            m_Drucken_Position = False
+            m_Pos_Bezeichnung = "Zwischensumme Position:" & Left(m_Pos_Nummer, 2)
+           
+         Case Right(m_Pos_Nummer, 2) = "00" 'Hauptgruppe
+            m_Drucken_Preis = False
+            m_Drucken_Menge = False
+            m_Drucken_Position = True
+            
+         Case Val(Right(m_Pos_Nummer, 2)) > 0  'Eine unter Position mit Nummer
+            m_Drucken_Preis = False
+            m_Drucken_Menge = True
+            m_Drucken_Position = True
+        
+            
+            
+    End Select
+    
+
+        
+    
+End Property

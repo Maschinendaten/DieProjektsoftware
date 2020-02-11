@@ -1,0 +1,44 @@
+Option Compare Database
+Option Explicit
+
+'Nachfolgende Verweise müssen vorhanden sein
+'Visual Basic For Applications
+'Microsoft Access 10.0 Objekt Library
+'Microsoft DAO 3.6 Objekt Library
+'Microsoft Activ X Dataobjekts Ver2.1
+'Microsoft Windows Common Controls 5.0(SP2)
+'Microsoft Graph 10.0 Objekt Library
+'Microsoft Excel 10.0 Objekt Library
+'Microsoft Office 10.o Objekt Library
+
+' Die Version 10.0 steht für Office 2002 bei Office 2003 steht hier 11.0 usw.
+
+
+Public Function FunVerweiseAnzeigen() As String
+    Dim ref As Reference
+    Dim strSp1 As String
+    
+    On Error Resume Next
+    
+    ' Enumerate through References collection.
+    For Each ref In References
+        ' Check IsBroken property.
+        If ref.IsBroken = False Then
+            'strSp1 = strSp1 & "" & ref.Name & Space(8 - Len(ref.Name)) & "" & ref.Major & "." & ref.Minor & " Guid: " & ref.GUID
+            strSp1 = strSp1 & "" & ref.Name & ref.Major & "." & ref.Minor & " Guid: " & ref.GUID
+            strSp1 = strSp1 & " Path: " & ref.FullPath & vbCrLf
+        Else
+            strSp1 = strSp1 & "GUIDs of broken references:"
+            strSp1 = strSp1 & ref.GUID & vbCrLf
+        End If
+    Next ref
+    FunVerweiseAnzeigen = strSp1
+End Function
+
+'Name: VBA  Version: 4.1 Guid: {000204EF-0000-0000-C000-000000000046} Path: C:\PROGRA~2\COMMON~1\MICROS~1\VBA\VBA7\VBE7.DLL
+'Name: Access  Version: 9.0 Guid: {4AFFC9A0-5F99-101B-AF4E-00AA003F0F07} Path: C:\Program Files (x86)\Microsoft Office\Office14\MSACC.OLB
+'Name: stdole  Version: 2.0 Guid: {00020430-0000-0000-C000-000000000046} Path: C:\Windows\SysWOW64\stdole2.tlb
+'Name: ADODB  Version: 2.5 Guid: {00000205-0000-0010-8000-00AA006D2EA4} Path: C:\Program Files (x86)\Common Files\System\ado\msado25.tlb
+'Name: Office  Version: 2.5 Guid: {2DF8D04C-5BFA-101B-BDE5-00AA0044DE52} Path: C:\Program Files (x86)\Common Files\Microsoft Shared\OFFICE14\MSO.DLL
+'Name: Word  Version: 8.5 Guid: {00020905-0000-0000-C000-000000000046} Path: C:\Program Files (x86)\Microsoft Office\Office14\MSWORD.OLB
+'Name: DAO  Version: 3.5 Guid: {00025E04-0000-0000-C000-000000000046} Path: C:\Program Files (x86)\Common Files\Microsoft Shared\DAO\dao2535.tlb

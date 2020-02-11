@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<CommandBar name="PS_HamProjekt">
+  <AdaptiveMenu value="false"/>
+  <Context value=""/>
+  <Description value="PS_HamProjekt-Menü"/>
+  <Enabled value="true"/>
+  <Position value="5"/>
+  <Protection value="22"/>
+  <RowIndex value="-1"/>
+  <Type value="2"/>
+  <Visible value="false"/>
+  <Controls>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Adressen Pro."/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="1"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Adressen zu dem Projekt anzeigen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenProAdr()"/>
+      <FaceId value="24"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Einkaufsliste"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="2"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Einkaufsliset alle Artikel zum Projekt"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenEinkaufsListe()"/>
+      <FaceId value="184"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Kalkulation/Angebot"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="3"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Kalkulation und Angebotserstellung"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenProKalk(-67)"/>
+      <FaceId value="369"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Packliste/Liefer."/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="4"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Eine Packliste und Lieferschein zum Projekt erzeugen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;NaviPack&quot;)"/>
+      <FaceId value="1"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Dokumente Projekt"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="5"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Alle Dokumente zu dem Projekt anzeigen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenProDokuInfo()"/>
+      <FaceId value="1594"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Verzeichnis öffnen"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="6"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Das Verzeichnis zum Projekt öffnen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenDirOpen()"/>
+      <FaceId value="1755"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Info zum Projekt"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="7"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Stammdaten des Projekts anzeigen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenProStam()"/>
+      <FaceId value="487"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Neues Projekt"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="8"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Neues Projekt anlegen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funFormOpen(&quot;NaviNeuesProjekt&quot;)"/>
+      <FaceId value="535"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="Aufträge im Projekt"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="9"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Aufträge im Projekt"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funAufProUebersicht(&quot;berCoAuswertungProjekt01&quot;)"/>
+      <FaceId value="2522"/>
+    </Control>
+  </Controls>
+</CommandBar>

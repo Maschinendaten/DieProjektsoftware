@@ -1,0 +1,232 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+'Berechnet die Preise unter berücksichtigung der Regeln
+' Tabellen beinhalten immer
+' Key
+' Menge        |
+' Einzelpreis  |
+' Position     | xx.zs  = Zwischensumme preis= gesamtsumme
+' Bezeichnung  | (Option)= Preis erscheint nicht in Summe oder Zwischensumme aber mit % Aufschlag und
+' % Wert Einzelaufschlag
+' % Wert Gesamtaufschlag oder Abzug
+' Risiko Aufschlag oder Abschlag auf die Summe
+
+Private m_KeySuch As Long
+Private m_tabelle As String
+Private m_ProzentAufschlag As Double 'Prozentaufschlag global auf jede Position
+Private m_Aufschlag As Double  'Wert als Auf oder Abschlag auf die Endsumme
+Private m_SummePreis As Double 'Errechneter Gesamtpreis ohne Optionen
+
+
+Public Property Get KeySuch() As Long:      KeySuch = m_KeySuch: End Property
+Public Property Let KeySuch(WERT As Long):  m_KeySuch = WERT: End Property
+
+Public Property Get Tabelle() As String:      Tabelle = m_tabelle: End Property
+Public Property Let Tabelle(WERT As String):  m_tabelle = WERT: End Property
+
+'Public Property Get KeySuch() As Long:      KeySuch = m_KeySuch: End Property
+'Public Property Let KeySuch(WERT As Long):  m_KeySuch = WERT: End Property
+
+Public Property Get ProzentAufschlag() As Double:      ProzentAufschlag = m_ProzentAufschlag: End Property
+Public Property Let ProzentAufschlag(WERT As Double):  m_ProzentAufschlag = WERT: End Property
+
+Public Property Get Aufschlag() As Double:      Aufschlag = m_Aufschlag: End Property
+Public Property Let Aufschlag(WERT As Double):  m_Aufschlag = WERT: End Property
+
+
+Public Property Get SummePreis() As Double:      SummePreis = m_SummePreis: End Property
+Public Property Let SummePreis(WERT As Double):  m_SummePreis = WERT: End Property
+
+'Mögliche Tabellen sind
+'tblProjektbeschreibung  Key ist Unternummer
+'    .Fields("ID").Value
+'    .Fields("Projektnummer").Value
+'    .Fields("Pos_Nummer").Value
+'    .Fields("Pos_Bezeichnung").Value
+'    .Fields("Pos_Beschreibung").Value
+'    .Fields("Anzahl_Stueck").Value
+'    .Fields("Anzahl_Teile").Value
+'    .Fields("Anzahl_Menge").Value
+'    .Fields("Einheit").Value
+'    .Fields("Preis_einzeln").Value
+'    .Fields("Material_J_N").Value
+'    .Fields("Preis_Material").Value
+'    .Fields("Preis_Summe").Value
+'    .Fields("Einzel_Kalkulation").Value
+'    .Fields("Preis_Aufschlag").Value
+'    .Fields("Preis_VK").Value
+'    .Fields("Drucken_Preis").Value
+'    .Fields("Drucken_Position").Value
+'    .Fields("Drucken_Menge").Value
+'    .Fields("ArtikelID").Value
+'    .Fields("ArtikelIDaktualisieren").Value
+'    .Fields("Unternummer").Value
+'    .Fields("Lieferzeit").Value
+
+'tblAufPositionen Key Auftragsnummer
+'    .Fields("ID").Value
+'    .Fields("Auftragsnummer").Value
+'    .Fields("Pos_Nummer").Value
+'    .Fields("Pos_Bezeichnung").Value
+'    .Fields("Pos_Beschreibung").Value
+'    .Fields("Anzahl_Stueck").Value
+'    .Fields("Anzahl_Teile").Value
+'    .Fields("Anzahl_Menge").Value
+'    .Fields("Einheit").Value
+'    .Fields("Preis_einzeln").Value
+'    .Fields("Preis_Summe").Value
+'    .Fields("Einzel_Kalkulation").Value
+'    .Fields("Preis_VK").Value
+'    .Fields("Drucken_Pos").Value
+'    .Fields("Drucken_Preis").Value
+'    .Fields("Drucken_Menge").Value
+'    .Fields("ArtikelID").Value
+'    .Fields("InEkListe").Value
+
+' tblProjektbeschreibungDokumente key belegnummer
+'    .Fields("BelegNr").Value
+'    .Fields("Projektnummer").Value
+'    .Fields("Pos_Nummer").Value
+'    .Fields("Pos_Bezeichnung").Value
+'    .Fields("Pos_Beschreibung").Value
+'    .Fields("Anzahl_Menge").Value
+'    .Fields("Einheit").Value
+'    .Fields("Preis_VK").Value
+'    .Fields("Drucken_Preis").Value
+'    .Fields("Drucken_Position").Value
+'    .Fields("Drucken_Menge").Value
+'    .Fields("Unternummer").Value
+'    .Fields("ArtikelID").Value
+'    .Fields("St_Preis_VK").Value
+'    .Fields("Id").Value
+'    .Fields("Lieferzeit").Value
+
+Public Function berechnen() As Boolean
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim aw As Long
+Dim sum_VK As Double
+Dim sum_ZS As Double
+Dim sum_E As Double
+
+Select Case True
+    Case m_tabelle = "tblProjektbeschreibung" 'Kalkulation Angebot
+        aw = 1
+        sSql = "SELECT Unternummer AS Such_, " & _
+                "Pos_Nummer AS Sort_, " & _
+                "Anzahl_Menge AS Menge_, " & _
+                "Preis_Summe AS PreisSPr_, " & _
+                "Einzel_Kalkulation AS EKalk_, " & _
+                "Preis_Einzeln AS EPreis_ ," & _
+                "tblProjektbeschreibung.* " & _
+                "From tblProjektbeschreibung " & _
+                "WHERE Unternummer = " & m_KeySuch & " " & _
+                "ORDER BY tblProjektbeschreibung.Pos_Nummer "
+
+
+    Case m_tabelle = "tblAufPositionen"  'Auftragsdaten
+        aw = 2
+        sSql = "SELECT Auftragsnummer AS Such_, " & _
+                "Pos_Nummer AS Sort_, " & _
+                "Anzahl_Menge AS Menge_, " & _
+                "Einzel_Kalkulation AS EKalk_, " & _
+                "Preis_Einzeln AS EPreis_ ," & _
+                "tblAufPositionen.* " & _
+                "From tblAufPositionen " & _
+                "WHERE Auftragsnummer = " & m_KeySuch & " " & _
+                "ORDER BY tblAufPositionen.Pos_Nummer"
+               
+    Case m_tabelle = "tblProjektbeschreibungDokumente"  'Rechnung Gutschrift AB Lieferschein
+        aw = 3
+        sSql = "SELECT BelegNr  AS Such_, " & _
+                "Pos_Nummer AS Sort_, " & _
+                "Anzahl_Menge AS Menge_, " & _
+                "Einzel_Kalkulation AS EKalk_, " & _
+                "Preis_Einzeln AS EPreis_ ," & _
+                "tblProjektbeschreibungDokumente.* " & _
+                "FROM tblProjektbeschreibungDokumente " & _
+                "WHERE BelegNr = " & m_KeySuch & " " & _
+                "ORDER BY tblProjektbeschreibungDokumente.Pos_Nummer"
+        
+End Select
+
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+
+With rs1
+    Do Until rs1.EOF
+        .Edit
+            'PS.PSDebug "SuchOptio:" & .Fields("Pos_Bezeichnung").Value
+            
+            Select Case True
+            
+                Case IsNull(.Fields("Pos_Nummer").Value)
+                    'Nix machen
+                Case Right(.Fields("Pos_Nummer").Value, 3) = ".ZS"
+                    'Zwischensumme erkannt
+                    .Fields("Preis_VK").Value = sum_ZS
+                    
+                    .Fields("Menge_").Value = Null
+                    .Fields("Einheit").Value = Null
+                    .Fields("EKalk_").Value = Null
+                    .Fields("EPreis_").Value = Null
+                    
+                    
+                    sum_ZS = 0
+                Case Left(.Fields("Pos_Nummer").Value, 5) = "Preis"
+                    'Gesamtpreis erkannt
+                    .Fields("Preis_VK").Value = sum_VK + Aufschlag
+                    
+                    .Fields("Menge_").Value = Null
+                    .Fields("Einheit").Value = Null
+                    .Fields("EKalk_").Value = Null
+                    .Fields("EPreis_").Value = Null
+                    
+                Case InStr(1, .Fields("Pos_Bezeichnung").Value, "(Option)") <> 0
+                    'Option erkannt nicht in Summe
+
+                    .Fields("Preis_VK").Value = Nz(.Fields("Menge_").Value, 0) * Nz(.Fields("EPreis_").Value, 0) * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
+                    
+                Case Else
+                
+                    'Hier alles was nicht besonders ist
+                    If m_tabelle = "tblProjektbeschreibung" Then .Fields("Anzahl_Menge").Value = .Fields("Anzahl_Teile").Value * .Fields("Anzahl_Stueck").Value
+                    sum_E = Nz(.Fields("Menge_").Value, 0) * Nz(.Fields("EPreis_").Value, 0) * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
+                    sum_E = CDbl(Format(sum_E, "0.00"))
+                    .Fields("Preis_VK").Value = sum_E
+                    sum_VK = sum_VK + sum_E
+                    sum_ZS = sum_ZS + sum_E
+                    
+                    m_SummePreis = sum_VK + m_Aufschlag
+                    
+                    
+                    
+            End Select
+        .Update
+        .MoveNext
+    Loop 'Loop Do Until
+    .Close
+End With
+
+
+
+'    .Fields("Unternummer").Value
+'tblProjektbeschreibung  Key ist Unternummer
+
+'tblAufPositionen Key Auftragsnummer
+'    .Fields("Auftragsnummer").Value
+
+' tblProjektbeschreibungDokumente key belegnummer
+'    .Fields("BelegNr").Value
+
+'Allgemeine Felder
+'    .Fields("Pos_Nummer").Value
+'    .Fields("Pos_Bezeichnung").Value
+
+
+End Function

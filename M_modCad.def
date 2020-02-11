@@ -1,0 +1,166 @@
+Option Compare Database
+Option Explicit
+
+'Diese Abteilung ist für alles was mit CAD zu tun hat
+
+'
+'Function CadNummer(artikelNr As Long) As String
+''Gibt die Cad Nummer mit Präfix und fester Länge usw mit
+'Dim Praefix As String
+'Dim Sufix As String
+'Dim Laenge As Long
+'Dim Caduse As Boolean
+'
+'
+'Caduse = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadUse'"), 0) = 1
+'Praefix = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadPraefix'"), "")
+'Sufix = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadPDFSufix'"), "")
+'Laenge = Nz(DLookup("Wert2", "tblIni", "Wert1 ='CadLaenge'"), -1)
+'
+' If Caduse Then  'Soll Präfix Sufix und Länge benutzt werden
+'    CadNummer = Praefix & String(Laenge - Len(CStr(artikelNr)), "0") & artikelNr
+' Else
+'    CadNummer = artikelNr
+' End If
+'
+'
+'End Function
+
+
+Function CadPdfNummer(ArtikelNr As Long, IstAktuelleRevision As String) As String
+'Gibt die CAD Nummer mit Sufix zurück und fester Länge
+
+
+
+End Function
+
+
+
+Function pdfCadAnzeigen(ID As Long) As Boolean
+'Sucht die Id im CAD Verzeichnis und schaut ob die PDF vorhanden ist wenn ja wird diese geöffnet
+
+Dim oCad As CAD
+Dim sFile As String
+Dim s1 As String
+'Öffnet das PDF mit dem Standart PDF reader
+    
+    Set oCad = New CAD
+    
+    s1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & oCad.Nummer(ID) & ".PDF"
+    sFile = Dir(s1)
+    
+    If sFile <> "" Then
+        sFile = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sFile
+        Application.FollowHyperlink sFile, , False, , , , "TEST" ' True
+        pdfCadAnzeigen = True
+    Else
+        pdfCadAnzeigen = False
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
+    End If
+
+Exit Function
+
+End Function
+
+
+Function DFTCadAnzeigen(ID As Long) As Boolean
+'Sucht die Id im CAD Verzeichnis und schaut ob die PDF vorhanden ist wenn ja wird diese geöffnet
+
+Dim oCad As CAD
+Dim sFile As String
+Dim s1 As String
+Dim sDatei As String
+
+'Öffnet das PDF mit dem Standart PDF reader
+    
+    Set oCad = New CAD
+    
+    sDatei = oCad.Nummer(ID)
+    
+    s1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sDatei & ".DFT"
+    sFile = Dir(s1)
+    
+    If sFile <> "" Then
+        sFile = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sFile
+        Application.FollowHyperlink sFile, , False, , , , "TEST" ' True
+        'pdfCadAnzeigen = True
+    Else
+        'pdfCadAnzeigen = False
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
+    End If
+
+Exit Function
+
+End Function
+
+Function Cad3DAnzeigen(ID As Long) As Boolean
+'Sucht den gespeicherten Dateinamen im CAD Verzeichnis und schaut ob die PDF vorhanden ist wenn ja wird diese geöffnet
+
+Dim oCad As CAD
+Dim sFile As String
+Dim s1 As String
+Dim sDatei As String
+'Öffnet das PDF mit dem Standart PDF reader
+    
+    Set oCad = New CAD
+    
+         
+    sDatei = oCad.Dateiname(ID)
+         
+        
+         
+         
+    s1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sDatei              'oCad.Nummer(ID) & ".DFT"
+    sFile = Dir(s1)
+    
+    If sFile <> "" And sDatei <> "" Then
+        'sFile = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sFile
+        Application.FollowHyperlink sFile, , False, , , , "TEST" ' True
+        'pdfCadAnzeigen = True
+    Else
+        'pdfCadAnzeigen = False
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
+    End If
+
+
+
+End Function
+
+
+Function pdfAnzeigen(sFile As String) As Boolean
+'Sucht die DAtei und versucht diese zu öffenen
+
+Dim s1 As String
+'Öffnet das PDF mit dem Standart PDF reader
+    If Right(Nz(sFile, ""), 4) <> ".pdf" Then
+        MsgBox Nz(sFile, "") & LA(" ist keine .PDF Datei!")
+        Exit Function
+    End If
+    
+    s1 = sFile  'Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & ocad.NummerPDF(iD) & "*.PDF"
+    sFile = Dir(s1)
+    
+    If sFile <> "" Then
+        
+        Application.FollowHyperlink s1, , False, , , , "TEST" ' True
+        pdfAnzeigen = True
+    Else
+        pdfAnzeigen = False
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
+    End If
+
+Exit Function
+
+End Function
+
+
+
+Function funCAdDateiname(ArtId As Long)
+Dim oCad As CAD
+
+Set oCad = New CAD
+
+funCAdDateiname = oCad.Nummer(ArtId)
+
+
+End Function

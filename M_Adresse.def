@@ -1,0 +1,334 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+Private m_AdressNr As Long
+Private m_Rufname As String
+Private m_Adresse1 As String
+Private m_Adresse2 As String
+Private m_Adresse3 As String
+Private m_Strasse As String
+Private m_PLZ As String
+Private m_Ort As String
+Private m_Land As String
+Private m_Telefon As String
+Private m_Fax As String
+Private m_Handy As String
+Private m_EMail As String
+Private m_Webadresse As String
+Private m_Bemerkung As String
+Private m_Kennwort As String
+Private m_Gruppe As String
+Private m_UnsereKuNr As String
+Private m_LiAdresse1 As String
+Private m_LiAdresse2 As String
+Private m_LiAdresse3 As String
+Private m_LiStrasse As String
+Private m_LiPLZ As String
+Private m_LiOrt As String
+Private m_LiLand As String
+Private m_LiBemerkung As String
+Private m_ReAdresse1 As String
+Private m_ReAdresse2 As String
+Private m_ReAdresse3 As String
+Private m_ReStrasse As String
+Private m_RePLZ As String
+Private m_ReOrt As String
+Private m_ReLand As String
+Private m_ReBemerkung As String
+Private m_BankKontoNr1 As String
+Private m_BankBLZ1 As String
+Private m_BankName1 As String
+Private m_ZahlungSkonto As Double
+Private m_ZahlungZeitraumSkonto As Long
+Private m_ZahlungRabatt As Double
+Private m_ZahlungBemerkung As String
+Private m_ZahlungBuchKontoNr As String
+Private m_ZahlungBuchKontoBez As String
+Private m_USINr As String
+
+'Information zum Ansprechpartner
+
+Private m_PersonTelNr As String
+Private m_PersonFaxNr As String
+Private m_PersonEmail As String
+Private m_PersonVorname As String
+Private m_PersonNachname As String
+Private m_PersonAnrede As String
+Private m_PersonName As String
+
+Public Property Get PersonTelNr() As String:       PersonTelNr = m_PersonTelNr: End Property
+Public Property Get PersonFaxNr() As String:       PersonFaxNr = m_PersonFaxNr: End Property
+Public Property Get PersonEmail() As String:       PersonEmail = m_PersonEmail: End Property
+Public Property Get PersonVorname() As String:     PersonVorname = m_PersonVorname: End Property
+Public Property Get PersonNachname() As String:    PersonNachname = m_PersonNachname: End Property
+Public Property Get PersonAnrede() As String:      PersonAnrede = m_PersonAnrede: End Property
+Public Property Get PersonName() As String:        PersonName = m_PersonName: End Property
+
+
+
+
+
+Public Property Get AdressNr() As Long:    AdressNr = m_AdressNr: End Property
+Public Property Let AdressNr(WERT As Long):     m_AdressNr = WERT: End Property
+Public Property Get Rufname() As String:    Rufname = m_Rufname: End Property
+Public Property Let Rufname(WERT As String):     m_Rufname = WERT: End Property
+Public Property Get Adresse1() As String:    Adresse1 = m_Adresse1: End Property
+Public Property Let Adresse1(WERT As String):     m_Adresse1 = WERT: End Property
+Public Property Get Adresse2() As String:    Adresse2 = m_Adresse2: End Property
+Public Property Let Adresse2(WERT As String):     m_Adresse2 = WERT: End Property
+Public Property Get Adresse3() As String:    Adresse3 = m_Adresse3: End Property
+Public Property Let Adresse3(WERT As String):     m_Adresse3 = WERT: End Property
+Public Property Get Strasse() As String:    Strasse = m_Strasse: End Property
+Public Property Let Strasse(WERT As String):     m_Strasse = WERT: End Property
+Public Property Get PLZ() As String:    PLZ = m_PLZ: End Property
+Public Property Let PLZ(WERT As String):     m_PLZ = WERT: End Property
+Public Property Get Ort() As String:    Ort = m_Ort: End Property
+Public Property Let Ort(WERT As String):     m_Ort = WERT: End Property
+Public Property Get Land() As String:    Land = m_Land: End Property
+Public Property Let Land(WERT As String):     m_Land = WERT: End Property
+Public Property Get Telefon() As String:    Telefon = m_Telefon: End Property
+Public Property Let Telefon(WERT As String):     m_Telefon = WERT: End Property
+Public Property Get Fax() As String:    Fax = m_Fax: End Property
+Public Property Let Fax(WERT As String):     m_Fax = WERT: End Property
+Public Property Get Handy() As String:    Handy = m_Handy: End Property
+Public Property Let Handy(WERT As String):     m_Handy = WERT: End Property
+Public Property Get EMail() As String:    EMail = m_EMail: End Property
+Public Property Let EMail(WERT As String):     m_EMail = WERT: End Property
+Public Property Get Webadresse() As String:    Webadresse = m_Webadresse: End Property
+Public Property Let Webadresse(WERT As String):     m_Webadresse = WERT: End Property
+Public Property Get Bemerkung() As String:    Bemerkung = m_Bemerkung: End Property
+Public Property Let Bemerkung(WERT As String):     m_Bemerkung = WERT: End Property
+Public Property Get Kennwort() As String:    Kennwort = m_Kennwort: End Property
+Public Property Let Kennwort(WERT As String):     m_Kennwort = WERT: End Property
+Public Property Get Gruppe() As String:    Gruppe = m_Gruppe: End Property
+Public Property Let Gruppe(WERT As String):     m_Gruppe = WERT: End Property
+Public Property Get UnsereKuNr() As String:    UnsereKuNr = m_UnsereKuNr: End Property
+Public Property Let UnsereKuNr(WERT As String):     m_UnsereKuNr = WERT: End Property
+Public Property Get LiAdresse1() As String:    LiAdresse1 = m_LiAdresse1: End Property
+Public Property Let LiAdresse1(WERT As String):     m_LiAdresse1 = WERT: End Property
+Public Property Get LiAdresse2() As String:    LiAdresse2 = m_LiAdresse2: End Property
+Public Property Let LiAdresse2(WERT As String):     m_LiAdresse2 = WERT: End Property
+Public Property Get LiAdresse3() As String:    LiAdresse3 = m_LiAdresse3: End Property
+Public Property Let LiAdresse3(WERT As String):     m_LiAdresse3 = WERT: End Property
+Public Property Get LiStrasse() As String:    LiStrasse = m_LiStrasse: End Property
+Public Property Let LiStrasse(WERT As String):     m_LiStrasse = WERT: End Property
+Public Property Get LiPLZ() As String:    LiPLZ = m_LiPLZ: End Property
+Public Property Let LiPLZ(WERT As String):     m_LiPLZ = WERT: End Property
+Public Property Get LiOrt() As String:    LiOrt = m_LiOrt: End Property
+Public Property Let LiOrt(WERT As String):     m_LiOrt = WERT: End Property
+Public Property Get LiLand() As String:    LiLand = m_LiLand: End Property
+Public Property Let LiLand(WERT As String):     m_LiLand = WERT: End Property
+Public Property Get LiBemerkung() As String:    LiBemerkung = m_LiBemerkung: End Property
+Public Property Let LiBemerkung(WERT As String):     m_LiBemerkung = WERT: End Property
+Public Property Get ReAdresse1() As String:    ReAdresse1 = m_ReAdresse1: End Property
+Public Property Let ReAdresse1(WERT As String):     m_ReAdresse1 = WERT: End Property
+Public Property Get ReAdresse2() As String:    ReAdresse2 = m_ReAdresse2: End Property
+Public Property Let ReAdresse2(WERT As String):     m_ReAdresse2 = WERT: End Property
+Public Property Get ReAdresse3() As String:    ReAdresse3 = m_ReAdresse3: End Property
+Public Property Let ReAdresse3(WERT As String):     m_ReAdresse3 = WERT: End Property
+Public Property Get ReStrasse() As String:    ReStrasse = m_ReStrasse: End Property
+Public Property Let ReStrasse(WERT As String):     m_ReStrasse = WERT: End Property
+Public Property Get RePLZ() As String:    RePLZ = m_RePLZ: End Property
+Public Property Let RePLZ(WERT As String):     m_RePLZ = WERT: End Property
+Public Property Get ReOrt() As String:    ReOrt = m_ReOrt: End Property
+Public Property Let ReOrt(WERT As String):     m_ReOrt = WERT: End Property
+Public Property Get ReLand() As String:    ReLand = m_ReLand: End Property
+Public Property Let ReLand(WERT As String):     m_ReLand = WERT: End Property
+Public Property Get ReBemerkung() As String:    ReBemerkung = m_ReBemerkung: End Property
+Public Property Let ReBemerkung(WERT As String):     m_ReBemerkung = WERT: End Property
+Public Property Get BankKontoNr1() As String:    BankKontoNr1 = m_BankKontoNr1: End Property
+Public Property Let BankKontoNr1(WERT As String):     m_BankKontoNr1 = WERT: End Property
+Public Property Get BankBLZ1() As String:    BankBLZ1 = m_BankBLZ1: End Property
+Public Property Let BankBLZ1(WERT As String):     m_BankBLZ1 = WERT: End Property
+Public Property Get BankName1() As String:    BankName1 = m_BankName1: End Property
+Public Property Let BankName1(WERT As String):     m_BankName1 = WERT: End Property
+Public Property Get ZahlungSkonto() As Double:    ZahlungSkonto = m_ZahlungSkonto: End Property
+Public Property Let ZahlungSkonto(WERT As Double):     m_ZahlungSkonto = WERT: End Property
+Public Property Get ZahlungZeitraumSkonto() As Long:    ZahlungZeitraumSkonto = m_ZahlungZeitraumSkonto: End Property
+Public Property Let ZahlungZeitraumSkonto(WERT As Long):     m_ZahlungZeitraumSkonto = WERT: End Property
+Public Property Get ZahlungRabatt() As Double:    ZahlungRabatt = m_ZahlungRabatt: End Property
+Public Property Let ZahlungRabatt(WERT As Double):     m_ZahlungRabatt = WERT: End Property
+Public Property Get ZahlungBemerkung() As String:    ZahlungBemerkung = m_ZahlungBemerkung: End Property
+Public Property Let ZahlungBemerkung(WERT As String):     m_ZahlungBemerkung = WERT: End Property
+Public Property Get ZahlungBuchKontoNr() As String:    ZahlungBuchKontoNr = m_ZahlungBuchKontoNr: End Property
+Public Property Let ZahlungBuchKontoNr(WERT As String):     m_ZahlungBuchKontoNr = WERT: End Property
+Public Property Get ZahlungBuchKontoBez() As String:    ZahlungBuchKontoBez = m_ZahlungBuchKontoBez: End Property
+Public Property Let ZahlungBuchKontoBez(WERT As String):     m_ZahlungBuchKontoBez = WERT: End Property
+Public Property Get USINr() As String:    USINr = m_USINr: End Property
+Public Property Let USINr(WERT As String):     m_USINr = WERT: End Property
+
+
+Public Function AdressNrAusRufname(Rufname As String) As Long
+    AdressNrAusRufname = Nz(DLookup("AdressNr", "tblAdressen", "Rufname='" & Rufname & "'"), 0)
+End Function
+
+Public Function RufnameAusAdressNr(Adressnummer As Long) As String
+    RufnameAusAdressNr = Nz(DLookup("Rufname", "tblAdressen", "AdressNr =" & Adressnummer), "")
+End Function
+
+Public Function Laden(AdressNr As Variant) As Boolean
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+If IsNull(AdressNr) Then
+    Laden = True
+    Exit Function
+End If
+
+sSql = "SELECT * FROM tblAdressen WHERE AdressNr=" & AdressNr
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+With rs1
+    If .EOF Then
+        Laden = False
+    Else
+        m_AdressNr = Nz(.Fields("AdressNr").Value)
+        m_Rufname = Nz(.Fields("Rufname").Value)
+        m_Adresse1 = Nz(.Fields("Adresse1").Value)
+        m_Adresse2 = Nz(.Fields("Adresse2").Value)
+        m_Adresse3 = Nz(.Fields("Adresse3").Value)
+        m_Strasse = Nz(.Fields("Strasse").Value)
+        m_PLZ = Nz(.Fields("PLZ").Value)
+        m_Ort = Nz(.Fields("Ort").Value)
+        m_Land = Nz(.Fields("Land").Value)
+        m_Telefon = Nz(.Fields("Telefon").Value)
+        m_Fax = Nz(.Fields("Fax").Value)
+        m_Handy = Nz(.Fields("Handy").Value)
+        m_EMail = Nz(.Fields("EMail").Value)
+        m_Webadresse = Nz(.Fields("Webadresse").Value)
+        m_Bemerkung = Nz(.Fields("Bemerkung").Value)
+        m_Kennwort = Nz(.Fields("Kennwort").Value)
+        m_Gruppe = Nz(.Fields("Gruppe").Value)
+        m_UnsereKuNr = Nz(.Fields("UnsereKuNr").Value)
+        m_LiAdresse1 = Nz(.Fields("LiAdresse1").Value)
+        m_LiAdresse2 = Nz(.Fields("LiAdresse2").Value)
+        m_LiAdresse3 = Nz(.Fields("LiAdresse3").Value)
+        m_LiStrasse = Nz(.Fields("LiStrasse").Value)
+        m_LiPLZ = Nz(.Fields("LiPLZ").Value)
+        m_LiOrt = Nz(.Fields("LiOrt").Value)
+        m_LiLand = Nz(.Fields("LiLand").Value)
+        m_LiBemerkung = Nz(.Fields("LiBemerkung").Value)
+        m_ReAdresse1 = Nz(.Fields("ReAdresse1").Value)
+        m_ReAdresse2 = Nz(.Fields("ReAdresse2").Value)
+        m_ReAdresse3 = Nz(.Fields("ReAdresse3").Value)
+        m_ReStrasse = Nz(.Fields("ReStrasse").Value)
+        m_RePLZ = Nz(.Fields("RePLZ").Value)
+        m_ReOrt = Nz(.Fields("ReOrt").Value)
+        m_ReLand = Nz(.Fields("ReLand").Value)
+        m_ReBemerkung = Nz(.Fields("ReBemerkung").Value)
+        m_BankKontoNr1 = Nz(.Fields("BankKontoNr1").Value)
+        m_BankBLZ1 = Nz(.Fields("BankBLZ1").Value)
+        m_BankName1 = Nz(.Fields("BankName1").Value)
+        m_ZahlungSkonto = Nz(.Fields("ZahlungSkonto").Value)
+        m_ZahlungZeitraumSkonto = Nz(.Fields("ZahlungZeitraumSkonto").Value)
+        m_ZahlungRabatt = Nz(.Fields("ZahlungRabatt").Value)
+        m_ZahlungBemerkung = Nz(.Fields("ZahlungBemerkung").Value)
+        m_ZahlungBuchKontoNr = Nz(.Fields("ZahlungBuchKontoNr").Value)
+        m_ZahlungBuchKontoBez = Nz(.Fields("ZahlungBuchKontoBez").Value)
+        m_USINr = Nz(.Fields("USINr").Value)
+        Laden = True
+    End If
+
+End With
+
+    
+End Function
+
+
+Public Function AdresseRTF() As String
+Dim A As String
+
+A = ""
+
+A = A & "<b>" & Nz(m_Adresse1) & "</b>" & "<BR>"
+A = A & Nz(m_Strasse) & "<BR>"
+If Nz(m_Land) <> "" Then
+    A = A & "<b>" & Nz(m_Land) & "-<b>"
+End If
+A = A & "<b>" & Nz(m_PLZ) & "</b>" & " " & Nz(m_Ort)
+
+AdresseRTF = A
+
+End Function
+
+
+
+Public Function PersonLaden(IDPerson As Long) As Boolean
+'Lädt die Person
+
+
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim A As String
+Dim B As String
+
+sSql = "SELECT * FROM tblPersonen WHERE ID=" & IDPerson
+
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+
+With rs1
+    If Not .EOF Then
+        m_PersonAnrede = Nz(.Fields("Anrede").Value, "")
+        m_PersonVorname = Nz(.Fields("Vorname").Value, "")
+        m_PersonNachname = Nz(.Fields("Nachname").Value, "")
+        
+        m_PersonName = m_PersonAnrede & " " & m_PersonVorname & " " & m_PersonNachname
+        
+        'Me.EMail = IIf(Nz(.Fields("Bezeichnung_Nr").Value, "") = "E-Mail", .Fields("Rufnummer").Value, "")
+        
+        A = "Mail" 'EMail Adresse
+        Select Case True   'Sucht die E-Mail der erste gewinnt
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr2").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer2").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr3").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer3").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr4").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer4").Value)
+        End Select
+        If B <> "" Then m_PersonEmail = B
+        
+        B = ""
+        A = "Tel" 'Telefonnummer
+        Select Case True   'Sucht die E-Mail der erste gewinnt
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr2").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer2").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr3").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer3").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr4").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer4").Value)
+        End Select
+        If B <> "" Then m_PersonTelNr = B
+        
+        B = ""
+        A = "Fax" 'Fax Nummer
+        Select Case True   'Sucht die E-Mail der erste gewinnt
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr2").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer2").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr3").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer3").Value)
+            Case InStr(1, Nz(.Fields("Bezeichnung_Nr4").Value, "#"), A) <> 0
+                B = Nz(.Fields("Rufnummer4").Value)
+        End Select
+        If B <> "" Then m_PersonFaxNr = B
+        
+        
+        
+        
+    End If
+    .Close
+End With
+
+
+
+End Function

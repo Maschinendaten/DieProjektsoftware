@@ -1,0 +1,672 @@
+Option Compare Database
+Option Explicit
+'Public gloDruckForm As Form
+
+Public Const conWord = True
+
+Public gloAWWordNr As String
+Public gloWordOK As Boolean
+Function funDruckWord(sDokuName As String, sDokuPfad As String, sVorlageName As String, sAbfrage As String)
+'--------------------------------------------------------
+' Grundlagen Michael Zimmermann
+' Veränder und erstellt durch M.Gut 2012.01.31
+'
+' Das Programm liest eine Abfrage ein und öffnet ein gleichlautendes Word Dokument
+' Es werden die Textmarken im Worddokument gesucht und durch gleich lautende Records aus der
+' Abfrage ersetzt.
+' sDokuName = der Dokumentnahme ohne .DOC
+' sDokuPfad = der Fad wo das Dokument abgespeichert werden soll
+' sVorlageName = der Name der Vorlage inkl. Pfad und Dateiname mit der Endung .DOC
+' sAbfrage = Name der Abfrage
+'--------------------------------------------------------
+' Testfunktion für Direktfenster fundruckword("BestellungAnfrage","","")
+
+'###geändert 17.8.2012 für late binding MG
+
+'Dim wdApp As Application
+'Dim wdDoc As Document
+'Dim wdRng As Range
+
+Dim objWord As Object
+
+Dim tTmp As String
+Dim tDoc As String
+Dim rs1  As DAO.Recordset
+Dim A As Long
+Dim s1 As String
+Dim s2 As String
+Dim sPVorlage As String
+Dim sPAusgabe As String
+
+'on error Goto Err_
+
+
+sPAusgabe = CurrentProject.Path & "\Ausgabe\"
+
+
+'Hier werden der Pfad und Dateiname aus der Datenbank ermittelt im Beispiel hardgecodet
+tTmp = sVorlageName
+tDoc = sDokuPfad & "\" & sDokuName '& ".pdf"
+
+'Prüft ob die Verzeichnisse bestehen wenn nicht werden Sie angelegt
+'### Hier müßten noch die Fehler abgefangen werden wenn garkein Verzeichnis vorhanden ist
+'### wenn kein Verzeichnis der Vorlage besteht besteht auch keine Vorlage
+
+'If Dir(CurrentProject.path & "\Vorlagen", vbDirectory) = "" Then MkDir CurrentProject.path & "Vorlagen\"
+'If Dir(CurrentProject.path & "\Ausgabe", vbDirectory) = "" Then MkDir CurrentProject.path & "Ausgabe\"
+
+FileCopy tTmp, tDoc
+
+
+'Set wdApp = GetObject(, "Word.Application")
+'If wdApp Is Nothing Then Set wdApp = CreateObject("Word.Application")
+'If objWord Is Nothing Then
+
+Set objWord = CreateObject("Word.Application")
+
+
+With objWord
+
+    .Visible = True
+    'Set wdDoc = wdApp.Documents.Add(tDoc)
+    .Documents.Open tDoc
+    '.ActiveDocument.SaveAs tDoc
+
+    'Öffne Abfrage
+    Set rs1 = CurrentDb.OpenRecordset(sAbfrage)
+    If rs1.EOF = True Then
+        MsgBox ("Es gibt keinen Datensat in dieser Abfrage " & "a_" & sDokuName)
+        Set rs1 = Nothing
+        Exit Function
+    End If
+
+    rs1.MoveFirst
+    'Es werden alle Bookmarks ersetzt die einzeln vorkommen
+    For A = 0 To rs1.Fields.Count - 1
+        s1 = rs1.Fields(A).Name
+        s2 = Nz(rs1.Fields(A).Value, "")
+        'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
+        If .ActiveDocument.Bookmarks.Exists(s1) Then
+            .ActiveDocument.Bookmarks(s1).Range.Text = s2
+        End If
+    Next A
+    
+    'Es werden die Bookmarks ersetzt die mehrfach vorkommen können
+    'diese müssen mit Txx gekennzeichnet sein
+    
+    'prüft ob mehrfachtabelle überhaupt vorhanden
+    If .ActiveDocument.Bookmarks.Exists("TxxTABELLE") = False Then
+        GoTo EndeWord_
+    End If
+
+
+    While rs1.EOF = False
+        'Markiere die Tabelle zum kopieren
+        .Selection.GoTo What:=-1, Name:="TxxTABELLE"     'wdGoToBookmark = -1
+        'Kopiere die Tabelle für Später mit Bookmarks
+        .Selection.copy
+        
+        'Ersetze die Bookmarks in der Tabelle
+        For A = 0 To rs1.Fields.Count - 1
+            s1 = "Txx" & rs1.Fields(A).Name
+            s2 = Nz(rs1.Fields(A).Value, "")
+            Debug.Print "f#D:", s1, Mid(s2, 1, 10)
+            'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
+            If .ActiveDocument.Bookmarks.Exists(s1) Then
+                .ActiveDocument.Bookmarks(s1).Range.Text = s2
+                Debug.Print "T#D:", s1, Mid(s2, 1, 10)
+            End If
+        Next A
+        'Markiere die Tabelle um mit dem Cursor unter diese zu springen
+        .Selection.GoTo What:=-1, Name:="TxxTABELLE"      'wdGoToBookmark=-1
+        'Springe unter die Tabelle
+        .Selection.MoveDown unit:=5, Count:=1     ' wdLine =5
+        'Lösche das Bookmark der Tabelle damit es kopiert werden kann
+        .ActiveDocument.Bookmarks("TxxTABELLE").Delete
+        'Spring zum nächsten satz um prüfen zu können ob danach das ende ist
+        rs1.MoveNext
+        'Setze die Tabelle mit allen Bookmarks wieder ein wenn nicht das ende
+        If Not rs1.EOF Then
+            .Selection.Paste
+        End If
+    Wend
+    
+.Visible = True
+    
+'    wdDoc.Selection.Copy
+'    wdDoc.Selection.MoveDown Unit:=wdLine, Count:=1
+'    wdDoc.Selection.PasteAppendTable
+
+
+
+
+''Etwas mutiger: Einfach druff, und ohne Error-Handling
+''Mal ohne explicite Variable
+'wdDoc.Bookmarks("Datum").Range.Text = "03.04.2006"
+'wdDoc.Bookmarks("Betreff").Range.Text = "Rechnung"
+''Bracket-Bookmark retten
+'Set wdRng = wdDoc.Bookmarks("Anrede").Range
+'wdRng.Text = "Sehr geehrter Herr Meier,"
+'wdDoc.Bookmarks.Add "Anrede", wdRng
+'
+''Und nochmal ohne explicite Variable
+'wdDoc.Bookmarks("Text").Range.Text = "bitte überweisen Sie viel Geld!"
+'
+''Änderungen sind nicht gespeichert; User soll Dokument
+''bearbeiten und selbst speichern.
+''Alternativ: wdDoc.Save und folgenden Block weglassen
+''Dann wird das Dokument vöölig im Hintergrund fertiggestellt
+''und findet sich dann im Ausgabeordner
+
+
+'Einsprung wenn Wordarbeit beendet werden soll
+EndeWord_:
+'Set wdApp = wdDoc.Application
+'wdApp.Visible = True
+'AppActivate wdApp.Caption
+'Speichert die Datei mit dem vorbestimmten Namen
+
+.ActiveDocument.BuiltInDocumentProperties("Title").Value = "Angebot " & Now
+
+.ActiveDocument.Save
+
+End With
+
+
+Exit Function
+Err_:
+
+If Err.Number = 5981 Then MsgBox "Sie müssen in Word die Option Geschützte Ansicht anpassen" & vbCrLf & _
+                                    " unter Datei - Optionen - Sicherheitscenter -Geschützte Ansicht" & vbCrLf & _
+                                    "Geschützte Ansicht für Dateien aktivieren"
+
+MsgErr "modDruckenWord", "funDruckWord", Err.Description, Err.Number, 1
+
+End Function
+
+
+'Function funDruckWord(sDokuName As String, sDokuPfad As String, sVorlageName As String, sAbfrage As String)
+''--------------------------------------------------------
+'' Grundlagen Michael Zimmermann
+'' Veränder und erstellt durch M.Gut 2012.01.31
+''
+'' Das Programm liest eine Abfrage ein und öffnet ein gleichlautendes Word Dokument
+'' Es werden die Textmarken im Worddokument gesucht und durch gleich lautende Records aus der
+'' Abfrage ersetzt.
+'' sDokuName = der Dokumentnahme ohne .DOC
+'' sDokuPfad = der Fad wo das Dokument abgespeichert werden soll
+'' sVorlageName = der Name der Vorlage inkl. Pfad und Dateiname mit der Endung .DOC
+'' sAbfrage = Name der Abfrage
+''--------------------------------------------------------
+'' Testfunktion für Direktfenster fundruckword("BestellungAnfrage","","")
+'
+''###geändert 17.8.2012 für late binding MG
+'
+'If conWord = False Then
+'    MsgBox "Word ist deaktiviert (suchen nach conWord in VBA)."
+'End If
+'
+'' If conWord = True Then 'Bedingte Compilierung kein Word
+'
+'Dim wdApp As Application
+'Dim wdDoc As Document
+'Dim wdRng As Range
+'Dim objWord
+'' #Runtime Dim objWord As Object
+'
+'Dim tTmp As String
+'Dim tDoc As String
+'Dim rs1  As DAO.Recordset
+'Dim A As Long
+'Dim s1 As String
+'Dim S2 As String
+'Dim sPVorlage As String
+'Dim sPAusgabe As String
+'
+'
+'
+''on error Goto Err_
+'
+'
+'sPAusgabe = CurrentProject.Path & "\Ausgabe\"
+'
+'
+''Hier werden der Pfad und Dateiname aus der Datenbank ermittelt im Beispiel hardgecodet
+'tTmp = sVorlageName
+'tDoc = sDokuPfad & "\" & sDokuName '& ".pdf"
+'
+''Prüft ob die Verzeichnisse bestehen wenn nicht werden Sie angelegt
+''### Hier müßten noch die Fehler abgefangen werden wenn garkein Verzeichnis vorhanden ist
+''### wenn kein Verzeichnis der Vorlage besteht besteht auch keine Vorlage
+'
+''If Dir(CurrentProject.path & "\Vorlagen", vbDirectory) = "" Then MkDir CurrentProject.path & "Vorlagen\"
+''If Dir(CurrentProject.path & "\Ausgabe", vbDirectory) = "" Then MkDir CurrentProject.path & "Ausgabe\"
+'
+'FileCopy tTmp, tDoc
+'
+'
+'Set wdApp = GetObject(, "Word.Application")
+'If wdApp Is Nothing Then Set wdApp = CreateObject("Word.Application")
+'' If objWord Is Nothing Then Set objWord = CreateObject("Word.Application")
+'
+'Set objWord = CreateObject("Word.Application")
+'
+'
+'With objWord
+'
+'    .visible = True
+'    'Set wdDoc = wdApp.Documents.Add(tDoc)
+'    .Documents (tDoc)
+'    .ActiveDocument.SaveAs tDoc
+'
+'MsgBox wdDoc.Name
+'
+'
+'''Set wdDoc = CreateObject(tDoc)
+'''Set wdApp = wdDoc.Application
+'''wdDoc.Close
+'
+''Öffne Abfrage
+'Set rs1 = CurrentDb.OpenRecordset(sAbfrage)
+'If rs1.EOF = True Then
+'    MsgBox ("Es gibt keinen Datensat in dieser Abfrage " & "a_" & sDokuName)
+'    Set rs1 = Nothing
+'    Exit Function
+'End If
+'
+'rs1.MoveFirst
+''Es werden alle Bookmarks ersetzt die einzeln vorkommen
+'For A = 0 To rs1.Fields.count - 1
+'    s1 = rs1.Fields(A).Name
+'    S2 = Nz(rs1.Fields(A).Value, "")
+'    'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
+'    If .ActiveDocument.Bookmarks.Exists(s1) Then
+'        .ActiveDocument.Bookmarks(s1).Range.Text = S2
+'    End If
+'Next A
+'
+''Es werden die Bookmarks ersetzt die mehrfach vorkommen können
+''diese müssen mit Txx gekennzeichnet sein
+'
+''prüft ob mehrfachtabelle überhaupt vorhanden
+'If .ActiveDocument.Bookmarks.Exists("TxxTABELLE") = False Then
+'    GoTo EndeWord_
+'End If
+'
+'
+'    While rs1.EOF = False
+'        'Markiere die Tabelle zum kopieren
+'        .Selection.Goto What:=-1, Name:="TxxTABELLE"     'wdGoToBookmark = -1
+'        'Kopiere die Tabelle für Später mit Bookmarks
+'        .Selection.Copy
+'
+'        'Ersetze die Bookmarks in der Tabelle
+'        For A = 0 To rs1.Fields.count - 1
+'            s1 = "Txx" & rs1.Fields(A).Name
+'            S2 = Nz(rs1.Fields(A).Value, "")
+'            'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
+'            If .ActiveDocument.Bookmarks.Exists(s1) Then
+'                .ActiveDocument.Bookmarks(s1).Range.Text = S2
+'            End If
+'        Next A
+'        'Markiere die Tabelle um mit dem Cursor unter diese zu springen
+'        .Selection.Goto What:=-1, Name:="TxxTABELLE"      'wdGoToBookmark=-1
+'        'Springe unter die Tabelle
+'        .Selection.MoveDown unit:=5, count:=1     ' wdLine =5
+'        'Lösche das Bookmark der Tabelle damit es kopiert werden kann
+'        .ActiveDocument.Bookmarks("TxxTABELLE").Delete
+'        'Spring zum nächsten satz um prüfen zu können ob danach das ende ist
+'        rs1.MoveNext
+'        'Setze die Tabelle mit allen Bookmarks wieder ein wenn nicht das ende
+'        If Not rs1.EOF Then
+'            .Selection.Paste
+'        End If
+'    Wend
+'
+'.visible = True
+'
+''    wdDoc.Selection.Copy
+''    wdDoc.Selection.MoveDown Unit:=wdLine, Count:=1
+''    wdDoc.Selection.PasteAppendTable
+'
+'
+'
+'
+'''Etwas mutiger: Einfach druff, und ohne Error-Handling
+'''Mal ohne explicite Variable
+''wdDoc.Bookmarks("Datum").Range.Text = "03.04.2006"
+''wdDoc.Bookmarks("Betreff").Range.Text = "Rechnung"
+'''Bracket-Bookmark retten
+''Set wdRng = wdDoc.Bookmarks("Anrede").Range
+''wdRng.Text = "Sehr geehrter Herr Meier,"
+''wdDoc.Bookmarks.Add "Anrede", wdRng
+''
+'''Und nochmal ohne explicite Variable
+''wdDoc.Bookmarks("Text").Range.Text = "bitte überweisen Sie viel Geld!"
+''
+'''Änderungen sind nicht gespeichert; User soll Dokument
+'''bearbeiten und selbst speichern.
+'''Alternativ: wdDoc.Save und folgenden Block weglassen
+'''Dann wird das Dokument vöölig im Hintergrund fertiggestellt
+'''und findet sich dann im Ausgabeordner
+'
+'
+''Einsprung wenn Wordarbeit beendet werden soll
+'EndeWord_:
+''Set wdApp = wdDoc.Application
+''wdApp.Visible = True
+''AppActivate wdApp.Caption
+''Speichert die Datei mit dem vorbestimmten Namen
+'
+'.ActiveDocument.BuiltInDocumentProperties("Title").Value = "Angebot " & Now
+'
+'.ActiveDocument.Save
+'
+'End With
+'
+'
+'Exit Function
+'Err_:
+'
+'If Err.Number = 5981 Then MsgBox "Sie müssen in Word die Option Geschützte Ansicht anpassen" & vbCrLf & _
+'                                    " unter Datei - Optionen - Sicherheitscenter -Geschützte Ansicht" & vbCrLf & _
+'                                    "Geschützte Ansicht für Dateien aktivieren"
+'
+'MsgErr "modDruckenWord", "funDruckWord", Err.description, Err.Number, 1
+''#End If
+'End Function
+
+
+Function funOpenWord(sDokuName As String)
+'öffnet das Dokument für die erneute Bearbeitung oder den Ausdruck
+
+
+Dim wdDoc As Document
+Dim wdApp As Application
+Dim s1 As String
+
+Dim objWord
+
+'on error Goto Err_
+
+'nur zum testen
+'sDokuName = "C:\AA_MG\PS\Word_Berichte\Zimmermann\Ausgabe\brief.doc"
+
+s1 = sDokuName
+'Set wdDoc = GetObject(S1)
+'Set wdApp = wdDoc.Application
+
+Set objWord = CreateObject("Word.Application")
+
+objWord.Documents.Add (s1)
+
+objWord.Visible = True
+'AppActivate objWord.Caption
+
+Exit Function
+Err_:
+
+MsgErr "modDruckWord", "funOpenWord", Err.Description, Err.Number, 1
+End Function
+
+
+
+Public Function funDruckFormWord(frmForm As Form, sVorlage As String, sDokuID As String)
+'Druckt den Bericht in Word mit Vorlage
+'Oder öffnet einbereits gedrucktes Dokument
+'frmForm  = der Verweis von dem aus die Funktion aufgerufen wurde
+'sVorlage = die Vorlage Datei ohne Pfad in dem die Vorlage ist
+'sDokuID  = die ID mit der das Dokument erstellt wir entspricht dem Dateinamen und sollte aus der
+
+''on error Goto err_
+
+
+
+'Prüfen ob ein Betreff in dem Formular vergeben wurde
+If (frmForm.Betreff = "") Or IsNull(frmForm.Betreff) Then
+        MsgBox ("Bitte geben Sie einen Betreff ein um den Beleg leichter zu finden!")
+        Exit Function
+End If
+
+'Die globalen variablen werden benötigt um die Ablage zu erstellen
+
+gloAblage.ProNr = Nz(frmForm.Projektnummer)
+gloAblage.AdressId = Nz(frmForm.Adressnummer)
+gloAblage.ArtikelID = 0
+gloAblage.PersonId = 0
+gloAblage.BelegId = Nz(frmForm.BelegNr)
+gloAblage.Datei = frmForm.BelegArt & "_" & frmForm.Belegbezeichnung & ".doc"
+
+
+
+'Damit Projektnummer usw. von dem frmDruckenWord abgefragt werden können
+'gloDruckForm = frmForm
+
+
+'Wenn alles korekt durchlaufen ist wir word ok = true
+gloWordOK = False
+
+'Ruft das Formular auf in dem die Berichte ausgewählt werden
+DoCmd.OpenForm "frmdruckenWord", , , , , acDialog, sVorlage & ";" & gloAblage.BelegId & ";"    ' muss mit open args analysiert werden   sVorlage & ";" & Ab.BelegId & ";"
+    
+    
+'Funzt noch nicht mit der Ablage
+    
+
+
+Exit Function
+Err_:
+MsgErr "SubDrucken", "Form_frmDrucken", Err.Description, Err.Number, Erl()
+
+End Function
+
+
+
+
+Public Sub test_Word(DokuName As String, sDokuPfad As String, sVorlageName As String, sAbfrage As String)
+'--------------------------------------------------------
+' Grundlagen Michael Zimmermann
+' Veränder und erstellt durch M.Gut 2012.01.31
+'
+' Das Programm liest eine Abfrage ein und öffnet ein gleichlautendes Word Dokument
+' Es werden die Textmarken im Worddokument gesucht und durch gleich lautende Records aus der
+' Abfrage ersetzt.
+' sDokuName = der Dokumentnahme ohne .DOC
+' sDokuPfad = der Fad wo das Dokument abgespeichert werden soll
+' sVorlageName = der Name der Vorlage inkl. Pfad und Dateiname mit der Endung .DOC
+' sAbfrage = Name der Abfrage
+'--------------------------------------------------------
+' Testfunktion für Direktfenster fundruckword("BestellungAnfrage","","")
+
+'###geändert 17.8.2012 für late binding MG
+#If conWord Then   'Bedingte Compilierung kein Word
+
+'Dim wdApp As Word.Application
+'Dim wdDoc As Word.Document
+'Dim wdRng As Word.Range
+
+Dim objWord As Object
+
+Dim tTmp As String
+Dim tDoc As String
+Dim rs1  As DAO.Recordset
+Dim A As Long
+Dim s1 As String
+Dim s2 As String
+Dim sPVorlage As String
+Dim sPAusgabe As String
+
+
+
+
+
+Set wdDoc = CreateObject(tDoc)
+wdDoc.Windows(1).Visible = True
+
+wdDoc.Bookmarks("").Range.Text = "03.04.2006"
+
+
+
+Set wdApp = wdDoc.Application
+wdApp.Visible = True
+AppActivate wdApp.Caption
+
+Exit Sub
+
+'on error Goto Err_
+
+
+'sPAusgabe = CurrentProject.Path & "\Ausgabe\"
+
+
+'Hier werden der Pfad und Dateiname aus der Datenbank ermittelt im Beispiel hardgecodet
+'tTmp = sVorlageName
+'tDoc = sDokuPfad & "\" & sDokuName '& ".pdf"
+
+'Prüft ob die Verzeichnisse bestehen wenn nicht werden Sie angelegt
+'### Hier müßten noch die Fehler abgefangen werden wenn garkein Verzeichnis vorhanden ist
+'### wenn kein Verzeichnis der Vorlage besteht besteht auch keine Vorlage
+
+'If Dir(CurrentProject.path & "\Vorlagen", vbDirectory) = "" Then MkDir CurrentProject.path & "Vorlagen\"
+'If Dir(CurrentProject.path & "\Ausgabe", vbDirectory) = "" Then MkDir CurrentProject.path & "Ausgabe\"
+
+'FileCopy tTmp, tDoc
+
+
+'Set wdApp = GetObject(, "Word.Application")
+'If wdApp Is Nothing Then Set wdApp = CreateObject("Word.Application")
+If objWord Is Nothing Then Set objWord = CreateObject("Word.Application")
+Set wdDoc = objWord.Documents.Add
+
+With objWord
+
+    .Visible = True
+    'Set wdDoc = wdApp.Documents.Add(tDoc)
+    '.Documents (tDoc)
+    '.ActiveDocument.SaveAs tDoc
+.ActiveDocument = "wdqwlkfölkdklq"
+'MsgBox wdDoc.Name
+
+
+''Set wdDoc = CreateObject(tDoc)
+''Set wdApp = wdDoc.Application
+''wdDoc.Close
+
+'Öffne Abfrage
+Set rs1 = CurrentDb.OpenRecordset(sAbfrage)
+If rs1.EOF = True Then
+    MsgBox ("Es gibt keinen Datensat in dieser Abfrage " & "a_" & DokuName)
+    Set rs1 = Nothing
+    Exit Sub
+End If
+
+rs1.MoveFirst
+'Es werden alle Bookmarks ersetzt die einzeln vorkommen
+For A = 0 To rs1.Fields.Count - 1
+    s1 = rs1.Fields(A).Name
+    s2 = Nz(rs1.Fields(A).Value, "")
+    'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
+    If .ActiveDocument.Bookmarks.Exists(s1) Then
+        .ActiveDocument.Bookmarks(s1).Range.Text = s2
+    End If
+Next A
+
+'Es werden die Bookmarks ersetzt die mehrfach vorkommen können
+'diese müssen mit Txx gekennzeichnet sein
+
+'prüft ob mehrfachtabelle überhaupt vorhanden
+If .ActiveDocument.Bookmarks.Exists("TxxTABELLE") = False Then
+    GoTo EndeWord_
+End If
+
+
+    While rs1.EOF = False
+        'Markiere die Tabelle zum kopieren
+        .Selection.GoTo What:=-1, Name:="TxxTABELLE"     'wdGoToBookmark = -1
+        'Kopiere die Tabelle für Später mit Bookmarks
+        .Selection.copy
+        
+        'Ersetze die Bookmarks in der Tabelle
+        For A = 0 To rs1.Fields.Count - 1
+            s1 = "Txx" & rs1.Fields(A).Name
+            s2 = Nz(rs1.Fields(A).Value, "")
+            'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
+            If .ActiveDocument.Bookmarks.Exists(s1) Then
+                .ActiveDocument.Bookmarks(s1).Range.Text = s2
+            End If
+        Next A
+        'Markiere die Tabelle um mit dem Cursor unter diese zu springen
+        .Selection.GoTo What:=-1, Name:="TxxTABELLE"      'wdGoToBookmark=-1
+        'Springe unter die Tabelle
+        .Selection.MoveDown unit:=5, Count:=1     ' wdLine =5
+        'Lösche das Bookmark der Tabelle damit es kopiert werden kann
+        .ActiveDocument.Bookmarks("TxxTABELLE").Delete
+        'Spring zum nächsten satz um prüfen zu können ob danach das ende ist
+        rs1.MoveNext
+        'Setze die Tabelle mit allen Bookmarks wieder ein wenn nicht das ende
+        If Not rs1.EOF Then
+            .Selection.Paste
+        End If
+    Wend
+    
+.Visible = True
+    
+'    wdDoc.Selection.Copy
+'    wdDoc.Selection.MoveDown Unit:=wdLine, Count:=1
+'    wdDoc.Selection.PasteAppendTable
+
+
+
+
+''Etwas mutiger: Einfach druff, und ohne Error-Handling
+''Mal ohne explicite Variable
+'wdDoc.Bookmarks("Datum").Range.Text = "03.04.2006"
+'wdDoc.Bookmarks("Betreff").Range.Text = "Rechnung"
+''Bracket-Bookmark retten
+'Set wdRng = wdDoc.Bookmarks("Anrede").Range
+'wdRng.Text = "Sehr geehrter Herr Meier,"
+'wdDoc.Bookmarks.Add "Anrede", wdRng
+'
+''Und nochmal ohne explicite Variable
+'wdDoc.Bookmarks("Text").Range.Text = "bitte überweisen Sie viel Geld!"
+'
+''Änderungen sind nicht gespeichert; User soll Dokument
+''bearbeiten und selbst speichern.
+''Alternativ: wdDoc.Save und folgenden Block weglassen
+''Dann wird das Dokument vöölig im Hintergrund fertiggestellt
+''und findet sich dann im Ausgabeordner
+
+
+'Einsprung wenn Wordarbeit beendet werden soll
+EndeWord_:
+'Set wdApp = wdDoc.Application
+'wdApp.Visible = True
+'AppActivate wdApp.Caption
+'Speichert die Datei mit dem vorbestimmten Namen
+
+.ActiveDocument.BuiltInDocumentProperties("Title").Value = "Angebot " & Now
+
+.ActiveDocument.Save
+
+End With
+
+
+Exit Sub
+Err_:
+
+If Err.Number = 5981 Then MsgBox "Sie müssen in Word die Option Geschützte Ansicht anpassen" & vbCrLf & _
+                                    " unter Datei - Optionen - Sicherheitscenter -Geschützte Ansicht" & vbCrLf & _
+                                    "Geschützte Ansicht für Dateien aktivieren"
+
+MsgErr "modDruckenWord", "funDruckWord", Err.Description, Err.Number, 1
+#End If
+End Sub
+
+
+Sub test1()
+
+
+
+
+
+End Sub

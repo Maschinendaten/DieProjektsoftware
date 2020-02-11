@@ -1,0 +1,262 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+'Hier gehts ab was die Rechnung und Gutschrift angeht
+
+
+Private m_laufendeNr As Long
+Private m_BelegNr As Long
+Private m_ProjekktNr As Long
+Private m_AufNr As Long
+Private m_IDNr As Long
+Private m_AdrNr As Long
+Private m_AngelegtVon As String
+Private m_AngelegtAm As Date
+Private m_SummeText As String
+Private m_SummeWert As Double
+Private m_MwstText As String
+Private m_MwstWert As Double
+Private m_AuftragnettoText As String
+Private m_AuftragNettoWert As Double
+Private m_BereitsBezahltText As String
+Private m_BereistBezahltWert As String
+Private m_ZuZahlenderBetragText As String
+Private m_ZuZahlenderBetragWert As Double
+Private m_RechnungsbetragText As String
+Private m_RechnungsbetragWert As Double
+Private m_mitAnzahlung As Boolean
+Private m_Zahlungsbedingungen As String
+Private m_Waehrung As String
+Private m_Berechnet As Boolean
+Private m_AngezahltPro As Double
+Private m_Bezahlt As Boolean
+Private m_BezahltDatum As Date
+Private m_BezahltEingetragen As String
+Private m_ReBelegart As Long
+Private m_ReBelegNr2 As Long
+Private m_ReZusatz01Text As String
+Private m_ReZusatz01Betrag As Double
+Private m_ReZusatz02Text As String
+Private m_ReZusatz02Betrag As Double
+
+Public Property Get laufendeNr() As Long:    laufendeNr = m_laufendeNr: End Property
+Public Property Let laufendeNr(WERT As Long):     m_laufendeNr = WERT: End Property
+Public Property Get BelegNr() As Long:    BelegNr = m_BelegNr: End Property
+Public Property Let BelegNr(WERT As Long):     m_BelegNr = WERT: End Property
+Public Property Get ProjekktNr() As Long:    ProjekktNr = m_ProjekktNr: End Property
+Public Property Let ProjekktNr(WERT As Long):     m_ProjekktNr = WERT: End Property
+Public Property Get AufNr() As Long:    AufNr = m_AufNr: End Property
+Public Property Let AufNr(WERT As Long):     m_AufNr = WERT: End Property
+Public Property Get IDNr() As Long:    IDNr = m_IDNr: End Property
+Public Property Let IDNr(WERT As Long):     m_IDNr = WERT: End Property
+Public Property Get AdrNr() As Long:    AdrNr = m_AdrNr: End Property
+Public Property Let AdrNr(WERT As Long):     m_AdrNr = WERT: End Property
+Public Property Get AngelegtVon() As String:    AngelegtVon = m_AngelegtVon: End Property
+Public Property Let AngelegtVon(WERT As String):     m_AngelegtVon = WERT: End Property
+Public Property Get AngelegtAm() As Date:    AngelegtAm = m_AngelegtAm: End Property
+Public Property Let AngelegtAm(WERT As Date):     m_AngelegtAm = WERT: End Property
+Public Property Get SummeText() As String:    SummeText = m_SummeText: End Property
+Public Property Let SummeText(WERT As String):     m_SummeText = WERT: End Property
+Public Property Get SummeWert() As Double:    SummeWert = m_SummeWert: End Property
+Public Property Let SummeWert(WERT As Double):     m_SummeWert = WERT: End Property
+Public Property Get MwstText() As String:    MwstText = m_MwstText: End Property
+Public Property Let MwstText(WERT As String):     m_MwstText = WERT: End Property
+Public Property Get MwstWert() As Double:    MwstWert = m_MwstWert: End Property
+Public Property Let MwstWert(WERT As Double):     m_MwstWert = WERT: End Property
+Public Property Get AuftragnettoText() As String:    AuftragnettoText = m_AuftragnettoText: End Property
+Public Property Let AuftragnettoText(WERT As String):     m_AuftragnettoText = WERT: End Property
+Public Property Get AuftragNettoWert() As Double:    AuftragNettoWert = m_AuftragNettoWert: End Property
+Public Property Let AuftragNettoWert(WERT As Double):     m_AuftragNettoWert = WERT: End Property
+Public Property Get BereitsBezahltText() As String:    BereitsBezahltText = m_BereitsBezahltText: End Property
+Public Property Let BereitsBezahltText(WERT As String):     m_BereitsBezahltText = WERT: End Property
+Public Property Get BereistBezahltWert() As String:    BereistBezahltWert = m_BereistBezahltWert: End Property
+Public Property Let BereistBezahltWert(WERT As String):     m_BereistBezahltWert = WERT: End Property
+Public Property Get ZuZahlenderBetragText() As String:    ZuZahlenderBetragText = m_ZuZahlenderBetragText: End Property
+Public Property Let ZuZahlenderBetragText(WERT As String):     m_ZuZahlenderBetragText = WERT: End Property
+Public Property Get ZuZahlenderBetragWert() As Double:    ZuZahlenderBetragWert = m_ZuZahlenderBetragWert: End Property
+Public Property Let ZuZahlenderBetragWert(WERT As Double):     m_ZuZahlenderBetragWert = WERT: End Property
+Public Property Get RechnungsbetragText() As String:    RechnungsbetragText = m_RechnungsbetragText: End Property
+Public Property Let RechnungsbetragText(WERT As String):     m_RechnungsbetragText = WERT: End Property
+Public Property Get RechnungsbetragWert() As Double:    RechnungsbetragWert = m_RechnungsbetragWert: End Property
+Public Property Let RechnungsbetragWert(WERT As Double):     m_RechnungsbetragWert = WERT: End Property
+Public Property Get mitAnzahlung() As Boolean:    mitAnzahlung = m_mitAnzahlung: End Property
+Public Property Let mitAnzahlung(WERT As Boolean):     m_mitAnzahlung = WERT: End Property
+Public Property Get Zahlungsbedingungen() As String:    Zahlungsbedingungen = m_Zahlungsbedingungen: End Property
+Public Property Let Zahlungsbedingungen(WERT As String):     m_Zahlungsbedingungen = WERT: End Property
+Public Property Get Waehrung() As String:    Waehrung = m_Waehrung: End Property
+Public Property Let Waehrung(WERT As String):     m_Waehrung = WERT: End Property
+Public Property Get Berechnet() As Boolean:    Berechnet = m_Berechnet: End Property
+Public Property Let Berechnet(WERT As Boolean):     m_Berechnet = WERT: End Property
+Public Property Get AngezahltPro() As Double:    AngezahltPro = m_AngezahltPro: End Property
+Public Property Let AngezahltPro(WERT As Double):     m_AngezahltPro = WERT: End Property
+Public Property Get Bezahlt() As Boolean:    Bezahlt = m_Bezahlt: End Property
+Public Property Let Bezahlt(WERT As Boolean):     m_Bezahlt = WERT: End Property
+Public Property Get BezahltDatum() As Date:    BezahltDatum = m_BezahltDatum: End Property
+Public Property Let BezahltDatum(WERT As Date):     m_BezahltDatum = WERT: End Property
+Public Property Get BezahltEingetragen() As String:    BezahltEingetragen = m_BezahltEingetragen: End Property
+Public Property Let BezahltEingetragen(WERT As String):     m_BezahltEingetragen = WERT: End Property
+Public Property Get ReBelegart() As Long:    ReBelegart = m_ReBelegart: End Property
+Public Property Let ReBelegart(WERT As Long):     m_ReBelegart = WERT: End Property
+Public Property Get ReBelegNr2() As Long:    ReBelegNr2 = m_ReBelegNr2: End Property
+Public Property Let ReBelegNr2(WERT As Long):     m_ReBelegNr2 = WERT: End Property
+Public Property Get ReZusatz01Text() As String:    ReZusatz01Text = m_ReZusatz01Text: End Property
+Public Property Let ReZusatz01Text(WERT As String):     m_ReZusatz01Text = WERT: End Property
+Public Property Get ReZusatz01Betrag() As Double:    ReZusatz01Betrag = m_ReZusatz01Betrag: End Property
+Public Property Let ReZusatz01Betrag(WERT As Double):     m_ReZusatz01Betrag = WERT: End Property
+Public Property Get ReZusatz02Text() As String:    ReZusatz02Text = m_ReZusatz02Text: End Property
+Public Property Let ReZusatz02Text(WERT As String):     m_ReZusatz02Text = WERT: End Property
+Public Property Get ReZusatz02Betrag() As Double:    ReZusatz02Betrag = m_ReZusatz02Betrag: End Property
+Public Property Let ReZusatz02Betrag(WERT As Double):     m_ReZusatz02Betrag = WERT: End Property
+
+
+Public Function Laden(DokNummer As Long) As Boolean
+'Lädt einen Rechnungsdatensatz
+End Function
+
+
+
+Public Function Neu(DokNummer As Long) As Long
+'erzeugt einen neuen Rechnungsdatensatz
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+sSql = "SELECT * FROM tblRechnung WHERE FALSE"
+Set rs1 = CurrentDbC.OpenRecordset(sSql)
+   ' Stop  'Hier zu kalt 2.2.2020
+    
+'            Rs1.AddNew    'Neuen Datensatz anlegen
+'            Rs1!BelegNr = PS.Anschreiben.BelegNr
+'
+'            Rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
+'            Rs1!ReBelegart = 1 '1 ist Rechnung
+'            Rs1!AufNr = m_ID  'P_Auf_Nr
+'            Rs1!ProjekktNr = m_ProNr    ' SpPNr
+'            Rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
+'            Rs1!AngelegtAm = Now()
+'            Rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
+            
+    '#### vorbelegten Textfelder
+'            Rs1!SummeText
+'            Rs1!MwstText
+'            Rs1!AuftragnettoText
+'            Rs1!BereitsBezahltText
+'            Rs1!ZuZahlenderBetragText
+'            Rs1!RechnungsbetragText
+'            Rs1!MwstWert
+'            Rs1!Zahlungsbedingungen
+'            Rs1!Waehrung
+    
+   PS.Anschreiben.Laden (DokNummer)
+    
+With rs1
+'If Not .EOF Then
+    .AddNew
+'    .Fields("laufendeNr").Value
+    .Fields("BelegNr").Value = DokNummer
+    .Fields("ProjekktNr").Value = PS.Anschreiben.Projektnummer
+    .Fields("AufNr").Value = PS.Anschreiben.AufNr
+'    .Fields("IDNr").Value
+'    .Fields("AdrNr").Value
+    .Fields("AngelegtVon").Value = PS.User.Kurzzeichen
+    .Fields("AngelegtAm").Value = Now
+   .Fields("SummeText").Value = funDbText(5, "SummeText")
+'    .Fields("SummeWert").Value
+    .Fields("MwstText").Value = funDbText(5, "MwstText")
+     .Fields("MwstWert").Value = Val(funDbText(5, "MwstWert"))
+     .Fields("AuftragnettoText").Value = funDbText(5, "SummeText")
+'    .Fields("AuftragNettoWert").Value
+     .Fields("BereitsBezahltText").Value = funDbText(5, "BereitsBezahltText")
+'    .Fields("BereistBezahltWert").Value
+     .Fields("ZuZahlenderBetragText").Value = funDbText(5, "ZuZahlenderBetragText")
+'    .Fields("ZuZahlenderBetragWert").Value
+     .Fields("RechnungsbetragText").Value = funDbText(5, "RechnungsbetragText")
+'    .Fields("RechnungsbetragWert").Value
+'    .Fields("mitAnzahlung").Value
+     .Fields("Zahlungsbedingungen").Value = funDbText(5, "Zahlungsbedingungen")
+     .Fields("Waehrung").Value = funDbText(5, "Waehrung")
+'    .Fields("Berechnet").Value
+'    .Fields("AngezahltPro").Value
+'    .Fields("Bezahlt").Value
+'    .Fields("BezahltDatum").Value
+'    .Fields("BezahltEingetragen").Value
+    .Fields("ReBelegart").Value = 1 '1 ist Rechnung 2 ist Gutschrift
+    .Fields("ReBelegNr2").Value = Me.NeueRechnungsnummer
+'    .Fields("ReZusatz01Text").Value
+'    .Fields("ReZusatz01Betrag").Value
+'    .Fields("ReZusatz02Text").Value
+'    .Fields("ReZusatz02Betrag").Value
+    .Update
+'End If
+End With
+ 
+
+
+End Function
+
+
+Public Function NeueRechnungsnummer() As Long
+'Holt die nächst mögliche Rechnungsnummer wenn nix geht wird 0 gesetzt
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim lonReNr As Long
+Dim tRn As Long
+
+    sSql = "SELECT TOP 1 reBelegNr2 FROM tblRechnung ORDER BY reBelegNr2 DESC;"
+    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    'Wenn noch keine Rechnung vorhanden ist oder mehr wie eine Startnummer fragen
+    If rs1.RecordCount <> 1 Then
+        lonReNr = 0  'Val(InputBox("Bitte geben Sie die Startnummer der Rechnungen ein. Die Nummer lauttet 20040001 für die erste Rechnung im Jahr 2004.", "Eingabe der Startrechnungsnummer", "20040001"))
+    Else
+        'Wenn Rechnung vorhanden Rechnungsnummer auf addieren
+        lonReNr = rs1!ReBelegNr2 + 1
+
+    End If
+        tRn = Nz(DLookup("Wert2", "tblIni", "wert1='STtblRechnung'"), 0)
+        
+        'prüfen ob Rechnungsvorgabe < ist wie Vorgabe
+        If tRn > lonReNr Then lonReNr = tRn
+        NeueRechnungsnummer = lonReNr
+        
+        
+End Function
+
+Function copy(idRechnungMutter As Long, fiDokument As Long) As Long
+'Kopiert eine Rechnung
+'Die Details müssen dann bei der jeweiligen Ausprägung kopiert werden
+'Zurückgegeben wird die Nummer des neu erzeugten Rechnung
+
+Dim QDs As DAO.Recordset 'Quelldatensat
+Dim ZDs As DAO.Recordset 'Zieldatensatz
+Dim sSql As String
+Dim A As Long
+
+sSql = "SELECT * FROM tblRechnung WHERE laufendeNr=" & idRechnungMutter
+Set QDs = CurrentDbC.OpenRecordset(sSql)
+With QDs
+    If .EOF Then
+        MsgBox LA("Kein Dokument vorhanden")
+    Else
+        sSql = "SELECT * FROM tblRechnung WHERE FALSE"
+        Set ZDs = CurrentDbC.OpenRecordset(sSql)
+        ZDs.AddNew
+            'Einfach alle Felder kopieren
+            For A = 1 To QDs.Fields.Count - 1
+              ZDs.Fields(A).Value = .Fields(A).Value
+            Next A
+            'Hier kommen die Felder die geändert werden müssen
+            ZDs.Fields("ReBelegNr2").Value = Me.NeueRechnungsnummer
+            ZDs.Fields("BelegNr").Value = fiDokument 'fi von Dokument zuweisen
+            'Eindeutige Datensatznummer zuweisen
+            m_laufendeNr = funLetzteDatensatzNr("tblRechnung", "laufendeNr", False)
+            ZDs.Fields("laufendeNr").Value = m_laufendeNr
+        ZDs.Update
+        ZDs.Close
+        copy = m_laufendeNr
+        'Me.Laden (m_laufendeNr)
+    End If
+End With
+QDs.Close
+End Function

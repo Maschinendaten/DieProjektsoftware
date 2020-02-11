@@ -1,0 +1,201 @@
+Option Compare Database
+Option Explicit
+
+'Private Declare Function GetAsyncKeyState Lib "user32" ( _
+'    ByVal vKey As Long) As Integer
+    'Aus http://vb-tec.de/inkey.htm 18.8.2012
+
+
+
+Function funStart()
+'Das muss ganz am anfang sein wenn Runtime und die Verweise sind nicht OK
+Dim s1 As String
+
+s1 = FunVerweiseAnzeigen
+
+'Wenn ein ungültiger Verweis erkannt wir zeigen wir die Verweise an.
+If InStr(1, s1, "broken") <> 0 Then
+    MsgBox s1
+End If
+
+Call funStart2
+End Function
+
+Function funStart2()
+
+
+Dim Key As Long
+Dim cmb As CommandBar
+
+'Diese Funktion sollte beim Start ausgeführt werden.
+
+
+'Stellt fest ob Parameter mit /CMD beim Aufrufen übergeben wurden
+'N:\PS\PS_Run\PS2_006.accdb /CMD Debug
+'C:\Users\gut\Daten\PS\PS_Run\PS2_006.accdb /CMD Debug
+ gloDebug = Replace(Command, " ", "") = "Debug"
+ 
+'Andere Variante Abfrage Datei psdebug.txt im gleichen Verzeichnis
+If Dir(CurrentProject.Path & "\" & "psdebug.txt") = "psdebug.txt" Then gloDebug = True
+
+
+
+
+'Fehlerbehandlung wird eingeschalten für
+Application.SetOption "Error Trapping", 1
+
+If gloDebug Then   'Wenn im Entwicklermodus
+    menueEin
+    'Application.SetOption "Error Trapping", 0   '-bei jedem fehler
+    Application.SetOption "Error Trapping", 1   '-Fehler in Klassenmodul
+    'Application.SetOption "Error Trapping", 2   '-nicht verarbeitet
+Else
+    menueAus
+    'Startet das Globale errorHandling von http://www.everythingaccess.com 18.8.2012
+    Call EnableWatchdog
+End If
+
+
+
+'Setze Icon für Anwendung
+
+
+'Setze Kontexmenues für die Anwendung
+IconAusDB
+
+
+
+DoCmd.OpenForm "frmDatenbanknutzer"
+
+
+
+End Function
+
+
+
+Public Function EnableWatchdog()
+Dim sBody As String
+    
+'Startet die Globale fehlerbehandlung und ist super 18.8.2012
+    Call ErrEx.Enable("GlobalErrorTrap")
+     
+    
+ 'Stellt einen deutschen text ein
+ 
+If gloDebug = False And False Then
+     sBody = "<font face=Arial size=13pt color=""#4040FF"">" & _
+             "<b>Ein Fehler ist aufgetreten. Der Fehler wird in <br>" & _
+             "der Datei [PS_ErrorLog.txt]protokolliert bitte schicken Sie diese Datei an <br>" & _
+             "info@dieProjektsoftware.de zur Analyse.</b></font><br><br> " & _
+             "<b><ERRDESC></b><br><br>" & _
+             "Source:|<SOURCEPROJ>.<SOURCEMOD>.<SOURCEPROC><br>" & _
+             "Number:|&H<ERRNUMBERHEX> (<ERRNUMBER>)<br>" & _
+             "Source Line:|#<SOURCELINENUMBER>.     <i><SOURCELINECODE></i><br>" & _
+             "Date/Time:|<ERRDATETIME><br><br>" & _
+             "<b><u>What do you want to do?</u></b>"
+
+     ErrEx.DialogOptions.HTML_MainBody = sBody
+     
+     'Schaltet alle Tasten aus
+     With ErrEx.DialogOptions
+        .RemoveAllButtons
+        .AddButton "Procedure Beenden", BUTTONACTION_ONERROREXITPROCEDURE
+     End With
+End If
+     
+End Function
+
+Public Sub GlobalErrorTrap()
+
+     
+     LogErrorToFile  ' Immer Fehler
+
+End Sub
+
+
+Public Sub LogErrorToFile()
+    
+    Dim FilePath As String
+    Dim FileNum As Long
+    Dim LogLine As String
+    Dim sDir As String
+    On Error Resume Next ' If this procedure fails, something fairly major has gone wrong.
+    
+    ' We will write to a simple text file called SampleErrorLog in our MyDocuments folder
+    sDir = Left(CurrentDb.Name, Len(CurrentDb.Name) - Len(Dir(CurrentDb.Name)))
+    'CreateObject("WScript.Shell").SpecialFolders("MYDOCUMENTS")   'Original Datenbankpfad
+    FilePath = sDir & "\PS_ErrorLog.txt"
+    
+    ' If you're new to vbWatchdog, don't worry about what follows just yet.
+    ' It is basically iterating through the call stack to get more details about the error.
+
+    FileNum = FreeFile
+    Open FilePath For Append Access Write Lock Write As FileNum
+
+        Print #FileNum, Now() & " - " & CStr(ErrEx.Number) & " - " & CStr(ErrEx.Description)
+            
+       'We will seperate the call stack onto seperate lines in the log
+    With ErrEx.Callstack
+            Do
+                Print #FileNum, "       --> " & .ProjectName & "." & _
+                                .ModuleName & "." & _
+                                .ProcedureName & ", " & _
+                                "#" & .LineNumber & ", " & _
+                                .LineCode & vbCrLf
+            Loop While .NextLevel
+    End With
+
+    Close FileNum
+
+End Sub
+
+
+'Beispiel wenn Error lokal verarbeitet wird
+
+'Err_:
+'If Err.Number = 2450 Then
+'    MsgBox ("Es muß ein Beleg angelegt und geöffnet sein! Wohin wollen Sie sonst schreiben!")
+'    'Property Not Found
+'    Exit Function
+'
+''An unexpected error has occured
+'ErrEx.CallGlobalErrorHandler
+
+
+
+
+Sub menueEin()
+Dim cmb As CommandBar
+      DoCmd.ShowToolbar "Ribbon", acToolbarYes
+        Application.SetOption "ShowWindowsInTaskbar", True
+        Application.CommandBars("Menu Bar").Enabled = True
+               
+        'Schaltet alle Menueleiste aus
+          
+        'Blendet alle Menüs aus
+        For Each cmb In CommandBars
+           cmb.Enabled = True
+        '    wert1 = wert1 & cmb.Name & " /" & cmb.Enabled & vbCrLf
+        Next
+   
+
+End Sub
+
+
+Sub menueAus()
+Dim cmb As CommandBar
+      DoCmd.ShowToolbar "Ribbon", acToolbarNo
+        Application.SetOption "ShowWindowsInTaskbar", False
+        Application.CommandBars("Menu Bar").Enabled = False
+        
+        
+        'Schaltet alle Menueleiste aus
+          
+        'Blendet alle Menüs aus
+        For Each cmb In CommandBars
+           cmb.Enabled = False
+        '    wert1 = wert1 & cmb.Name & " /" & cmb.Enabled & vbCrLf
+        Next
+   
+
+End Sub

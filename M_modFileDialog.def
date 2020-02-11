@@ -1,0 +1,291 @@
+Option Compare Database
+Option Explicit
+Option Base 0
+
+Const OFN_FILEMUSTEXIST = &H1000
+Const OFN_PATHMUSTEXIST = &H800
+Const OFN_HIDEREADONLY = &H4
+Const OFN_READONLY = &H1
+Const OFN_OVERWRITEPROMPT = &H2
+
+Public Declare PtrSafe Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal Hwnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+
+
+'#If Win64 Then
+'    Public Declare PtrSafe Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hwnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+'#Else
+'    Public Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hwnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+'#End If
+
+Function DateiSpeichern() As String
+'on error Goto Err_
+Dim dlgSaveAs As FileDialog
+
+Set dlgSaveAs = Application.FileDialog(msoFileDialogSaveAs)
+
+dlgSaveAs.Show
+
+Exit_:
+Exit Function
+Err_:
+   MsgErr "modFileDialog", "DateiSpeichern", Err.Description, Err.Number, Err.Erl()
+   Resume Exit_
+End Function
+Function funVerzeichnisAuswaehlen(VerzeichnisName As String) As String
+
+
+Dim vrtSelectedItem As Variant
+'Declare a variable as a FileDialog object.
+Dim fd As FileDialog
+Dim TextSp1 As String
+
+'Create a FileDialog object as a File Picker dialog box.
+Set fd = Application.FileDialog(msoFileDialogFolderPicker) '(msoFileDialogFilePicker)
+
+With fd
+    .title = "Auswahl Projektpfad"
+    .InitialFileName = VerzeichnisName   'Startverzeichnis
+    'Use the Show method to display the File Picker dialog box and return the user's action.
+    If .Show = -1 Then
+                'Step through each string in the FileDialogSelectedItems collection.
+            For Each vrtSelectedItem In .SelectedItems
+                TextSp1 = vrtSelectedItem
+            Next vrtSelectedItem
+    Else                                'The user pressed Cancel.
+        funVerzeichnisAuswaehlen = ""
+    End If
+End With
+
+
+funVerzeichnisAuswaehlen = TextSp1
+    'Set the object variable to Nothing.
+    Set fd = Nothing
+End Function
+Function funDateiAuswaehlen(VerzeichnisName, DateiEndung As String) As String
+
+Dim vrtSelectedItem As Variant
+Dim fd As FileDialog
+Dim TextSp1 As String
+
+'Dim txtEndung As String
+
+
+If Nz(DateiEndung) = "" Then DateiEndung = ".*"
+
+'Create a FileDialog object as a File Picker dialog box.
+Set fd = Application.FileDialog(msoFileDialogFilePicker)   '(msoFileDialogFilePicker)
+
+With fd
+    .Filters.Add "Dateien:", DateiEndung, 1  'Die Dateien müssen mit ; getrennt werden am Ende kein ;
+    .title = LA("Dateinam einlesen")
+    .InitialFileName = VerzeichnisName   'Startverzeichnis
+    .FilterIndex = 1
+    
+    'Use the Show method to display the File Picker dialog box and return the user's action.
+    If .Show = -1 Then
+                'Step through each string in the FileDialogSelectedItems collection.
+            For Each vrtSelectedItem In .SelectedItems
+                TextSp1 = vrtSelectedItem
+            Next vrtSelectedItem
+    Else                                'The user pressed Cancel.
+        funDateiAuswaehlen = ""
+    End If
+End With
+
+
+funDateiAuswaehlen = TextSp1
+
+    'Set the object variable to Nothing.
+    Set fd = Nothing
+
+End Function
+
+'Wenn ein Projektverzeichnis vorhanden ist wird zu diesem gewechselt
+Function funChangeProDir(ProjektNr As Long)
+Dim rs1 As DAO.Recordset
+Dim strDrive As String
+Dim strDir As String
+Dim strSp1 As String
+Dim strSql As String
+
+On Error GoTo Err_
+    
+strSp1 = Nz(DLookup("Verzeichnis", "tblProjekte", "ProjektNr =" & ProjektNr), "")
+    
+'Verzeichnis besteht Explorer wird aufgerufen
+If strSp1 <> "" Then
+    strDrive = Left(strSp1, 2)
+    strDir = Right(strSp1, Len(strSp1) - 3)
+    'Debug.Print CurDir
+    'strDir = Left(strDir, Len(strDir) - 1)
+    ChDrive strDrive
+    'Dir
+    ChDir "\.."
+    If Right(strDir, 1) = "\" Then strDir = Left(strDir, Len(strDir) - 1)
+    ChDir strDir
+Else
+    'Wenn das Projektverzeichnis nicht besteht wird es angelegt
+    funMenDirOpen
+End If
+
+Exit Function
+Err_:
+ If Err.Number <> 76 Then
+    MsgErr "modFileDialog", "funChangeProDir", Err.Description, Err.Number, Erl()
+ End If
+End Function
+
+Function funDirProjekte() As String
+Dim strSp1 As String
+
+'strSp1 = Nz(DLookup("VerzeichnisAnBe", "tblProjekte", "ProjektNr = " & funProjektNummer()), "")
+strSp1 = Nz(DLookup("Verzeichnis", "tblProjekte", "ProjektNr = " & funProjektNummer()), "")
+
+
+'strSp1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirProjekte'"), "")
+'If strSp1 = "" Then strSp1 = "C:\"
+
+funDirProjekte = strSp1
+
+End Function
+
+Function funDirProjekteAnBe(Optional Projektnummer As Long) As String
+Dim strSp1 As String
+If Projektnummer = 0 Then
+    strSp1 = Nz(DLookup("VerzeichnisAnBe", "tblProjekte", "ProjektNr = " & funProjektNummer()), "")
+Else
+    strSp1 = Nz(DLookup("VerzeichnisAnBe", "tblProjekte", "ProjektNr = " & Projektnummer), "")
+ 
+    
+End If
+
+'Eintag existiert aber Verzeichnis nicht
+
+If Dir(strSp1, vbDirectory) = "" Then  ' Verzeichnis falsch
+    funDirProjekteAnBe = ""
+Else
+    funDirProjekteAnBe = strSp1
+End If
+
+End Function
+
+
+
+Function funAWArtikel(strKurzBez As String) As String
+Dim strSp1 As String
+
+strSp1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like '" & strKurzBez & "'"), "")
+
+funAWArtikel = strSp1
+
+End Function
+
+
+Function funDirArtikel() As String
+Dim strSp1 As String
+
+strSp1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirArtikel'"), "")
+
+If strSp1 = "" Then strSp1 = "C:\"
+
+funDirArtikel = strSp1
+
+End Function
+Function funDirPDF() As String
+Dim strSp1 As String
+
+strSp1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirPDF'"), "")
+
+If strSp1 = "" Then strSp1 = "C:\"
+
+funDirPDF = strSp1
+
+End Function
+Function funDirPDFpro() As String
+Dim strSp1 As String
+
+strSp1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirPDFpro'"), "")
+
+If strSp1 = "" Then strSp1 = "C:\"
+
+funDirPDFpro = strSp1
+
+End Function
+
+Function funDirDokuAblage() As String
+Dim s1 As String
+Dim s2 As String
+
+
+
+s1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirDokuAb'"), "")
+
+funDirDokuAblage = ""
+ 
+If Dir(s1, 16) = "" Or s1 = "" Then
+    MsgBox ("Das Verzeichnis : [" & s1 & "] ist nicht vorhanden.?" & _
+    vbCrLf & vbCrLf & "Das Verzeichnis muss unter Extras|Stammdate|Verzeichnise angelegt oder angepasst werden.")
+Else 'Verzeichnis ist vorhanden
+    funDirDokuAblage = s1
+End If
+
+
+
+End Function
+
+Function funDirDokuTempAblage(Optional NeuOrdner As Boolean) As String
+'Es wird das aktuelle verzeichnis für die Ablage übergeben wenn es nicht
+'vorhanden ist wird nachgefragt ob es erzeugtwerden soll wenn nein wird "" zurück gegeben.
+
+
+Dim s1 As String
+Dim s2 As String
+Dim s3 As String
+
+
+s1 = funLadeReg("Ablage", "Dir", "")  'Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirDokuTemp'"), "")
+s3 = s1
+funDirDokuTempAblage = ""
+ 
+'Wenn neuer Ordner Speicher leeren
+If NeuOrdner = True Then
+    
+    s1 = ""
+End If
+
+
+If Dir(s1, 16) = "" Or s1 = "" Then
+        s2 = MsgBox("Das Verzeichnis :[" & s3 & "] wird als Verzeichnis für die Temp Ablage festgelegt." & _
+            vbCrLf & vbCrLf & "Wenn Ja wählen Sie ein Verzeichnis auf Ihrem lokalen Computer das Sie als temporäre Ablage nutzen wollen.", 3)
+        '6=Ja 7=Nein 2=Abbrechen
+        Select Case s2
+            Case "6"
+                s1 = funVerzeichnisAuswaehlen("")
+                If s1 <> "" Then
+                    funSpeicherReg "Ablage", "Dir", s1
+                    funDirDokuTempAblage = s1
+                End If
+            
+            Case Else
+                Exit Function
+        End Select
+Else 'Verzeichnis ist vorhanden
+    funDirDokuTempAblage = s1
+End If
+
+
+
+
+End Function
+
+
+
+
+Function funDirWordVorlage() As String
+Dim strSp1 As String
+
+strSp1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirWordV'"), "")
+
+funDirWordVorlage = strSp1
+
+End Function

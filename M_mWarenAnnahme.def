@@ -1,0 +1,124 @@
+Option Compare Database
+Option Explicit
+
+
+Sub CheckWeb()
+' Schaut in der Liste im Web ob Artikel angenommen oder Umgelagert wurden
+' Im Web steht eine txt Liste die in den Spalsten die Informationen speichert+
+'z.B.
+' 1544875412;2018.12.15 13:03:32;GFIA0012182;2a01:598:b00a:f73:71b4:6f4f:f5b0:6d50;from Bar code
+' 1544875442;2018.12.15 13:04:02;GFIA0012182;2a01:598:b00a:f73:71b4:6f4f:f5b0:6d50;from Bar code
+'UTC Time=id; Datum Uhrzeit     ;Mandant EK ID ; IP Adresse                       ; Herkunft
+
+Dim IEApp 'As WebBrowserControl
+Dim IEDocument
+Dim sWWW As String
+Dim s1 As String
+Dim pqr As String
+
+PSDebug "checkWeb"
+
+pqr = funMandant()  'Holt sich das kürzel aus dem Mandant
+PSDebug "Mandant:" & pqr
+pqr = pqr & String(3 - Len(pqr), "X")
+
+
+
+sWWW = "http://www.s.g001.de/files/" & pqr & ".txt"
+
+
+PSDebug sWWW
+
+
+
+
+'Neues Browser-Objekt erzeugen
+    Set IEApp = CreateObject("InternetExplorer.Application")
+    'Browser versteckt ausführen (höhere Geschwindigkeit)
+    IEApp.Visible = False 'True
+    
+    ' HTML-Datei aufrufen
+    IEApp.navigate sWWW
+    
+Do
+    'Application.Wait Now + TimeSerial(0, 0, 1)
+    DoEvents
+    'Debug.Print Now
+Loop Until IEApp.Busy = False
+Set IEDocument = IEApp.Document
+
+s1 = Mid(IEDocument.body.innerHTML, 6)
+'Stop
+IEApp.quit
+
+  'Debug.Print S1
+PSDebug s1
+
+If InStr(1, s1, "alert-") <> 0 Then
+    'Der Empfangene Text ist nicht die erwartete Tabelle sondern enthält einen Fehler
+    MsgBox LA("Adresse stimmt nicht. f_Debug ")
+    Exit Sub
+End If
+checkString (s1)
+End Sub
+
+Private Function checkString(Sx As String) As Boolean
+'Erwartet einen String mit ; als Trennzeichne und zerlegt diesen
+'1544875412;2018.12.15 13:03:32;GFIA0012182;2a01:598:b00a:f73:71b4:6f4f:f5b0:6d50;from Bar code
+'1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim lz As Long
+Dim z1 As Long
+Dim ok As Boolean
+Dim idTS As Long 'id von Web Timestamp
+Dim idEK As Long  ' id von Einkaufsliste
+Dim iDatum As Date
+Dim Zz  As Long
+
+
+'Zeit auslesen
+'? format((1544875412/86400)+25569,"mm.dd.yyyy nn:mm:ss")
+lz = 1
+
+While Not ok
+    Zz = Zz + 1 'Zeilenzähler
+    z1 = InStr(lz, Sx, Chr(10))
+    
+    If z1 = 0 Then
+        ok = True
+    Else
+        idTS = Val(Mid(Sx, lz, 10))                ' ID Timestamp
+        idEK = Val(Mid(Sx, lz + 31 + 4, 11 - 4))   '  ID EK List
+        'iDatum =
+                                  
+        Debug.Print Zz, lz, z1, idTS, idEK
+        lz = z1 + 1
+        ok = False
+            
+        sSql = "SELECT * FROM tblStuecklisteStatus WHERE SsWebid=" & idTS
+        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+            
+        With rs1
+            If .EOF Then
+                'Wenn Nummer nicht da Such EK-Listeneintag und ergänze Status
+                mPS.StatusNeu idEK, 63, 0, "", "Vom Web", idTS
+                mPS.StatusAnpassenStueckliste idEK, 63, True
+            Else
+                'Wenn Nummer schon vorhanden nix machen
+            End If
+        End With
+        
+    
+            
+        
+    End If
+    
+    
+Wend
+rs1.Close
+
+'Debug.Print Zz
+
+
+End Function

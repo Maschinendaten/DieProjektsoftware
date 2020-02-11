@@ -1,0 +1,344 @@
+Option Compare Database
+Option Explicit
+
+
+
+
+Function funStandardtext(originalText As String, Optional gesperrt As Boolean) As String
+Dim fr As Form
+' die Variable strTexstinhalt wird von dem Formular "frmStandardtexte"
+' mit der Funktion Klick beschrieben mit dem Wert des gewählten Feldes
+
+'22.03.2018 noch nicht ausgereift
+'funStandardtext = originalText
+'Stop
+'Exit Function
+'
+'If gesperrt = True Then
+'    funStandardtext = originalText
+'    Exit Function
+'End If
+'
+'Set fr = Form_frmStandardtexte
+'
+'fr.visible = True
+
+'Stop
+
+DoCmd.OpenForm "frmStandardtexte", , , , , acDialog
+If strTexstinhalt = "nix" Then
+    funStandardtext = originalText
+Else
+    funStandardtext = strTexstinhalt
+End If
+
+End Function
+Function modAbfrage(text_in As String) As Boolean
+Dim Mldg, Stil, Titel, Antwort
+' Die Abfrag gibt True oder False zurück je nach gedrückter Taste
+' Man verwendet die Abfrage z.B. Für das Abfragen wenn ein neues Formular
+' angelegt werden soll
+
+Mldg = text_in    ' Meldung definieren.
+Stil = vbYesNo + vbDefaultButton2  ' + vbCritical  ' Schaltflächen
+Titel = "Sicherheitsabfrage"    ' Titel definieren.
+
+Antwort = MsgBox(Mldg, Stil, Titel)    ' Meldung anzeigen.
+
+' auswerten ob der Benutzer Ja oder Nein gewählt
+If Antwort = vbYes Then modAbfrage = True Else modAbfrage = False
+
+'Ende Abfrage neuer Text
+
+End Function  'Function modAbfrage() As Boolean
+
+'Function modArtikeleingabe() As Boolean
+'
+'' die Variable strTexstinhalt wird von dem Formular "frmStandardtexte"
+'' mit der Funktion Klick beschrieben mit dem Wert des gewählten Feldes
+'
+'DoCmd.OpenForm "frmArtikel", , , , , acDialog
+'
+'If varGFArtikelBezeichnung <> "" Then modArtikeleingabe = True
+'If varGFArtikelBezeichnung = "" Then modArtikeleingabe = False
+'
+''MsgBox ("Länge=" + Str(Len(VarGFArtikelbeschreibung)))
+'End Function
+
+Function modArtikelnummerOK(WERT As String) As Boolean
+'Allgemeine Funktion für die Abfrage ob ein feld Besonders behandelt wir in der Formular
+'Ansicht
+
+modArtikelnummerOK = False
+If Not IsNull(WERT) Then
+  If (Right$(WERT, 3)) = ".00" Then modArtikelnummerOK = True
+End If
+
+
+End Function
+Function modZwischensummeOK(WERT As String) As Boolean
+'Allgemeine Funktion für die Abfrage ob ein feld Besonders behandelt wir in der Formular
+'Ansicht
+modZwischensummeOK = False
+If Not IsNull(WERT) Then
+  If (Right$(WERT, 3)) = ".ZS" Then modZwischensummeOK = True
+End If
+
+End Function
+Function modRabattOK(WERT As String) As Boolean
+'Allgemeine Funktion für die Abfrage ob ein feld Besonders behandelt wir in der Formular
+'Ansicht
+modRabattOK = False
+If Not IsNull(WERT) Then
+  If (Right$(WERT, 3)) = ".RA" Then modRabattOK = True
+End If
+
+End Function
+
+
+
+
+Function modPreisOK(WERT As String) As Boolean
+'Allgemeine Funktion für die Abfrage ob ein feld Besonders behandelt wir in der Formular
+'Ansicht
+'on error Goto Err_
+modPreisOK = False
+If Not IsNull(WERT) Then
+    
+  If (Left$(WERT, 5)) = "Preis" Then
+    modPreisOK = True
+  '  Stop
+  End If
+End If
+
+'on error Goto 0
+Exit Function
+Err_:
+    MsgErr "modStandardtext", "modPreisOK", Err.Description, Err.Number, Err.Er
+End Function
+Function modZahlungsbedingungenOK(WERT As String) As Boolean
+'Allgemeine Funktion für die Abfrage ob ein feld Besonders behandelt wir in der Formular
+'Ansicht
+
+modZahlungsbedingungenOK = False
+If Not IsNull(WERT) Then
+  If (Right$(WERT, 5)) = "ZB" Then modZahlungsbedingungenOK = True
+End If
+
+
+End Function
+
+Function modMemofeld(Wert1 As String, Optional StrSchrift As String, Optional lonBreite As Long) As String
+' die Variable strTexstinhalt wird von dem Formular "frmStandardtexte"
+' mit der Funktion Klick beschriben mit dem Wert des gewählten Feldes
+
+
+DoCmd.OpenForm "frmMemofeldeingabe", , , , , acDialog, Wert1
+modMemofeld = VarPSMemofeld
+
+End Function
+Function modOptionOk(Wert3 As String) As Boolean
+'Allgemeine Funktion für die Abfrage ob ein feld Besonders behandelt wir in der Formular
+'Ansicht
+   'on error Goto Err_
+
+modOptionOk = False
+If Not IsNull(Wert3) Then
+  If (Right$(Wert3, 8)) = "(Option)" Then modOptionOk = True
+  'MsgBox (Right$(wert3, 8))
+End If
+
+'on error Goto 0
+Exit Function
+
+Err_:
+
+    MsgErr "modStandardtext", "modOptionOK", Err.Description, Err.Number, Err.Erl
+
+End Function
+
+'---------------------------------------------------------------------------------------
+' Projekt      : PS
+' Procedure    : modAuftrag
+' DateTime     : 06.06.2003 17:01
+' Version      : 06.06.2003 17:01
+' Author       : MG
+' Beschreibung : Die Funktion prüft ob zu diesem Projekt ein Auftrag vorliegt wenn dann true
+'
+'---------------------------------------------------------------------------------------
+
+Function modAuftrag(ProNr As String) As Boolean
+Dim rs1 As DAO.Recordset
+Dim strSql As String
+'on error Goto Err_
+
+modAuftrag = False
+
+strSql = "SELECT tblAufDaten.ProNr FROM" & _
+" tblAufDaten WHERE (((tblAufDaten.ProNr)=" & Str(ProNr) & "));"
+Set rs1 = CurrentDbC.OpenRecordset(strSql)
+
+If rs1.RecordCount <> 0 Then
+  modAuftrag = True
+End If
+
+rs1.Close
+Set rs1 = Nothing
+
+
+Exit_:
+Exit Function
+Err_:
+MsgErr "modAuftrag", "modStandardtext", Err.Description, Err.Number, Erl()
+Resume Exit_
+End Function
+
+Public Sub MsgErr(strForm As String, strFunctionSub As String, strFehlerText As String, lonFehlerNr As String, erl_Fehlerzeile As Long)
+'on error Goto Err_
+'Zentrale Ausgabe aller Warnmeldungen oder Fehler zu Protokolliereung
+    MsgBox ("Fehler in Form :" & strForm & vbCrLf & _
+            "bei Aktion     :" & strFunctionSub & vbCrLf & _
+            "Fehler         :" & strFehlerText & vbCrLf & _
+            "Fehlernummer   :" & lonFehlerNr & vbCrLf & _
+            "In Zeile       :" & erl_Fehlerzeile)
+Exit Sub
+Err_:
+MsgBox ("Fehler in der Sub MsgErr.")
+End Sub
+
+Function msgJaNein(text_in As String) As Boolean
+' Die Abfrag gibt True oder False zurück je nach gedrückter Taste
+' Man verwendet die Abfrage z.B. Für das Abfragen wenn ein neues Formular
+' angelegt werden soll
+'####### Neue Version von modAbfrage weil diese Bezeichnung nicht zu merken ist ####
+Dim Mldg, Stil, Titel, Antwort
+
+Mldg = text_in    ' Meldung definieren.
+Stil = vbYesNo + vbCritical + vbDefaultButton2    ' Schaltflächen
+Titel = "Sicherheitsabfrage"    ' Titel definieren.
+
+Antwort = MsgBox(Mldg, Stil, Titel)    ' Meldung anzeigen.
+
+' auswerten ob der Benutzer Ja oder Nein gewählt
+If Antwort = vbYes Then
+    msgJaNein = True
+Else
+    msgJaNein = False
+End If
+
+End Function
+
+Function funTextParser(strText As String) As String
+'Die Funktion durchsucht den übergebenen String und ersetzt die Platzhalter durch
+'den vorgegebenen Text der aus der Tabelle tblAutoText ausgelesen wird
+'In der Spalte Key steht der Wert der den Schlüssel darstellt in dem Feld Outtext steht
+'der Wert der eingesetzt wird In dem Feld Akt steht ein Befehl oder eine Funktion dies kann
+'z.B. die Funktion Datum sein oder eine selbstdeffinierte Funktion
+'Beispiel:
+'KEY = <Datum> Akt=datum() es wir der Wert im Text <Datum> durch das Datum ersetzt z.B. 06.10.2007
+'KEY = <mfg>   Akt="" outText="Mit freundlichen Grüßen" im Text wird <mfg> durch Mit freundlichen Grüßen ersetzt
+'Key = <Vorname> Akt=form.vorname Es werden alle geöffneten Formulare nach der Variablen Vorname durchsucht ist diese vorhanden
+'      wird derWert <Vorname> durch den gefundenen Vornamen ersetzt
+Dim a1 As Long
+Dim s1 As String
+Dim s2 As String
+Dim rs1 As DAO.Recordset
+
+''on error Goto err_
+s1 = Nz(strText)
+
+Set rs1 = CurrentDb.OpenRecordset("tblAutoText")
+If Not rs1.EOF Then
+rs1.MoveFirst
+    
+    For a1 = 1 To rs1.RecordCount
+        
+        If Nz(rs1!akt) <> "" Then
+            'Wenn der Wert aus einem Formular oder einer Funktion kommt.
+            s2 = rs1!akt
+            If Left(s2, 5) = "form." Then 'Der Wert soll aus einem Form kommen
+                s2 = funFormsParsen(Mid$(s2, 6)) 'geöffnete Forms werden nach dem Wert durchsucht
+                If s2 <> "" Then
+                    s1 = Replace(s1, rs1!Key, s2)
+                End If
+            Else 'Der Text stellt eine Funktion dar
+                s1 = Replace(s1, rs1!Key, Eval(s2))
+            End If
+        Else
+            'Text wird durch festen Text ersetzt
+            s1 = Replace(s1, rs1!Key, rs1!outtext)
+        End If
+        rs1.MoveNext
+    Next a1
+End If
+    
+    'Wenn kein Text wird der alte Wert zurück gegeben
+    If Nz(s1) <> "" Then
+        funTextParser = s1
+    Else
+        funTextParser = Nz(strText)
+    End If
+Exit Function
+Err_:
+Resume Next
+
+End Function
+
+
+Function funFormsParsen(varName As String) As String
+Dim FO1 As Form
+Dim ctl As Control
+
+'on error Goto Err_
+'Durchsuche alle geöffneten Formulare
+    
+For Each FO1 In Application.Forms
+    Debug.Print FO1.Name
+    For Each ctl In FO1.Controls
+        If Not IsNull(ctl.Name) And ctl.Name Like varName Then
+            Debug.Print ctl.Value
+            funFormsParsen = Nz(ctl.Value)
+        End If
+    Next ctl
+Next FO1
+
+Err_:
+Exit Function
+    MsgErr "modStandardtexte", "funFormsParsen", Err.Description, Err.Number, 1
+    Resume Next
+
+End Function
+
+
+
+
+
+Function modEKLBedingt(Befehl As String, WERT As String, Optional Auswahl As String) As Boolean
+'Ermöglicht in der Einkaufsliste Zeilen mit verschiedenen Funktionen zu versehen
+'dies ist abhängig von der Positionsbezeichnung die als WERT übergeben wird
+Dim s1 As String
+
+s1 = Right(WERT, 1)
+'If Len(s1) = 2 Then
+'    s1 = Left(s1, 1)
+'End If
+modEKLBedingt = False
+
+Select Case Befehl
+
+    Case "M" ' Mutter
+        If s1 = "M" Then modEKLBedingt = True
+    Case "Z" ' Zwischensumme
+        If s1 = "Z" Then modEKLBedingt = True
+    Case "X" ' Option
+        'Es werden alle auf Option geschalten die nicht der Auswahl entsprechen
+        If s1 = "X" Or s1 = "1" Or s1 = "2" Or s1 = "3" Or s1 = "4" Then
+            If s1 <> Auswahl Then modEKLBedingt = True
+        End If
+    Case "S" ' Option
+        If s1 = "S" Then modEKLBedingt = True
+        
+End Select
+
+
+End Function

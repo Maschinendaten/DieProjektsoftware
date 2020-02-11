@@ -1,0 +1,13 @@
+DELETE * FROM [MSysIMEXColumns] WHERE SpecID=(SELECT SpecID FROM [MSysIMEXSpecs] WHERE SpecName='Export_Gleo');
+DELETE * FROM [MSysIMEXSpecs] WHERE SpecName='Export_Gleo';
+INSERT INTO [MSysIMEXSpecs] ([DateDelim],[DateFourDigitYear],[DateLeadingZeros],[DateOrder],[DecimalPoint],[FieldSeparator],[FileType],[SpecName],[SpecType],[StartRow],[TextDelim],[TimeDelim]) VALUES(Chr(45),True,False,5,Chr(46),Chr(59),1252,'Export_Gleo',1,1,NULL,Chr(58));
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,7,'Decimal Duration',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),116,17);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Details',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),28,45);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Domain',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),1,9);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,8,'Duration',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),107,9);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,8,'End',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),90,17);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Project',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),10,11);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Project-Extra-2',0,True,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),133,16);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,8,'Start',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),73,17);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Task',0,False,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),21,7);
+INSERT INTO [MSysIMEXColumns] ([Attributes],[DataType],[FieldName],[IndexType],[SkipColumn],[SpecID],[Start],[Width]) VALUES(0,10,'Task-Extra-2',0,True,DFirst('SpecID','MSysIMEXSpecs','SpecName=''Export_Gleo'''),149,13);

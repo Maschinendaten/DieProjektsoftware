@@ -1,0 +1,298 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+
+Option Explicit
+Private Declare PtrSafe Function FindFirstFile Lib "kernel32.dll" Alias "FindFirstFileA" ( _
+    ByVal lpFileName As String, _
+    ByRef lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare PtrSafe Function FindNextFile Lib "kernel32.dll" Alias "FindNextFileA" ( _
+    ByVal hFindFile As Long, _
+    ByRef lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare PtrSafe Function FindClose Lib "kernel32.dll" ( _
+    ByVal hFindFile As Long) As Long
+Private Declare PtrSafe Function FileTimeToLocalFileTime Lib "kernel32.dll" ( _
+    ByRef lpFileTime As FILETIME, _
+    ByRef lpLocalFileTime As FILETIME) As Long
+Private Declare PtrSafe Function FileTimeToSystemTime Lib "kernel32.dll" ( _
+    ByRef lpFileTime As FILETIME, _
+    ByRef lpSystemTime As SYSTEMTIME) As Long
+
+Private Enum FILE_ATTRIBUTE
+    FILE_ATTRIBUTE_READONLY = &H1
+    FILE_ATTRIBUTE_HIDDEN = &H2
+    FILE_ATTRIBUTE_SYSTEM = &H4
+    FILE_ATTRIBUTE_DIRECTORY = &H10
+    FILE_ATTRIBUTE_ARCHIVE = &H20
+    FILE_ATTRIBUTE_NORMAL = &H80
+    FILE_ATTRIBUTE_TEMPORARY = &H100
+End Enum
+
+Private Const MAX_PATH = 260&
+Private Const INVALID_HANDLE_VALUE = -1&
+
+Private Type FILETIME
+    dwLowDateTime As Long
+    dwHighDateTime As Long
+End Type
+
+Private Type SYSTEMTIME
+    wYear As Integer
+    wMonth As Integer
+    wDayOfWeek As Integer
+    wDay As Integer
+    wHour As Integer
+    wMinute As Integer
+    wSecond As Integer
+    wMilliseconds As Integer
+End Type
+
+Private Type WIN32_FIND_DATA
+    dwFileAttributes As Long
+    ftCreationTime As FILETIME
+    ftLastAccessTime As FILETIME
+    ftLastWriteTime As FILETIME
+    nFileSizeHigh As Long
+    nFileSizeLow As Long
+    dwReserved0 As Long
+    dwReserved1 As Long
+    cFileName As String * MAX_PATH
+    cAlternate As String * 14
+End Type
+
+Private mlngFileCount As Long
+Private mudtFiles() As FILEINFO
+Private mstrFolderPath As String
+Private mstrExtension As String
+Private mstrSearchLike As String
+Private mblnSubFolders As Boolean
+Private mblnCaseSenstiv As Boolean
+
+Friend Property Get Files(lngIndex As Long) As FILEINFO
+    Files = mudtFiles(lngIndex)
+End Property
+
+Friend Property Get FileCount() As Long
+    FileCount = mlngFileCount
+End Property
+
+Friend Property Let FolderPath(strFolderPath As String)
+    mstrFolderPath = strFolderPath
+End Property
+
+Friend Property Let Extension(strExtension As String)
+    mstrExtension = strExtension
+End Property
+
+Friend Property Let SearchLike(strSearchLike As String)
+    mstrSearchLike = strSearchLike
+End Property
+
+Friend Property Let SubFolders(blnSubFolders As Boolean)
+    mblnSubFolders = blnSubFolders
+End Property
+
+Friend Property Let CaseSenstiv(blnCaseSenstiv As Boolean)
+    mblnCaseSenstiv = blnCaseSenstiv
+End Property
+
+Friend Function Execute(Optional enmSortBy As SORT_BY = Sort_by_None, _
+    Optional enmSortOrder As SORT_ORDER = Sort_Order_Ascending) As Long
+    Call FindFiles(mstrFolderPath)
+    If mlngFileCount > 1 And enmSortBy <> Sort_by_None Then _
+        Call prcSort(1, mlngFileCount, enmSortBy, enmSortOrder)
+    Execute = mlngFileCount
+End Function
+
+Private Sub FindFiles(ByVal strFolderPath As String)
+    Dim WFD As WIN32_FIND_DATA, lngSearch As Long, strDirName As String
+    On Error GoTo ErrorHandling
+    If Right$(strFolderPath, 1) <> "\" Then strFolderPath = strFolderPath & "\"
+    lngSearch = FindFirstFile(strFolderPath & "*.*", WFD)
+    If lngSearch <> INVALID_HANDLE_VALUE Then
+        Call GetFilesInFolder(strFolderPath)
+        If mblnSubFolders Then
+            Do
+                If (WFD.dwFileAttributes And FILE_ATTRIBUTE_DIRECTORY) Then
+                    strDirName = Left$(WFD.cFileName, InStr(WFD.cFileName, Chr$(0)) - 1)
+                    If (strDirName <> ".") And (strDirName <> "..") Then _
+                        Call FindFiles(strFolderPath & strDirName)
+                End If
+            Loop While FindNextFile(lngSearch, WFD)
+        End If
+        FindClose lngSearch
+    End If
+    Exit Sub
+ErrorHandling:
+    MsgBox "Fehler " & CStr(Err.Number) & vbLf & vbLf & _
+        Err.Description, vbCritical, "Fehler"
+End Sub
+
+Private Sub GetFilesInFolder(ByVal strFolderPath As String)
+    Dim WFD As WIN32_FIND_DATA, lngSearch As Long, strFilename As String
+    Dim udtFiletime As FILETIME, udtSystemtime As SYSTEMTIME
+    On Error GoTo ErrorHandling
+    If Right$(strFolderPath, 1) <> "\" Then strFolderPath = strFolderPath & "\"
+    lngSearch = FindFirstFile(strFolderPath & mstrExtension, WFD)
+    If lngSearch <> INVALID_HANDLE_VALUE Then
+        Do
+            If (WFD.dwFileAttributes And FILE_ATTRIBUTE_DIRECTORY) <> FILE_ATTRIBUTE_DIRECTORY Then
+                strFilename = Left$(WFD.cFileName, InStr(WFD.cFileName, Chr$(0)) - 1)
+                If IIf(mblnCaseSenstiv, strFilename, LCase$(strFilename)) Like _
+                    IIf(mblnCaseSenstiv, mstrSearchLike, LCase$(mstrSearchLike)) Then
+                    mlngFileCount = mlngFileCount + 1
+                    ReDim Preserve mudtFiles(1 To mlngFileCount)
+                    With mudtFiles(mlngFileCount)
+                        .strPath = strFolderPath & strFilename
+                        .strFilename = strFilename
+                        .lngSize = WFD.nFileSizeLow
+                        FileTimeToLocalFileTime WFD.ftCreationTime, udtFiletime
+                        FileTimeToSystemTime udtFiletime, udtSystemtime
+                        .dmtDateCreate = CDate(DateSerial(udtSystemtime.wYear, udtSystemtime.wMonth, udtSystemtime.wDay) + _
+                            TimeSerial(udtSystemtime.wHour, udtSystemtime.wMinute, udtSystemtime.wSecond))
+                        FileTimeToLocalFileTime WFD.ftLastAccessTime, udtFiletime
+                        FileTimeToSystemTime udtFiletime, udtSystemtime
+                        .dmtLastAccess = CDate(DateSerial(udtSystemtime.wYear, udtSystemtime.wMonth, udtSystemtime.wDay) + _
+                            TimeSerial(udtSystemtime.wHour, udtSystemtime.wMinute, udtSystemtime.wSecond))
+                        FileTimeToLocalFileTime WFD.ftLastWriteTime, udtFiletime
+                        FileTimeToSystemTime udtFiletime, udtSystemtime
+                        .dmtLastModify = CDate(DateSerial(udtSystemtime.wYear, udtSystemtime.wMonth, udtSystemtime.wDay) + _
+                            TimeSerial(udtSystemtime.wHour, udtSystemtime.wMinute, udtSystemtime.wSecond))
+                    End With
+                End If
+            End If
+        Loop While FindNextFile(lngSearch, WFD)
+        FindClose lngSearch
+    End If
+    Exit Sub
+ErrorHandling:
+    MsgBox "Fehler " & CStr(Err.Number) & vbLf & vbLf & _
+        Err.Description, vbCritical, "Fehler"
+End Sub
+
+Private Sub prcSort(lngLBorder As Long, lngUBorder As Long, enmSortBy As SORT_BY, enmSortOrder As SORT_ORDER)
+    Dim lngIndex1 As Long, lngIndex2 As Long
+    Dim udtBuffer As FILEINFO, vntTemp As Variant
+    
+    lngIndex1 = lngLBorder
+    lngIndex2 = lngUBorder
+    Select Case enmSortBy
+      Case Sort_by_Name: vntTemp = mudtFiles((lngLBorder + lngUBorder) \ 2).strFilename
+      Case Sort_by_Path: vntTemp = mudtFiles((lngLBorder + lngUBorder) \ 2).strPath
+      Case Sort_by_Size: vntTemp = mudtFiles((lngLBorder + lngUBorder) \ 2).lngSize
+      Case Sort_by_Last_Access: vntTemp = mudtFiles((lngLBorder + lngUBorder) \ 2).dmtLastAccess
+      Case Sort_by_Last_Modyfy: vntTemp = mudtFiles((lngLBorder + lngUBorder) \ 2).dmtLastModify
+      Case Sort_by_Date_Create: vntTemp = mudtFiles((lngLBorder + lngUBorder) \ 2).dmtDateCreate
+    End Select
+    Do
+        Select Case enmSortBy
+          Case Sort_by_Name
+            If enmSortOrder = Sort_Order_Ascending Then
+                Do While mudtFiles(lngIndex1).strFilename < vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp < mudtFiles(lngIndex2).strFilename
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+              Else
+                Do While mudtFiles(lngIndex1).strFilename > vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp > mudtFiles(lngIndex2).strFilename
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+            End If
+          Case Sort_by_Path
+            If enmSortOrder = Sort_Order_Ascending Then
+                Do While mudtFiles(lngIndex1).strPath < vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp < mudtFiles(lngIndex2).strPath
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+              Else
+                Do While mudtFiles(lngIndex1).strPath > vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp > mudtFiles(lngIndex2).strPath
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+            End If
+          Case Sort_by_Size
+            If enmSortOrder = Sort_Order_Ascending Then
+                Do While mudtFiles(lngIndex1).lngSize < vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp < mudtFiles(lngIndex2).lngSize
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+              Else
+                Do While mudtFiles(lngIndex1).lngSize > vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp > mudtFiles(lngIndex2).lngSize
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+            End If
+          Case Sort_by_Last_Access
+            If enmSortOrder = Sort_Order_Ascending Then
+                Do While mudtFiles(lngIndex1).dmtLastAccess < vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp < mudtFiles(lngIndex2).dmtLastAccess
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+              Else
+                Do While mudtFiles(lngIndex1).dmtLastAccess > vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp > mudtFiles(lngIndex2).dmtLastAccess
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+            End If
+          Case Sort_by_Last_Modyfy
+            If enmSortOrder = Sort_Order_Ascending Then
+                Do While mudtFiles(lngIndex1).dmtLastModify < vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp < mudtFiles(lngIndex2).dmtLastModify
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+              Else
+                Do While mudtFiles(lngIndex1).dmtLastModify > vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp > mudtFiles(lngIndex2).dmtLastModify
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+            End If
+          Case Sort_by_Date_Create
+            If enmSortOrder = Sort_Order_Ascending Then
+                Do While mudtFiles(lngIndex1).dmtDateCreate < vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp < mudtFiles(lngIndex2).dmtDateCreate
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+              Else
+                Do While mudtFiles(lngIndex1).dmtDateCreate > vntTemp
+                    lngIndex1 = lngIndex1 + 1
+                Loop
+                Do While vntTemp > mudtFiles(lngIndex2).dmtDateCreate
+                    lngIndex2 = lngIndex2 - 1
+                Loop
+            End If
+        End Select
+        If lngIndex1 <= lngIndex2 Then
+            udtBuffer = mudtFiles(lngIndex1)
+            mudtFiles(lngIndex1) = mudtFiles(lngIndex2)
+            mudtFiles(lngIndex2) = udtBuffer
+            lngIndex1 = lngIndex1 + 1
+            lngIndex2 = lngIndex2 - 1
+        End If
+    Loop Until lngIndex1 > lngIndex2
+    If lngLBorder < lngIndex2 Then Call prcSort(lngLBorder, lngIndex2, enmSortBy, enmSortOrder)
+    If lngIndex1 < lngUBorder Then Call prcSort(lngIndex1, lngUBorder, enmSortBy, enmSortOrder)
+End Sub

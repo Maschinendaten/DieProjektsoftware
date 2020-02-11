@@ -1,0 +1,210 @@
+Option Compare Database
+Option Explicit
+
+'Nachfolgende Variablen weren benutzt um mit einem Popup Menue Änderng
+'in speziellen Tabelle die einen Artikel enthalten durch zu führen.
+'Public PopupTabellenname As String
+'Public PopUpTabellenIndex As Long
+'Public PopUpArtikelId As Long
+Public PopUpArtikelObj As Artikel
+
+Sub CreateStart()
+    Dim cmbRightClick As Office.CommandBar
+    Dim cmbcontrol As Office.CommandBarControl
+    Dim A As Long
+'On Error Resume Next
+'Wenn Command Bar vorhanden erst löschen
+  
+For Each cmbRightClick In CommandBars
+  
+    If InStr(1, cmbRightClick.Name, "cmd") <> 0 Then
+        Debug.Print cmbRightClick.Name
+         CommandBars(cmbRightClick.Name).Delete
+    End If
+  
+Next cmbRightClick
+
+'Weist der gesamten Datenban ein Kontexmenue zu wenn kenes zugewiesen ist
+'Application.ShortcutMenuBar = "scmenApplication"
+
+
+'funMenDB
+
+   ' Create the shortcut menu.
+    Set cmbRightClick = CommandBars.Add("cmdPSStart", msoBarPopup, False, True)
+    With cmbRightClick
+         'Adresse
+         Set cmbcontrol = .Controls.Add(msoControlButton, 7, , , True)  ' msoControlButton
+         cmbcontrol.Caption = "Adresse"
+         cmbcontrol.OnAction = "ComAdresse"
+    
+        'Einkaufsliste
+         Set cmbcontrol = .Controls.Add(msoControlButton, 11, , , True)  ' msoControlButton
+         cmbcontrol.Caption = "Einkaufsliste"
+         cmbcontrol.OnAction = "ComEinkaufsliste"
+         
+        'Kalkulation
+         Set cmbcontrol = .Controls.Add(msoControlButton, 11, , , True)  ' msoControlButton
+         cmbcontrol.Caption = "Kalkulation"
+         cmbcontrol.OnAction = "ComKalkulation"
+        .Controls(.Controls.Count).BeginGroup = True
+        
+        'Directory
+         Set cmbcontrol = .Controls.Add(msoControlButton, 23, , , True)  ' msoControlButton
+         cmbcontrol.Caption = "Dir"
+         cmbcontrol.OnAction = "funMenDirOpen"
+         
+        'Notiz
+         Set cmbcontrol = .Controls.Add(msoControlButton, 23, , , True)  ' msoControlButton
+         cmbcontrol.Caption = "Notiz zum Projekt"
+         cmbcontrol.OnAction = "comNotiz"
+    
+    
+    End With
+
+    Set cmbcontrol = Nothing
+    Set cmbRightClick = Nothing
+    
+    'erzeug alle anderen PS menues
+    subPSMenues
+    
+    'PS_Kontext
+    'PS_Drucken
+    
+    
+End Sub
+
+
+
+Function ComAdresse()
+funDoc "Adr", Form_frmStart.AdressNr
+
+
+End Function
+
+
+Function ComEinkaufsliste()
+
+DoCmd.OpenForm "frmStueckliste"
+
+End Function
+Function ComKalkulation()
+
+    DoCmd.OpenForm "NaviKalkulation", acNormal, , , , acDialog
+    If VarNaviKalkUn <> 0 Then '[IF 1]
+        ' aufrufen der Projektbeschreibung
+        DoCmd.OpenForm "frmKalkulation"
+    End If
+
+End Function
+
+
+Function comNotiz()
+
+
+    Dim lonAdrNr As Long
+    lonAdrNr = Form_frmStart.AdressNr
+    'DoCmd.Close acForm, "frmAdresse"
+    'Als 3 Parameter bei Open Args wird die Adressnummer übergeben
+    DoCmd.OpenForm "frmNotizenN1"   ', , , , , acDialog, "frmAdresse;0;" & CStr(lonAdrNr) & ";"
+
+
+
+
+End Function
+
+
+
+Function PS_Kontex(KontexMenueName As String) As Long
+'ruft das Kontex Menue auf und ändert vorher die Felder die angezeigt werden
+'die eigentliche Aktion findet dann in der Funktion statt die vom Pop up aufgerufen wir
+'das steht in der menuetabelle   siehe: funPopUPArtikel_16
+
+On Error GoTo Err_
+'Stop
+'Hier kann was spezielles passieren bei verschiedenen Menues
+Select Case KontexMenueName
+    Case "PS_HamStart"
+    
+    Case "PS_Artikel"
+        
+        If PopUpArtikelObj Is Nothing Then
+            MsgBox "Programmfehler es muss ein Objekt vorhanden sein PS_Kontex"
+            Exit Function
+        End If
+         
+        
+        'hier wird ermittelt werden welche menues mit der übergebenen Artikelnummer angezeigt werden
+        With PopUpArtikelObj
+            If .ZielArtikelID = 0 Then
+                'Die Artikelnummer 0 kann es nicht geben
+                MenueEintragEnablen "Artikel", 10, False, False   'Refresh
+                MenueEintragEnablen "Artikel", 11, True, False    'Neu erstellen aus Eintrag
+                MenueEintragEnablen "Artikel", 12, False, False   'Artikel anzeigen
+                MenueEintragEnablen "Artikel", 14, False, False   'Alle Kinder anzeigen
+                MenueEintragEnablen "Artikel", 16, False   'Alle Kinder einfügn
+                
+                
+            Else
+                If .Laden(.ZielArtikelID) _
+                    Then
+                        If .Mutter _
+                            Then
+                            'Der Artikel ist eine Mutter und kann Unterartikel haben
+                                MenueEintragEnablen "Artikel", 10, True, False  'Refresh
+                                MenueEintragEnablen "Artikel", 11, False, False  'Neu erstellen aus Eintrag
+                                MenueEintragEnablen "Artikel", 12, True, False  'Artikel anzeigen
+                                MenueEintragEnablen "Artikel", 14, True, False  'Alle Kinder anzeigen
+                                MenueEintragEnablen "Artikel", 16, True  'Alle Kinder einfügn
+                            Else
+                            'Der Artikel ist keine Mutter und hat auch keine Unterartikel (Kinder)
+                                MenueEintragEnablen "Artikel", 10, True, False  'Refresh
+                                MenueEintragEnablen "Artikel", 11, False, False  'Neu erstellen aus Eintrag
+                                MenueEintragEnablen "Artikel", 12, True, False  'Artikel anzeigen
+                                MenueEintragEnablen "Artikel", 14, False, False  'Alle Kinder anzeigen
+                                MenueEintragEnablen "Artikel", 16, False 'Alle Kinder einfügn
+                            End If
+                    
+                    
+                        
+                        
+                    Else
+                    'Es gibt keinen Artikel mit dieer Nummer
+                    MenueEintragEnablen "Artikel", 10, False, False  'Refresh
+                    MenueEintragEnablen "Artikel", 11, False, False  'Neu erstellen aus Eintrag
+                    MenueEintragEnablen "Artikel", 12, False, False  'Artikel anzeigen
+                    MenueEintragEnablen "Artikel", 14, False, False  'Alle Kinder anzeigen
+                    MenueEintragEnablen "Artikel", 16, False  'Alle Kinder einfügn
+                        
+                        
+                End If
+            End If
+            
+            
+            
+            
+        End With
+    Case "PS_AusgabeAnBest"
+    
+End Select
+
+
+
+'Jetzt wird das PopUp angezeigt um zu wissen was dann passiert muss man
+'die beim jeweiligen menue aufgerufenen Functionen betrachten
+PSDebug "Auswahl durchlaufen" & (Timer - gloT)
+MenueID = 0
+
+Application.CommandBars(KontexMenueName).ShowPopup
+
+PS_Kontex = MenueID
+
+
+Exit Function
+Err_:
+
+MsgBox LA("Nicht vorhanden.") & vbCrLf & KontexMenueName, vbCritical, "Error"
+
+
+
+End Function

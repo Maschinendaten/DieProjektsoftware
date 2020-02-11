@@ -1,0 +1,442 @@
+Option Compare Database
+Option Explicit
+
+Function fctShowAll()
+
+
+    Dim frm As Form
+    Dim ctl As Control
+    Dim sSql As String
+    
+    
+    Set frm = Screen.ActiveForm
+    sSql = "SELECT * FROM qry_" & Mid(frm.Name, 4) & " WHERE true"
+    'Frm.lstSuche.RowSource = sSql
+    'SQ (sSql)
+    frm.RecordSource = sSql
+    frm.FilterOn = False
+    frm.Requery
+    
+    Exit Function
+    
+    For Each ctl In frm.Controls
+        If Not IsNull(frm(ctl.Name)) And Left(ctl.Name, 9) = "Suchfeld_" Then ctl.Value = Null
+        
+    Next ctl
+
+    'frm!lstSuche.RowSource = "SELECT * FROM qry_" & MID(frm.Name, 4)
+
+funFilterForm
+
+End Function
+
+Function fctFilter(strType As String, strOperator As String)
+
+'Setzt den Filter in Listenfelder das er funktioniert
+
+    Dim frm As Form
+    Dim ctl As Control
+    Dim strSql As String
+    Dim pSql As String
+    Dim bol1Wert As Boolean
+    
+    Set frm = Screen.ActiveForm
+    pSql = ""
+    'geändert auf 3 zeichen frmXXXXXX x=Formularname
+    
+    strSql = "SELECT * FROM qry_" & Mid(frm.Name, 4) & " WHERE " ''1 = 1"
+    
+    For Each ctl In frm.Controls
+        If Not IsNull(frm(ctl.Name)) And ctl.Name Like "Such*" Then
+            
+            
+            
+            If pSql = "" Then 'Wenn noch nix da ist ohne And
+                pSql = Mid(ctl.Name, 5) & " " & strOperator
+            Else
+                pSql = pSql & " And " & Mid(ctl.Name, 5) & " " & strOperator
+            End If
+            
+            
+            Select Case strType
+                Case "TString"
+                    If strOperator = "Like" Then
+                        pSql = pSql & " '" & frm(ctl.Name) & "*'"
+                    Else
+                        pSql = pSql & " '" & frm(ctl.Name) & "'"
+                    End If
+                Case "TNumeric"
+                    strSql = strSql & frm(ctl.Name)
+                Case "TDate"
+                    strSql = strSql & CLng(frm(ctl.Name))
+            End Select
+        End If
+       
+    Next ctl
+    
+    If pSql = "" Then Beep
+    
+    
+    strSql = strSql & " " & pSql
+    
+    'Die Sortierrichtung wird festgelegt
+    '
+    
+    'ORDER BY qry_Adressenuebersicht.AdressNr DESC , qry_Adressenuebersicht.Rufname DESC;
+    For Each ctl In frm.Controls
+        If Not IsNull(frm(ctl.Name)) And _
+           ctl.Name Like "Sort*" Then
+           If ctl.Value = True Then
+                'Wenn mehrerer Sort Bedingungen
+                If bol1Wert = True Then
+                    strSql = strSql & " , " & Mid(ctl.Name, 6)
+                Else
+                    strSql = strSql & " Order By " & Mid(ctl.Name, 6)
+                End If
+                
+                bol1Wert = True
+                If Mid(ctl.Name, 5, 1) = "U" Then
+                    strSql = strSql & " DESC "
+                End If
+            End If
+         End If
+    Next ctl
+    
+    'Wird benutzt für Liste
+    
+    Debug.Print strSql
+    frm.lstSuche.RowSource = strSql
+    'Wird benutzt für Formular über error
+    'frm.RecordSource = strSql mg. auskommentier 18.10.2010
+'    Debug.Print "DK:" & strSql
+'    Debug.Print "UF:" & frm.FormName
+'    Debug.Print "FS:" & frm.RecordSource
+    'MsgBox (strSql)
+
+End Function
+
+Function fctCloseMe()
+
+    DoCmd.Close acForm, Screen.ActiveForm.Name
+
+End Function
+
+Function fctOpenForNew()
+
+    
+    Dim strFrm As String
+    
+    strFrm = Left(Screen.ActiveForm.Name, InStrRev(Screen.ActiveForm.Name, "_", , 1) - 1)
+    
+    DoCmd.OpenForm strFrm, , , , acFormAdd
+
+
+
+End Function
+
+Function fctlstSuche()
+    
+    Dim frm As Form
+    Dim strForm As String, strCond As String
+    
+    Set frm = Screen.ActiveForm
+    
+    strCond = CurrentDbC.QueryDefs("qry_" & Mid(frm.Name, 5)).Fields(0).Name & " = " & frm!lstSuche
+    strForm = Left(frm.Name, InStrRev(frm.Name, "_", , 1) - 1)
+    
+    DoCmd.OpenForm strForm, , , strCond
+
+
+End Function
+
+Function funFilter(frm As Form, Optional Felderleer As Boolean) As String
+'##MG 20141009
+'Die Funktion sucht Felder die mit Suchfeld_ beginnen und bastel daraus einen Filter
+'Hinter der Bezeichnung [Suchfeld_] muss immer der Name des Feldes Stehen nach dem gefiltert werden soll
+
+'Dim frm As Form
+Dim ctl As Control
+Dim sFi As String
+Dim sNa As String
+
+Set frm = Screen.ActiveForm
+
+For Each ctl In frm.Controls
+    If Not IsNull(frm(ctl.Name)) And Left(ctl.Name, 9) = "Suchfeld_" Then
+        If Felderleer Then
+            frm(ctl.Name) = Null 'wenn leeren werden alle Felder auf null gesetzt
+        Else
+            sNa = Mid(ctl.Name, 10)
+            If sFi = "" Then
+                'frm(ctl.Name).SetFocus
+                sFi = sNa & " LIKE '*" & frm(ctl.Name) & "*'"
+            Else
+                'frm(ctl.Name).SetFocus
+                sFi = sFi & " AND " & sNa & " LIKE '*" & frm(ctl.Name) & "*'"
+            End If
+        End If
+    End If
+Next ctl
+
+
+
+
+    
+'    frm.TasteFilterAus.SetFocus
+'    Me.FilterOn = True
+'    Me.varFilter = Me.Filter
+    
+    frm.Filter = sFi
+    
+ 
+
+
+End Function
+
+
+Function funFilterForm()
+'##MG 20141009
+'Die Funktion sucht Felder die mit Suchfeld_ beginnen und bastel daraus einen Filter
+'Hinter der Bezeichnung [Suchfeld_] muss immer der Name des Feldes Stehen nach dem gefiltert werden soll
+'sWild gibt an ob ein Wildkart gesetzt wird '* 'bedeutet am Anfang '**' bedeuten am Anfang und Ende ' *' nur am Ende
+
+Dim frm As Form
+Dim ctl As Control
+Dim Ctls As Control
+Dim sFi As String
+Dim sNa As String
+'Dim Felderleer
+Dim Ws As String 'Wildcard Start
+Dim We As String 'Wildcard Ende
+Dim i1 As String
+Dim Z As Long
+
+Dim SpCN As String 'Speichert controll Name Index
+
+'On Error GoTo Err_
+
+'=funFilterForm("**")
+
+On Error Resume Next
+
+
+
+Set frm = Screen.ActiveForm
+Set Ctls = frm.ActiveControl
+SpCN = Ctls.Name
+
+
+'
+'Debug.Print i1
+'
+'frm(Ctls.Name).SetFocus
+'frm(Ctls.Name).SelStart = Z
+'
+'Exit Function
+'Debug.Print "A:"; Screen.ActiveControl.Name
+'Debug.Print "V:" & Screen.ActiveControl.Value
+
+'frm.Recalc
+'############
+frm.FilterOn = True
+
+PSDebug "-- Filter Start:" & sFi
+
+For Each ctl In frm.Controls
+    
+    If Left(ctl.Name, 9) = "Suchfeld_" Then
+    'If Not frm(ctl.Name) Then    Das hier ist ganz schlecht weil das Käse macht!! 2019.05.15
+        frm.varFilter.SetFocus
+        PSDebug "Control Name: " & ctl.Name
+        Z = Z + 1
+        PSDebug "FilterFeld:" & Z & " " & ctl.Name & " " & frm(ctl.Name).Value
+        If Nz(frm(ctl.Name).Value) = "" Then
+            'frm(ctl.Name).Text = Null 'wenn leeren werden alle Felder auf null gesetzt
+            PSDebug "Leer"
+        Else
+            'Die zeichen müssen in marke (Tag) stehen nicht beim Aufruf weil der Filter ja aus allen zusammen gebaut wird
+
+            If InStr(frm(ctl.Name).Tag, "<WildcardStart>") <> 0 Then
+                Ws = Mid(frm(ctl.Name).Tag, InStr(frm(ctl.Name).Tag, "<WildcardStart>") + 16, 1)
+            Else
+                Ws = ""
+            End If
+            If InStr(frm(ctl.Name).Tag, "<WildcardEnde>") <> 0 Then
+                We = Mid(frm(ctl.Name).Tag, InStr(frm(ctl.Name).Tag, "<WildcardEnde>") + 15, 1)
+            Else
+                We = ""
+            End If
+            PSDebug "Wildcard :" & frm(ctl.Name).Tag & "WS:" & Ws & "WE:" & We
+
+
+            sNa = Mid(ctl.Name, 10)
+            'frm(ctl.Name).SetFocus
+            PSDebug "Sfi:" & sFi & "Fel--:" & frm(ctl.Name).Value
+            If sFi = "" Then
+                sFi = sNa & " LIKE '" & Ws & frm(ctl.Name).Value & We & "'"
+'                If frm.RecordsetClone.RecordCount = 0 Then
+'                    sFi = sNa & " LIKE '" & Ws & frm(ctl.Name).Text & We & "'"
+'                Else
+'
+'                    sFi = sNa & " LIKE '" & Ws & frm(ctl.Name).Text & We & "'"
+'                End If
+            Else
+                sFi = sFi & " AND " & sNa & " LIKE '" & Ws & frm(ctl.Name).Value & We & "'"
+                'frm(ctl.Name).SetFocus
+'                If frm.RecordsetClone.RecordCount = 0 Then
+'                    sFi = sFi & " AND " & sNa & " LIKE '" & Ws & frm(ctl.Name).Text & We & "'"
+'                Else
+'                    sFi = sFi & " AND " & sNa & " LIKE '" & Ws & frm(ctl.Name).Text & We & "'"
+'                End If
+            End If
+        End If
+    End If
+Next ctl
+
+PSDebug "++ Filter Ende:" & sFi
+
+'    If Felderleer Then
+'        'frm.FilterOn = False
+'        frm.Filter = sFi
+'        frm.FilterOn = False
+'        'frm.TasteFilterAus.SetFocus
+'    Else
+        frm.FilterOn = False
+        frm.Filter = sFi
+        frm.FilterOn = True
+'        If frm.RecordsetClone.RecordCount <> 0 Then
+'            frm(Ctls.Name).SetFocus
+'            frm(Ctls.Name).SelStart = Len("" & Ctls.Value)
+'        End If
+'    End If
+
+frm.varFilter = sFi
+
+'Setzt auf das beim kommen gesetzet Kontrol den Fokus
+frm(Ctls.Name).SetFocus
+frm(Ctls.Name).SelStart = Len("" & Ctls.Value)
+
+Exit Function
+
+Err_:
+i1 = i1 & Err.Description
+If Err.Number = 2185 Then
+    Resume Next
+    
+End If
+
+PSDebug "Err:" & Err.Number & i1
+frm.varFilter = "Hallo Fehler!"
+
+
+
+End Function
+
+
+
+
+
+
+Public Function funDoc(sDocType As String, sBedingung, Optional sHerkunft As String)
+'##MG 23 10 2014
+'Die Funktion ruft ein Formular auf die
+'die Herkunft gibt an wo der Link herkommt und ermöglicht somit eine zurück Taste
+Dim stLinkCriteria As String
+Dim stDocName As String
+Dim frm As Form
+
+'Abfangen leeres Feld
+If IsEmpty(sBedingung) Then Exit Function
+If IsNull(sBedingung) Then Exit Function
+
+
+
+Set frm = Screen.ActiveForm
+
+'gobjRibbon.ActivateTab ("tab0")
+
+
+
+'sAW = UCase(sDocType)
+
+Select Case sDocType
+
+    Case "Adr" 'für Adresse
+    
+        'PS_Kontex "PS_HamProjekt"
+        
+        lonAdressNr = Val(sBedingung)
+        stDocName = "frmAdresse"
+        If sHerkunft = "frmAdressenuebersicht" Then
+            DoCmd.Close acForm, "frmAdressenuebersicht"
+        End If
+    
+    Case "Pro" 'für Projekt
+        Form_frmStart.varProjektnummer = Val(sBedingung)
+         'funMenProDokuInfo 'öffnet alle Dokumente zum Projekt
+         PS_Kontex "PS_HamProjekt"
+    Case "PrA" 'für Projekt im Auftrag
+        Form_frmStartAuftrag.varProjektnummer = Val(sBedingung)
+         'funMenProDokuInfo 'öffnet alle Dokumente zum Projekt
+         funSpeicherReg "StartAuftrag", "LetzteProjektnummer", Str(sBedingung)
+         DoCmd.Close acForm, "frmProjektSuchen"
+         Form_frmStartAuftrag.AWProjektnummerRefresh
+         PS_Kontex "PS_HamProjekt"
+         
+         
+    Case "PrN" 'für Projektnummer setzen
+        Form_frmStartAuftrag.varProjektnummer = Val(sBedingung)
+         'funProjektNummer (Val(sBedingung))
+         Form_frmStartAuftrag.AWProjektnummerRefresh
+         'frm.ListToDo.Requery
+         funSpeicherReg "StartAuftrag", "LetzteProjektnummer", Str(sBedingung)
+         'frm.ListToDo.Height = 390 * frm.ListToDo.ListCount
+         'frm.Section(2).Height = 1400 + 390 * frm.ListToDo.ListCount
+         
+         'Debug.Print frm.ListToDo.ListCount
+       'PS_Kontex "PS_HamProjekt"
+    Case "Be+" 'für Beleg erzeugen
+        'Aufruf der Funktion mit Parametern neuen Beleg erstellen
+        lonBelegnummer = funNeuerBeleg("Bestellung", "neu", Val(sBedingung), Forms!frmdatenbanknutzer!Kurzzeichen, 0)
+        If lonBelegnummer = 0 Then
+            MsgBox ("Ein Fehler ist aufgetreten es konnte kein Beleg angelegt werden!")
+        Exit Function
+        Else
+            stDocName = "frmanfragenbestellungen"
+        End If
+    Case "BeP" 'Alle Belege im Projekt anzeigen
+        funProjektNummer (Val(sBedingung))
+        'lonProjektnummer = Val(sBedingung)
+        stDocName = "frmdokuInfo"
+        
+        
+    Case "AR" 'für Artikel
+         stLinkCriteria = "[ID_Artikel]=" & sBedingung
+        stDocName = "frmArtikel"
+
+    Case "EKL" 'für Artikel
+        funMenEinkaufsListe (Val(sBedingung))
+        Exit Function
+    
+    Case "Kal" 'für die Kalkulation
+        
+        funProjektNummer (Val(sBedingung))
+        funMenProKalk (funProjektNummer())
+        Exit Function
+            
+    Case Else
+
+    MsgBox ("Kein gültiger Parameter für DocType")
+    
+End Select
+
+'Das Formular öffnen
+If stDocName <> "" Then
+    'DoCmd.Close acForm, sHerkunft
+    DoCmd.OpenForm stDocName, , , stLinkCriteria, , , sHerkunft
+End If
+
+
+
+
+End Function

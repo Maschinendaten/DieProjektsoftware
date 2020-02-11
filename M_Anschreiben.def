@@ -1,0 +1,586 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+'Modul neu 2019 07 20 Version 1 noch nicht ausprogrammiert
+
+
+Private m_BelegNr As Long
+Private m_BelegArt As String
+Private m_BelegArtTyp As DokType
+Private m_BelegArt2 As String
+Private m_Projektnummer As Long
+Private m_Rufname As String
+Private m_Adresse1 As String
+Private m_Adresse2 As String
+Private m_Adresse3 As String
+Private m_Strasse As String
+Private m_PLZ As String
+Private m_Ort As String
+Private m_Land As String
+Private m_Telefon As String
+Private m_Fax As String
+Private m_Handy As String
+Private m_EMail As String
+Private m_Webadresse As String
+Private m_Betreff As String
+Private m_Kurzzeichenersteller As String
+Private m_Belegbezeichnung As String
+Private m_Kopftext As String
+Private m_Textstück As String
+Private m_Schlusstext As String
+Private m_Erstelldatum As Date
+Private m_Wiedervorlagedatum As Date
+Private m_Adressnummer As Long
+Private m_Anrede As String
+Private m_Vorname As String
+Private m_Nachname As String
+Private m_Gesperrt As Boolean
+Private m_Formulartype As String
+Private m_Unternummer As Long
+Private m_AufNr As Long
+Private m_UnsereKuNr As String
+Private m_Waehrung As String
+Private m_Rabatt As Double
+Private m_SummeNet As Double
+Private m_SummeBrut As Double
+Private m_Erledigt As Date
+Private m_NrErledigt As String
+Private m_QS1 As Long
+Private m_QS2 As Long
+Private m_LieferAdresse As String
+Private m_RechnungsAdresse As String
+Private m_AnschreibenAdresse As String
+Private m_fiLieferAdresse As Long
+Private m_fiAnschreibenAdresse As Long
+Private m_fiRechnungsAdresse As Long
+
+Public Property Get BelegArtDokType() As DokType
+
+BelegArtDokType = DokTypeVonString(m_BelegArt)
+
+End Property
+
+Public Function DokTypeVonString(BezeichnungDok As String) As DokType
+    Dim tdok As DokType
+    
+    'Rausfinden was für ein Dokumenttype
+
+Select Case BezeichnungDok
+    Case "-Rechnung", "Rechnung"
+        tdok = tyrechnung
+    Case "-Lieferschein", "Lieferschein"
+        tdok = tyLieferschein
+    Case "-Auftragsbestätigung", "Auftragsbestätigung"
+        tdok = tyAuftragsbestaetigung
+    Case "-Gutschrift", "Gutschrift"
+        tdok = tyGutschrift
+    Case "-Angebot" Or "Angebot"
+        'tdok = tyAngebot
+        
+End Select
+
+DokTypeVonString = tdok
+
+
+End Function
+
+
+
+Public Property Get BelegNr() As Long:    BelegNr = m_BelegNr: End Property
+Public Property Let BelegNr(WERT As Long):     m_BelegNr = WERT: End Property
+Public Property Get BelegArt() As String:    BelegArt = m_BelegArt: End Property
+Public Property Let BelegArt(WERT As String):     m_BelegArt = WERT: End Property
+Public Property Get BelegArt2() As String:    BelegArt2 = m_BelegArt2: End Property
+Public Property Let BelegArt2(WERT As String):     m_BelegArt2 = WERT: End Property
+Public Property Get Projektnummer() As Long:    Projektnummer = m_Projektnummer: End Property
+Public Property Let Projektnummer(WERT As Long):     m_Projektnummer = WERT: End Property
+Public Property Get Rufname() As String:    Rufname = m_Rufname: End Property
+Public Property Let Rufname(WERT As String):     m_Rufname = WERT: End Property
+'Public Property Get Adresse1() As String:    Adresse1 = m_Adresse1: End Property
+'Public Property Let Adresse1(WERT As String):     m_Adresse1 = WERT: End Property
+'Public Property Get Adresse2() As String:    Adresse2 = m_Adresse2: End Property
+'Public Property Let Adresse2(WERT As String):     m_Adresse2 = WERT: End Property
+'Public Property Get Adresse3() As String:    Adresse3 = m_Adresse3: End Property
+'Public Property Let Adresse3(WERT As String):     m_Adresse3 = WERT: End Property
+'Public Property Get Strasse() As String:    Strasse = m_Strasse: End Property
+'Public Property Let Strasse(WERT As String):     m_Strasse = WERT: End Property
+'Public Property Get PLZ() As String:    PLZ = m_PLZ: End Property
+'Public Property Let PLZ(WERT As String):     m_PLZ = WERT: End Property
+'Public Property Get Ort() As String:    Ort = m_Ort: End Property
+'Public Property Let Ort(WERT As String):     m_Ort = WERT: End Property
+'Public Property Get Land() As String:    Land = m_Land: End Property
+'Public Property Let Land(WERT As String):     m_Land = WERT: End Property
+Public Property Get Telefon() As String:    Telefon = m_Telefon: End Property
+Public Property Let Telefon(WERT As String):     m_Telefon = WERT: End Property
+Public Property Get Fax() As String:    Fax = m_Fax: End Property
+Public Property Let Fax(WERT As String):     m_Fax = WERT: End Property
+Public Property Get Handy() As String:    Handy = m_Handy: End Property
+Public Property Let Handy(WERT As String):     m_Handy = WERT: End Property
+Public Property Get EMail() As String:    EMail = m_EMail: End Property
+Public Property Let EMail(WERT As String):     m_EMail = WERT: End Property
+Public Property Get Webadresse() As String:    Webadresse = m_Webadresse: End Property
+Public Property Let Webadresse(WERT As String):     m_Webadresse = WERT: End Property
+Public Property Get Betreff() As String:    Betreff = m_Betreff: End Property
+Public Property Let Betreff(WERT As String):     m_Betreff = WERT: End Property
+Public Property Get Kurzzeichenersteller() As String:    Kurzzeichenersteller = m_Kurzzeichenersteller: End Property
+Public Property Let Kurzzeichenersteller(WERT As String):     m_Kurzzeichenersteller = WERT: End Property
+Public Property Get Belegbezeichnung() As String:    Belegbezeichnung = m_Belegbezeichnung: End Property
+Public Property Let Belegbezeichnung(WERT As String):     m_Belegbezeichnung = WERT: End Property
+Public Property Get Kopftext() As String:    Kopftext = m_Kopftext: End Property
+Public Property Let Kopftext(WERT As String):     m_Kopftext = WERT: End Property
+Public Property Get Textstück() As String:    Textstück = m_Textstück: End Property
+Public Property Let Textstück(WERT As String):     m_Textstück = WERT: End Property
+Public Property Get Schlusstext() As String:    Schlusstext = m_Schlusstext: End Property
+Public Property Let Schlusstext(WERT As String):     m_Schlusstext = WERT: End Property
+Public Property Get Erstelldatum() As Date:    Erstelldatum = m_Erstelldatum: End Property
+Public Property Let Erstelldatum(WERT As Date):     m_Erstelldatum = WERT: End Property
+Public Property Get Wiedervorlagedatum() As Date:    Wiedervorlagedatum = m_Wiedervorlagedatum: End Property
+Public Property Let Wiedervorlagedatum(WERT As Date):     m_Wiedervorlagedatum = WERT: End Property
+Public Property Get Adressnummer() As Long:    Adressnummer = m_Adressnummer: End Property
+Public Property Let Adressnummer(WERT As Long):     m_Adressnummer = WERT: End Property
+Public Property Get Anrede() As String:    Anrede = m_Anrede: End Property
+Public Property Let Anrede(WERT As String):     m_Anrede = WERT: End Property
+Public Property Get Vorname() As String:    Vorname = m_Vorname: End Property
+Public Property Let Vorname(WERT As String):     m_Vorname = WERT: End Property
+Public Property Get Nachname() As String:    Nachname = m_Nachname: End Property
+Public Property Let Nachname(WERT As String):     m_Nachname = WERT: End Property
+Public Property Get gesperrt() As Boolean:    gesperrt = m_Gesperrt: End Property
+Public Property Let gesperrt(WERT As Boolean):     m_Gesperrt = WERT: End Property
+Public Property Get Formulartype() As String:    Formulartype = m_Formulartype: End Property
+Public Property Let Formulartype(WERT As String):     m_Formulartype = WERT: End Property
+Public Property Get Unternummer() As Long:    Unternummer = m_Unternummer: End Property
+Public Property Let Unternummer(WERT As Long):     m_Unternummer = WERT: End Property
+Public Property Get AufNr() As Long:    AufNr = m_AufNr: End Property
+Public Property Let AufNr(WERT As Long):     m_AufNr = WERT: End Property
+Public Property Get UnsereKuNr() As String:    UnsereKuNr = m_UnsereKuNr: End Property
+Public Property Let UnsereKuNr(WERT As String):     m_UnsereKuNr = WERT: End Property
+Public Property Get Waehrung() As String:    Waehrung = m_Waehrung: End Property
+Public Property Let Waehrung(WERT As String):     m_Waehrung = WERT: End Property
+Public Property Get Rabatt() As Double:    Rabatt = m_Rabatt: End Property
+Public Property Let Rabatt(WERT As Double):     m_Rabatt = WERT: End Property
+Public Property Get SummeNet() As Double:    SummeNet = m_SummeNet: End Property
+Public Property Let SummeNet(WERT As Double):     m_SummeNet = WERT: End Property
+Public Property Get SummeBrut() As Double:    SummeBrut = m_SummeBrut: End Property
+Public Property Let SummeBrut(WERT As Double):     m_SummeBrut = WERT: End Property
+Public Property Get Erledigt() As Date:    Erledigt = m_Erledigt: End Property
+Public Property Let Erledigt(WERT As Date):     m_Erledigt = WERT: End Property
+Public Property Get NrErledigt() As String:    NrErledigt = m_NrErledigt: End Property
+Public Property Let NrErledigt(WERT As String):     m_NrErledigt = WERT: End Property
+Public Property Get QS1() As Long:    QS1 = m_QS1: End Property
+Public Property Let QS1(WERT As Long):     m_QS1 = WERT: End Property
+Public Property Get QS2() As Long:    QS2 = m_QS2: End Property
+Public Property Let QS2(WERT As Long):     m_QS2 = WERT: End Property
+Public Property Get Lieferadresse() As String:    Lieferadresse = m_LieferAdresse: End Property
+Public Property Let Lieferadresse(WERT As String):     m_LieferAdresse = WERT: End Property
+Public Property Get Rechnungsadresse() As String:    Rechnungsadresse = m_RechnungsAdresse: End Property
+Public Property Let Rechnungsadresse(WERT As String):     m_RechnungsAdresse = WERT: End Property
+Public Property Get AnschreibenAdresse() As String:    AnschreibenAdresse = m_AnschreibenAdresse: End Property
+Public Property Let AnschreibenAdresse(WERT As String):     m_AnschreibenAdresse = WERT: End Property
+Public Property Get fiLieferadresse() As Long:    fiLieferadresse = m_fiLieferAdresse: End Property
+Public Property Let fiLieferadresse(WERT As Long):     m_fiLieferAdresse = WERT: End Property
+Public Property Get fiAnschreibenAdresse() As Long:    fiAnschreibenAdresse = m_fiAnschreibenAdresse: End Property
+Public Property Let fiAnschreibenAdresse(WERT As Long):     m_fiAnschreibenAdresse = WERT: End Property
+Public Property Get fiRechnungsadresse() As Long:    fiRechnungsadresse = m_fiRechnungsAdresse: End Property
+Public Property Let fiRechnungsadresse(WERT As Long):     m_fiRechnungsAdresse = WERT: End Property
+
+
+Function copy(NrMutterDokument As Long, ZielDokType As DokType) As Long
+'Kopiert ein Anschreiben unabhängig ob Auftrag oder Angebot oder Bestellung
+'Die Details müssen dann bei der jeweiligen Ausprägung kopiert werden
+'Zurückgegeben wird die Nummer des neu erzeugten Anschreibens
+
+Dim QDs As DAO.Recordset 'Quelldatensat
+Dim ZDs As DAO.Recordset 'Zieldatensatz
+Dim sSql As String
+Dim A As Long
+
+sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr=" & NrMutterDokument
+Set QDs = CurrentDbC.OpenRecordset(sSql)
+With QDs
+    If .EOF Then
+        MsgBox LA("Kein Dokument vorhanden")
+    Else
+        sSql = "SELECT * FROM tblAnschreiben WHERE FALSE"
+        Set ZDs = CurrentDbC.OpenRecordset(sSql)
+        ZDs.AddNew
+            'Einfach alle Felder kopieren
+            For A = 1 To QDs.Fields.Count - 1
+              ZDs.Fields(A).Value = .Fields(A).Value
+            Next A
+            'Eindeutige Datensatznummer zuweisen und was sonst noch geändert werden muss beim kopieren
+            m_BelegNr = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
+            ZDs.Fields("BelegNr").Value = m_BelegNr
+            ZDs.Fields("Belegbezeichnung").Value = ZDs.Fields("Projektnummer").Value & "-" & m_BelegNr & "-" & PS.User.Kurzzeichen() & IIf(ZDs.Fields("AufNr").Value > 0, "-A" & ZDs.Fields("AufNr").Value, "")
+            ZDs.Fields("Erstelldatum").Value = Now()
+            ZDs.Fields("Wiedervorlagedatum").Value = Now() + 10
+            ZDs.Fields("Erledigt").Value = Null
+            ZDs.Fields("NrErledigt").Value = ""
+            ZDs.Fields("Kurzzeichenersteller").Value = PS.User.Kurzzeichen()
+            ZDs.Fields("BelegArt").Value = PS.Anschreiben.DokTypeString(ZielDokType)
+
+        ZDs.Update
+        ZDs.Close
+        copy = m_BelegNr
+        Me.Laden (m_BelegNr)
+    End If
+End With
+QDs.Close
+End Function
+
+'Public Function Neu(Projektnummer As Long, BelegArt As DokType, Formulartype As String) As Long
+Public Function Neu(Projektnummer As Long, Auftragsnummer As Long, BelegArt As DokType, Formulartype As String) As Long
+'Erstellt ein neues Anschreiben gibt die id des Anschreiben zurück
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+m_Projektnummer = Projektnummer
+m_BelegArt = BelegArt
+m_Formulartype = Formulartype
+
+'Das muss unbedingt angegeben werden
+Select Case True
+    Case m_Projektnummer = 0
+        Neu = -1
+    Case Nz(m_BelegArt, "") = ""
+        Neu = -2
+    Case Nz(m_Formulartype, "") = ""
+        Neu = -3
+End Select
+'Stop
+If Neu < 0 Then Exit Function
+
+sSql = "SELECT * FROM tblAnschreiben WHERE FALSE"
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+    Stop
+   With rs1
+        .AddNew
+            m_BelegNr = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
+            .Fields("BelegNr").Value = m_BelegNr
+            
+            .Fields("BelegArt").Value = DokTypeString(BelegArt) ' m_BelegArt
+'        .Fields("BelegArt2").Value
+            .Fields("Projektnummer").Value = m_Projektnummer
+        If m_Adressnummer = 0 Then
+            PS.Adresse.Laden (PS.Projekt.AdressNr)
+            .Fields("Adressnummer").Value = PS.Adresse.AdressNr
+            .Fields("Rufname").Value = PS.Adresse.Rufname
+            .Fields("Lieferadresse").Value = PS.Adresse.AdresseRTF
+            .Fields("Rechnungsadresse").Value = PS.Adresse.AdresseRTF
+            .Fields("AnschreibenAdresse").Value = PS.Adresse.AdresseRTF
+            .Fields("fiLieferadresse").Value = PS.Adresse.AdressNr
+            .Fields("fiAnschreibenAdresse").Value = PS.Adresse.AdressNr
+            .Fields("fiRechnungsadresse").Value = PS.Adresse.AdressNr
+        Else
+            .Fields("Adressnummer").Value = m_Adressnummer
+            .Fields("Rufname").Value = m_Rufname
+            .Fields("Lieferadresse").Value = m_LieferAdresse
+            .Fields("Rechnungsadresse").Value = m_RechnungsAdresse
+            .Fields("AnschreibenAdresse").Value = m_AnschreibenAdresse
+            .Fields("fiLieferadresse").Value = m_fiLieferAdresse
+            .Fields("fiAnschreibenAdresse").Value = m_fiAnschreibenAdresse
+            .Fields("fiRechnungsadresse").Value = m_fiRechnungsAdresse
+        End If
+         
+'        .Fields("Adresse1").Value
+'        .Fields("Adresse2").Value
+'        .Fields("Adresse3").Value
+'        .Fields("Strasse").Value
+'        .Fields("PLZ").Value
+'        .Fields("Ort").Value
+'        .Fields("Land").Value
+'        .Fields("Telefon").Value
+'        .Fields("Fax").Value
+'        .Fields("Handy").Value
+'        .Fields("EMail").Value
+'        .Fields("Webadresse").Value
+        .Fields("Betreff").Value = m_Betreff
+            .Fields("Kurzzeichenersteller").Value = PS.User.Kurzzeichen
+'        .Fields("Belegbezeichnung").Value
+'        .Fields("Kopftext").Value
+'        .Fields("Textstück").Value
+'        .Fields("Schlusstext").Value
+'        .Fields("Erstelldatum").Value
+'        .Fields("Wiedervorlagedatum").Value
+'        .Fields("Adressnummer").Value
+'        .Fields("Anrede").Value
+'        .Fields("Vorname").Value
+'        .Fields("Nachname").Value
+'        .Fields("gesperrt").Value
+        .Fields("Formulartype").Value = Formulartype
+        .Fields("Unternummer").Value = m_Unternummer
+        .Fields("AufNr").Value = m_AufNr
+'        .Fields("UnsereKuNr").Value
+'        .Fields("Waehrung").Value
+'        .Fields("Rabatt").Value
+'        .Fields("SummeNet").Value
+'        .Fields("SummeBrut").Value
+'        .Fields("Erledigt").Value
+'        .Fields("NrErledigt").Value
+'        .Fields("QS1").Value
+'        .Fields("QS2").Value
+
+
+            
+            Neu = m_BelegNr
+            
+        .Update
+    
+    End With
+     
+
+End Function
+
+Public Function DokTypeString(WERT As DokType) As String
+    Select Case WERT
+        Case DokType.tyAngebot
+            DokTypeString = "Angebot"
+        Case DokType.tyAuftragsbestaetigung
+            DokTypeString = "Auftragsbestätigung"
+        Case DokType.tyLieferschein
+            DokTypeString = "Lieferschein"
+        Case DokType.tyLieferschein
+            DokTypeString = "Lieferschein"
+        Case DokType.tyrechnung
+            DokTypeString = "Rechnung"
+        Case DokType.tyGutschrift
+            DokTypeString = "Gutschrift"
+        Case DokType.tyMahnung
+            DokTypeString = "Mahnung"
+        Case DokType.tyKurzbrief
+            DokTypeString = "Kurzbrief"
+        Case Else
+            DokTypeString = "DokErr"
+    End Select
+End Function
+
+
+
+
+
+
+Public Function Laden(BelegNr As Variant) As Boolean
+
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+If IsNull(BelegNr) Then
+    Laden = True
+    Exit Function
+End If
+
+sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr=" & BelegNr
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+With rs1
+    If .EOF Then
+        Laden = False
+    Else
+
+
+        m_BelegNr = Nz(.Fields("BelegNr").Value)
+        m_BelegArt = Nz(.Fields("BelegArt").Value)
+        m_BelegArt2 = Nz(.Fields("BelegArt2").Value)
+        m_Projektnummer = Nz(.Fields("Projektnummer").Value)
+        m_Rufname = Nz(.Fields("Rufname").Value)
+        m_Adresse1 = Nz(.Fields("Adresse1").Value)
+        m_Adresse2 = Nz(.Fields("Adresse2").Value)
+        m_Adresse3 = Nz(.Fields("Adresse3").Value)
+        m_Strasse = Nz(.Fields("Strasse").Value)
+        m_PLZ = Nz(.Fields("PLZ").Value)
+        m_Ort = Nz(.Fields("Ort").Value)
+        m_Land = Nz(.Fields("Land").Value)
+        m_Telefon = Nz(.Fields("Telefon").Value)
+        m_Fax = Nz(.Fields("Fax").Value)
+        m_Handy = Nz(.Fields("Handy").Value)
+        m_EMail = Nz(.Fields("EMail").Value)
+        m_Webadresse = Nz(.Fields("Webadresse").Value)
+        m_Betreff = Nz(.Fields("Betreff").Value)
+        m_Kurzzeichenersteller = Nz(.Fields("Kurzzeichenersteller").Value)
+        m_Belegbezeichnung = Nz(.Fields("Belegbezeichnung").Value)
+        m_Kopftext = Nz(.Fields("Kopftext").Value)
+        m_Textstück = Nz(.Fields("Textstück").Value)
+        m_Schlusstext = Nz(.Fields("Schlusstext").Value)
+        m_Erstelldatum = Nz(.Fields("Erstelldatum").Value)
+        m_Wiedervorlagedatum = Nz(.Fields("Wiedervorlagedatum").Value)
+        m_Adressnummer = Nz(.Fields("Adressnummer").Value)
+        m_Anrede = Nz(.Fields("Anrede").Value)
+        m_Vorname = Nz(.Fields("Vorname").Value)
+        m_Nachname = Nz(.Fields("Nachname").Value)
+        m_Gesperrt = Nz(.Fields("gesperrt").Value)
+        m_Formulartype = Nz(.Fields("Formulartype").Value)
+        m_Unternummer = Nz(.Fields("Unternummer").Value)
+        m_AufNr = Nz(.Fields("AufNr").Value)
+        m_UnsereKuNr = Nz(.Fields("UnsereKuNr").Value)
+        m_Waehrung = Nz(.Fields("Waehrung").Value)
+        m_Rabatt = Nz(.Fields("Rabatt").Value)
+        m_SummeNet = Nz(.Fields("SummeNet").Value)
+        m_SummeBrut = Nz(.Fields("SummeBrut").Value)
+        m_Erledigt = Nz(.Fields("Erledigt").Value)
+        m_NrErledigt = Nz(.Fields("NrErledigt").Value)
+        m_QS1 = Nz(.Fields("QS1").Value)
+        m_QS2 = Nz(.Fields("QS2").Value)
+        m_LieferAdresse = Nz(.Fields("Lieferadresse").Value)
+        m_RechnungsAdresse = Nz(.Fields("Rechnungsadresse").Value)
+        m_AnschreibenAdresse = Nz(.Fields("AnschreibenAdresse").Value)
+        m_fiLieferAdresse = Nz(.Fields("fiLieferadresse").Value)
+        m_fiAnschreibenAdresse = Nz(.Fields("fiAnschreibenAdresse").Value)
+        m_fiRechnungsAdresse = Nz(.Fields("fiRechnungsadresse").Value)
+        Laden = True
+    End If
+.Close
+End With
+
+
+End Function
+
+
+Public Function Speichern() As Boolean
+
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+
+If m_BelegNr = 0 Then
+    Speichern = False
+    Exit Function
+End If
+
+sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr=" & m_BelegNr
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+With rs1
+    If .EOF Then
+        Speichern = False
+        .Close
+        Exit Function
+    Else
+        .Edit
+
+            'm_BelegNr = Nz(.Fields("BelegNr").Value)
+            .Fields("BelegArt").Value = m_BelegArt
+            .Fields("BelegArt2").Value = m_BelegArt2
+            .Fields("Projektnummer").Value = m_Projektnummer
+            .Fields("Rufname").Value = m_Rufname
+            .Fields("Adresse1").Value = m_Adresse1
+            .Fields("Adresse2").Value = m_Adresse2
+            .Fields("Adresse3").Value = m_Adresse3
+            .Fields("Strasse").Value = m_Strasse
+            .Fields("PLZ").Value = m_PLZ
+            .Fields("Ort").Value = m_Ort
+            .Fields("Land").Value = m_Land
+            .Fields("Telefon").Value = m_Telefon
+            .Fields("Fax").Value = m_Fax
+            .Fields("Handy").Value = m_Handy
+            .Fields("EMail").Value = m_EMail
+            .Fields("Webadresse").Value = m_Webadresse
+            .Fields("Betreff").Value = m_Betreff
+            .Fields("Kurzzeichenersteller").Value = m_Kurzzeichenersteller
+            .Fields("Belegbezeichnung").Value = m_Belegbezeichnung
+            .Fields("Kopftext").Value = m_Kopftext
+            .Fields("Textstück").Value = m_Textstück
+            .Fields("Schlusstext").Value = m_Schlusstext
+            .Fields("Erstelldatum").Value = m_Erstelldatum
+            .Fields("Wiedervorlagedatum").Value = m_Wiedervorlagedatum
+            .Fields("Adressnummer").Value = m_Adressnummer
+            .Fields("Anrede").Value = m_Anrede
+            .Fields("Vorname").Value = m_Vorname
+            .Fields("Nachname").Value = m_Nachname
+            .Fields("gesperrt").Value = m_Gesperrt
+            .Fields("Formulartype").Value = m_Formulartype
+            .Fields("Unternummer").Value = m_Unternummer
+            .Fields("AufNr").Value = m_AufNr
+            .Fields("UnsereKuNr").Value = m_UnsereKuNr
+            .Fields("Waehrung").Value = m_Waehrung
+            .Fields("Rabatt").Value = m_Rabatt
+            .Fields("SummeNet").Value = m_SummeNet
+            .Fields("SummeBrut").Value = m_SummeBrut
+            .Fields("Erledigt").Value = IIf(m_Erledigt = 0, Null, m_Erledigt)
+            .Fields("NrErledigt").Value = m_NrErledigt
+            .Fields("QS1").Value = m_QS1
+            .Fields("QS2").Value = m_QS2
+            .Fields("Lieferadresse").Value = m_LieferAdresse
+            .Fields("Rechnungsadresse").Value = m_RechnungsAdresse
+            .Fields("AnschreibenAdresse").Value = m_AnschreibenAdresse
+            .Fields("fiLieferadresse").Value = m_fiLieferAdresse
+            .Fields("fiAnschreibenAdresse").Value = m_fiAnschreibenAdresse
+            .Fields("fiRechnungsadresse").Value = m_fiRechnungsAdresse
+        .Update
+        
+    End If
+    .Close
+End With
+
+
+End Function
+
+
+
+
+
+
+
+
+Public Function CheckAdresse(Belegnummer As Long)
+'Prüft ob die FiAnschreibenAdresse der Adresse bzw dem Rufnamen entspricht
+'Für Altdaten und neuen Blödsin
+'MG 2019.09.13
+Dim oAdr As Adresse
+
+
+
+
+If Me.Laden(Belegnummer) Then
+    
+    If m_fiAnschreibenAdresse <> 0 Then
+        m_Adressnummer = m_fiAnschreibenAdresse
+        m_Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+    End If
+    
+    
+'    'Erst prüfen ob AdressNr 0 wenn ja prüfe ob rufnamen oder fiAnschreibenAdresse
+'    If m_Adressnummer = 0 Then
+'        If m_Rufname <> "" Then
+'                m_Adressnummer = PS.Adresse.AdressNrAusRufname(m_Rufname)
+'        End If
+'        If m_fiAnschreibenAdresse <> 0 Then
+'                m_Adressnummer = m_fiAnschreibenAdresse
+'        End If
+'    End If
+'
+'
+'
+    If (m_Adressnummer <> m_fiAnschreibenAdresse And m_Adressnummer <> 0) Then
+        'Es wird nur die Anscreiben adresse angepasst dia anderen sind verschieden ob bestellung oder Angebot usw.
+        PS.Adresse.Laden (m_Adressnummer)
+        m_AnschreibenAdresse = PS.Adresse.AdresseRTF
+        'm_Rechnungsadresse = m_AnschreibenAdresse
+        'M_Lieferadresse = m_AnschreibenAdresse
+        m_Rufname = PS.Adresse.RufnameAusAdressNr(m_Adressnummer)
+        m_fiAnschreibenAdresse = PS.Adresse.AdressNr
+        'm_fiLieferadresse = PS.Adresse.AdressNr
+        'm_fiRechnungsadresse = PS.Adresse.AdressNr
+    End If
+'
+'    'Sicherstellen das Rufname zu Adressnummer passt
+'    If (m_Adressnummer = m_fiAnschreibenAdresse And m_Adressnummer <> 0) Then
+'        If PS.Adresse.Laden(m_Adressnummer) Then
+'            If m_Rufname <> PS.Adresse.Rufname Then
+'                m_Rufname = PS.Adresse.Rufname
+'            End If
+'        End If
+'    End If
+'
+    
+   
+    'Speichert den beleg mit den neuen Informationen
+    If m_Adressnummer <> 0 And m_Rufname <> "" Then
+        Me.Speichern
+    End If
+End If
+
+
+End Function

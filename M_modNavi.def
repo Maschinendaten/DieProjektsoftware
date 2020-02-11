@@ -1,0 +1,297 @@
+Option Compare Database
+Option Explicit
+
+Public Function funNeuerBeleg(BelArt As String, Aktion As String, ProNr As Long, Benutzer As String, belNr As Long) As Long
+'Dieses Programm legt eine neuen Beleg an oder kopiert einen Beleg
+'Dabei werden auch in der Stückliste die Einträge nachgeführt
+
+'BelArt =   "Anfrage"
+'           "Bestellung
+'Aktion =   "Neu"
+'           "Kopieren"
+'ProNr  =   Die Projektnummer zu dem der Beleg erstellt werden soll
+'Benutzer = Kurzzeichen der den Beleg erstellt
+'BelNr  =   Die Belegnummer die kopiert werden soll
+'
+'funNeuerBeleg = gibt die Nummer zurück die als Beleg angelegt wurde
+
+'on error Goto Err_fun
+Dim Rs4 As DAO.Recordset
+Dim Rs3 As DAO.Recordset
+Dim Rs2 As DAO.Recordset
+Dim rs1 As DAO.Recordset
+
+Dim stDocName As String
+Dim stLinkCriteria As String
+Dim lonBN As Long
+Dim varGeprueft As Byte
+Dim strSql As String
+Dim StrSqlS As String 'SQL Suchstring für Status
+
+'Alle Eingabebedingungen werden geprüft
+varGeprueft = 0
+If (Nz(BelArt) <> "Anfrage") And (Nz(BelArt) <> "Bestellung") Then varGeprueft = 1
+If (Nz(Aktion) <> "neu") And (Nz(Aktion) <> "kopieren") Then varGeprueft = 2
+If Nz(ProNr) = 0 Then varGeprueft = 3
+If Nz(Benutzer) = "" Then varGeprueft = 4
+If (Nz(BelArt) = "kopieren") And (Nz(belNr) = 0) Then varGeprueft = 5
+
+If varGeprueft <> 0 Then
+    MsgBox ("Fehler Nr." & varGeprueft & " Bei der Übergabe der Parameter.")
+    funNeuerBeleg = 0
+    Exit Function
+End If
+
+'Immer neues Formular anlegen
+    'Es wird ein neuer Datensatz mit einer neuen Dokumentnummer erstellt
+    Set Rs3 = CurrentDbC.OpenRecordset("tblAnschreiben")
+    Rs3.AddNew    'Neuen Datensatz anlegen
+    Rs3!Kurzzeichenersteller = Benutzer
+    Rs3!Projektnummer = ProNr
+    Rs3!Formulartype = "frmAnfragenBestellungen"
+    Rs3!Erstelldatum = Date
+    Rs3!BelegArt = BelArt
+    If BelArt = "Anfrage" Then Rs3!Kopftext = "Sehr geehrte Damen und Herren," & vbCrLf & vbCrLf & _
+        "wir bitten Sie, uns für die nachfolgende Position(en) ein Angebot mit Angabe der Lieferzeit zu erstellen."
+    If BelArt = "Bestellung" Then Rs3!Kopftext = "Sehr geehrte Damen und Herren," & vbCrLf & vbCrLf & _
+        "hiermit bestellen wir nachfolgende Position:"
+        'Höchste Nr Suchen oder Vorgabewert
+    lonBN = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
+    Rs3!BelegNr = lonBN
+    Rs3!Belegbezeichnung = CStr(ProNr) & "-" & CStr(lonBN) & "-" & Benutzer
+    Rs3.Update
+    Rs3.Close
+    Set Rs3 = Nothing
+
+
+'Abfrage Kopieren Anfrage
+
+If Aktion = "kopieren" Then 'IF1
+    Set Rs2 = CurrentDbC.OpenRecordset("SELECT tblStuecklisteBestellung.BelegNr AS lonBelegNr, tblStuecklisteBestellung.*  " & _
+             "FROM tblStuecklisteBestellung WHERE ((tblStuecklisteBestellung.BelegNr = " & belNr & "));")
+    If Rs2.RecordCount > 0 Then
+    
+    Set rs1 = CurrentDbC.OpenRecordset("tblStuecklisteBestellung")
+    'Set Rs4 = CurrentDbC.OpenRecordset("tblStuecklisteStatus") 'Tabelle in die die Daten geschrieben werden
+        Rs2.MoveFirst
+        Do Until Rs2.EOF
+            rs1.AddNew
+            'Die neue Belgnummer wird zugewiesen
+            rs1!BelegNr = lonBN
+            rs1!GF_Bezeichnung = Nz(Rs2!GF_Bezeichnung)
+            rs1!Bestell_Nr = Nz(Rs2!Bestell_Nr)
+            rs1!Menge = Nz(Rs2!Menge)
+            rs1!Liefereinheit = Nz(Rs2!Liefereinheit)
+            rs1![PreisStueck] = Nz(Rs2![PreisStueck])
+            rs1!Gesamtpreis = Nz(Rs2!Gesamtpreis)
+            rs1!BesondereVereinbarung = Nz(Rs2!BesondereVereinbarung)
+            rs1![BestellDatum] = Nz(Rs2![BestellDatum])
+            rs1![LieferzeitKW] = Nz(Rs2![LieferzeitKW])
+            rs1![zugesagtesLieferdatum] = Nz(Rs2![zugesagtesLieferdatum])
+            rs1!Positionsnummer = Nz(Rs2!Positionsnummer)
+            rs1!ArtikelID = Nz(Rs2!ArtikelID)
+            rs1!StuecklistenID = Nz(Rs2!StuecklistenID)
+            '######## erstellen des Suchstring für den Stücklistenstatus ###########
+            'OR anhängen für Mehrfachauswahl
+            If StrSqlS <> "" Then StrSqlS = StrSqlS & " OR"
+            StrSqlS = StrSqlS & "(tblStueckliste.ID_Nummer)=" & Nz(Rs2!StuecklistenID)
+            
+            rs1!BestellungID = Nz(Rs2!StuecklistenID)
+            rs1!ProjektbeschreibungID = Nz(Rs2!ProjektbeschreibungID)
+            'In der Tabelle Status wird der Status nachgetragen
+            Select Case BelArt
+                Case "Anfrage"
+                    mPS.StatusNeu Rs2!StuecklistenID, 23, lonBN, "frmAnfragenBestellungen", "modNavi-Anfrage"
+                Case "Bestellung"
+                    mPS.StatusNeu Rs2!StuecklistenID, 43, lonBN, "frmAnfragenBestellungen", "modNavi-Bestellung"
+                Case Else
+                    mPS.StatusNeu Rs2!StuecklistenID, 222, lonBN, "frmAnfragenBestellungen", "modNavi-?? Err"
+            End Select
+            
+'            If Rs4.Updatable Then 'IF 4
+'                Rs4.AddNew
+'                Rs4!ID_Nummer = Nz(Rs2!StuecklistenID)
+'                Rs4!DokumentNummer = lonBN
+'                Rs4!DokumentFormular = "frmAnfragenBestellungen"
+'                If BelArt = "Anfrage" Then
+'                    Rs4!Status = "angefragt"
+'                    Rs4!StatusNr = 23
+'                End If
+'                If BelArt = "Bestellung" Then
+'                    Rs4!Status = "bestellt"
+'                    Rs4!StatusNr = 43
+'                End If
+'                Rs4!Dat_Status = Date + Time
+'                Rs4!Benutzer = Benutzer
+'                Rs4.Update
+'            End If 'IF 4
+            rs1.Update
+            Rs2.MoveNext
+        Loop 'Loop Do Until
+        rs1.Close
+        Set rs1 = Nothing
+        Rs2.Close
+        Set Rs2 = Nothing
+
+        
+    'In der Stückliste wird der Status angepasst
+    Set rs1 = CurrentDbC.OpenRecordset(" SELECT tblStueckliste.ID_Nummer, tblStueckliste.Status, tblStueckliste.Besteller " & _
+        "FROM tblStueckliste " & _
+        "WHERE " & StrSqlS & ";") '(tblStueckliste.ID_Nummer)=4013 Or (tblStueckliste.ID_Nummer)=4014 Or (tblStueckliste.ID_Nummer)=4049;
+    Do Until rs1.EOF
+        rs1.Edit
+        If BelArt = "Anfrage" Then
+            rs1!Status = 23
+        End If
+        If BelArt = "Bestellung" Then
+            rs1!Status = 43
+        End If
+        rs1!Besteller = Benutzer
+        rs1.Update
+        rs1.MoveNext
+    Loop
+    Else
+        MsgBox ("Es ist kein Datensatz zum kopieren vorhanden")
+        Rs2.Close
+        Set Rs2 = Nothing
+        GoTo Ende_fun
+    End If
+End If 'IF1
+
+funNeuerBeleg = lonBN
+GoTo Ende_fun
+
+Exit Function
+Err_fun:
+        MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure TasteNeuerBeleg_Click of VBA Dokument Form_frmStueckliste"
+Ende_fun_Err:
+    funNeuerBeleg = 0
+Ende_fun:
+
+    Set rs1 = Nothing
+    Set Rs2 = Nothing
+    Set Rs3 = Nothing
+
+End Function
+
+Public Function funStueckliste(ProNr As Long) As Long
+'Beim erstellen einer neuen Stückliste wird der erste Eintrag erstellt
+Dim stDocName As String
+Dim stLinkCriteria As String
+Dim rs1 As DAO.Recordset
+Dim sP1 As Long
+Dim lonID As Long
+Dim lonSp1 As Long
+Dim strSql As String
+ 
+
+If ProNr <> 0 Then '[IF 1]
+    'Es wird nachgeschaut ob es schon eine Stückliste zu disem Projekt gibt
+    strSql = "SELECT Projektnummer " & _
+    "FROM tblStueckliste WHERE (((tblStueckliste.Projektnummer) =" & ProNr & "))"
+    Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+    sP1 = rs1.RecordCount
+    rs1.Close
+    Set rs1 = Nothing
+    If sP1 <> 0 Then '[IF 2]
+        'Wenn Stückliste vorhanden abbrechen Nummr zurückgeben
+        funStueckliste = ProNr
+    Else
+    'Wenn kein Stückliste gibt fragen ob Einkaufsliste/Stückliste erstellen
+        Select Case MsgBox("Zu diesem Projekt gibt es keine Einkaufsliste!" _
+        & vbCrLf & "Wollen Sie eine neue Einkaufsliste erstellen?" _
+        , vbYesNoCancel + vbExclamation + vbDefaultButton1, " Einkaufsliste erstellen")
+        Case vbYes
+            'Ersten Datensatz der Einkaufsliste anlegen
+            
+            strSql = "SELECT * FROM tblStueckliste WHERE False"
+            Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+            rs1.AddNew    'Neuen Datensatz anlegen
+                rs1!Projektnummer = ProNr
+                rs1!Angelegt_von = PS.User.Kurzzeichen()
+                rs1!Besteller = PS.User.Kurzzeichen()
+                rs1!Angelegt_am = Now
+                rs1!GF_Bezeichnung = "1) Artikel eingeben"
+                rs1!Status = 14
+            
+            
+            'Die Auftragsnummer wird gesucht
+            lonSp1 = funAufNrPro(ProNr)
+            'Es gibt einen Auftrag der wird zugewiesen
+            If lonSp1 > 0 Then rs1!AufNr = lonSp1
+            'Es gibt keinen Auftrag
+            If lonSp1 <= 0 Then rs1!AufNr = 0
+            rs1!Lieferant_Adress_Nr = Nz(DLookup("AdressNr", "tblAdressen", ""), 0)
+            
+            rs1.Update
+            rs1.Close
+            Set rs1 = Nothing
+            lonID = funLetzteDatensatzNr("tblStueckliste", "ID_Nummer")
+            funStueckliste = ProNr
+            
+            mPS.StatusNeu lonID, 14, 0, "", "modNaviFunSt"
+            
+
+        
+        Case vbNo
+            Exit Function
+        Case vbCancel
+            Exit Function
+        End Select
+    End If '[If2]
+End If '[If1]
+
+
+End Function
+
+
+
+Public Function funTerminplanProjekt(ProNr As Long) As Long
+'on error Goto Err_imFun
+
+Dim stDocName As String
+Dim stLinkCriteria As String
+Dim rs1 As DAO.Recordset
+Dim sP1 As Long
+ 
+If ProNr <> 0 Then '[IF 1]
+    'Es wird nachgeschaut ob es schon eine Stückliste zu disem Projekt gibt
+    Set rs1 = CurrentDbC.OpenRecordset("SELECT ProNr " & _
+    "FROM tblTerminplaeneProAuf WHERE (((tblTerminplaeneProAuf.ProNr) =" & ProNr & "))")
+    sP1 = rs1.RecordCount
+    rs1.Close
+    Set rs1 = Nothing
+    If sP1 <> 0 Then '[IF 2]
+        'Wenn Projektzeitplan vorhanden abbrechen Nummr zurückgeben
+        funTerminplanProjekt = ProNr
+    Else
+    'Wenn kein Stückliste gibt fragen ob Stückliste
+        Select Case MsgBox("Zu diesem Projekt gibt es keinen Terminplan!" _
+        & vbCrLf & "Wollen Sie eine neue Terminplan erstellen?" _
+        , vbYesNoCancel + vbExclamation + vbDefaultButton1, "Stückliste erstellen")
+        Case vbYes
+            Set rs1 = CurrentDbC.OpenRecordset("tblTerminplaeneProAuf")
+            rs1.AddNew    'Neuen Datensatz anlegen
+            rs1!ProNr = ProNr
+            rs1!AufNr = 0
+            rs1.Update
+            rs1.Close
+            Set rs1 = Nothing
+            funTerminplanProjekt = ProNr
+            funProjektNummer (ProNr)
+            varAufNr = 0
+            Case vbNo
+            Exit Function
+        Case vbCancel
+            Exit Function
+        End Select
+    End If '[If2]
+End If '[If1]
+
+Exit_err_imFun:
+    Exit Function
+Err_imFun:
+    MsgBox Err.Description
+    funTerminplanProjekt = 0
+    Resume Exit_err_imFun
+End Function

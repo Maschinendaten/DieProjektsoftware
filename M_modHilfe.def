@@ -1,0 +1,124 @@
+Option Compare Database
+Option Explicit
+Public gloLonHilfID As Long
+
+Public Function HilfeSuchen(strNameForm As String, strBezImForm As String, Optional HilfsID As Long)
+'--------------- 15.07.2004  MG ------------------------
+'Die Funktion öffnet die Hilfe oder legt eine neue an wenn
+'Es zu dem Formular bzw. zu dem feld keine Hilfe gibt
+'es wird benötigt die Tabelle "tblHilfe"
+
+Dim rs1 As DAO.Recordset
+Dim StrWhere As String
+Dim strHilfID As String
+Dim sSql As String
+Dim wshshell As Object
+
+Dim HelpID As Long
+
+    
+    sSql = "SELECT * FROM tblHilfe WHERE strNameForm = '" & strNameForm & "'"
+    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    
+    With rs1
+        If .EOF Then
+            'Kein Datensatz neu anlege
+            .AddNew
+                .Fields("strNameForm").Value = strNameForm
+                HelpID = .Fields("HilfID").Value
+            .Update
+            
+        Else
+            'Daten auslese
+            HelpID = .Fields("HilfID").Value
+        
+        End If
+    End With
+    
+    
+    'öffne Webseit
+    funWebHilfe HelpID
+    
+    
+    Exit Function
+    
+'      'Wenn Datensatz vorhanden Hilfe anzeigen
+'    If Nz(Rs1.RecordCount) = 1 Then
+'        Rs1.Edit
+'       Rs1!lonStat = Nz(Rs1!lonStat) + 1
+'       strHilfID = Nz(Rs1!HilfID)
+'       Rs1.Update
+'       Rs1.Close
+'
+'          End If
+'
+'   Rs1.Close
+'   Set Rs1 = Nothing
+'
+''Nochmal nachfragen wenn keine Hilfe da neue erstellt werden soll
+'   If MsgBox("Für das Feld " & strBezImForm & " im Form " & strNameForm & " gibt es keine Hilfe" & vbCrLf & _
+'          "Wollen Sie eine Hilfe deffinieren?" _
+'          , vbYesNo + vbQuestion + vbDefaultButton2, "Sicherheitsabfrage") = vbNo Then
+'       Exit Sub
+'   End If
+'
+'   strSql = "tblHilfe"
+'   Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+'
+'       Rs1.AddNew
+'       Rs1!strBezImForm = strBezImForm
+'      Rs1!strNameForm = strNameForm
+'      Rs1!memBesch1 = "Mit diesem Feld..."
+'       Rs1!GeaendertAm = Now
+'     gloLonHilfID = Nz(Rs1!HilfID) 'Hilfs ID zuweissen
+'       Rs1.Update
+'      Rs1.Close
+'  Set Rs1 = Nothing
+'
+'   StrWhere = ""
+'
+'  DoCmd.OpenForm "frmHilfe", , , StrWhere
+
+
+End Function
+
+Function funLonHilfID() As Long
+10        funLonHilfID = gloLonHilfID
+End Function
+
+Public Function funHilfeF1()
+    'on error Goto Err_
+      'Sucht in der Datenbank nach der Hilfe zu dem Formular
+      Dim frm As Form
+      Dim ctl As Control
+     Dim sC As String
+     
+     On Error Resume Next
+10    Set frm = Screen.ActiveForm
+      'Könnte eine Hilfe zu einem speziellen Feld erzeugen in dem man sich befindet
+'        For Each ctl In frm.ActiveControl.Controls
+'            MsgBox (frm.Name & " " & frm.ActiveControl)
+'        Next
+'
+        'MsgBox (frm.Name & " " & frm.ActiveControl.Name)
+        
+        'Stop
+        'Exit Function
+        sC = frm.ActiveControl.Name
+        
+20    Call HilfeSuchen(frm.Name, sC) 'Die Funktion Hilfe wird gestartet ohne eine spezielle position auf dem Form aus zu wählen
+
+End Function
+
+
+
+Public Sub funWebHilfe(LinkAdresse As Long)
+Dim wshshell As Object
+Dim s1 As String
+
+        Set wshshell = CreateObject("WScript.Shell")
+        
+        s1 = "www.help.DieProjektSoftware.de/" & LinkAdresse
+        
+        wshshell.Run s1
+End Sub

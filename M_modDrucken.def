@@ -1,0 +1,811 @@
+Option Compare Database
+Option Explicit
+
+
+Enum EnumPosition
+    Links = 1
+    Mitte = 2
+    Recht = 3
+End Enum
+
+
+Public gloAWDrucker As Long
+Public gloAWStrBericht As String
+
+Public strDruckerMerken As String
+Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+
+'----------- Von Microsoft Text in Zwischenablage ---------------------
+Declare PtrSafe Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) _
+   As Long
+Declare PtrSafe Function GlobalLock Lib "kernel32" (ByVal hMem As Long) _
+   As Long
+Declare PtrSafe Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, _
+   ByVal dwBytes As Long) As Long
+Declare PtrSafe Function CloseClipboard Lib "user32" () As Long
+Declare PtrSafe Function OpenClipboard Lib "user32" (ByVal Hwnd As Long) _
+   As Long
+Declare PtrSafe Function EmptyClipboard Lib "user32" () As Long
+
+#If VBA7 Then
+    '64 Bit
+    Private Declare PtrSafe Function GetSystemDirectoryA Lib "kernel32" _
+       (ByVal lpBuffer As String, ByVal nSize As Long) As Long
+'    public Declare PtrSafe Function lstrcpy Lib "kernel32" (ByVal lpString1 As Any, _
+'       ByVal lpStrin g2 As Any) As Long
+#Else
+    '32 Bit
+    public Declare PtrSafe Function lstrcpy Lib "kernel32" (ByVal lpString1 As Any, _
+       ByVal lpStrin g2 As Any) As Long
+#End If
+
+
+Declare PtrSafe Function SetClipboardData Lib "user32" (ByVal wFormat _
+   As Long, ByVal hMem As Long) As Long
+
+Public Const GHND = &H42
+Public Const CF_TEXT = 1
+Public Const MAXSIZE = 4096
+
+
+'**************************************
+'Windows API/Global Declarations for :Cr
+'     eate PDF from MS Access Report
+'**************************************
+
+
+Declare PtrSafe Function RegEnumValue Lib "advapi32.dll" Alias "RegEnumValueA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpValueName As String, lpcbValueName As Long, ByVal lpReserved As Long, lpType As Long, ByVal lpData As String, lpcbData As Long) As Long
+Declare PtrSafe Function RegOpenKeyEx Lib "advapi32" Alias "RegOpenKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
+Declare PtrSafe Function RegSetValueEx Lib "advapi32" Alias "RegSetValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal Reserved As Long, ByVal dwType As Long, ByVal szData As String, ByVal cbData As Long) As Long
+Declare PtrSafe Function RegCloseKey Lib "advapi32" (ByVal hKey As Long) As Long
+Declare PtrSafe Function RegCreateKeyEx Lib "advapi32" Alias "RegCreateKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal Reserved As Long, ByVal lpClass As String, ByVal dwOptions As Long, ByVal samDesired As Long, lpSecurityAttributes As SECURITY_ATTRIBUTES, phkResult As Long, lpdwDisposition As Long) As Long
+    #If Win32 Then
+        Public Const HKEY_CLASSES_ROOT = &H80000000
+        Public Const HKEY_CURRENT_USER = &H80000001
+        Public Const HKEY_LOCAL_MACHINE = &H80000002
+        Public Const HKEY_USERS = &H80000003
+        Public Const KEY_ALL_ACCESS = &H3F
+        Public Const REG_OPTION_NON_VOLATILE = 0&
+        Public Const REG_CREATED_NEW_KEY = &H1
+        Public Const REG_OPENED_EXISTING_KEY = &H2
+        Public Const ERROR_SUCCESS = 0&
+        Public Const REG_SZ = (1)
+    #End If
+Type SECURITY_ATTRIBUTES
+    nLength As Long
+    lpSecurityDescriptor As Long
+    bInheritHandle As Boolean
+    End Type
+'**************************************
+' Name: Create PDF from MS Access Report
+'
+' Description:On a machine where the Ado
+'     be PDFWriter is installed, the current p
+'     rinter is swapped out with the PDFWriter
+'     and the PDF file is created. The origina
+'     l printer is then restored.
+' By: Todd Benson
+'
+'
+' Inputs:rptName = Microsoft Access repo
+'     rt name you want to create pdf from. sPD
+'     FPath = the directory path where you wan
+'     t to create the pdf file (ex. - "c:\data
+'     \"). sPDFName = the name of the pdf file
+'     you are wanting to create (ex. - "file00
+'     1.pdf").
+'
+' Returns:None
+'
+'Assumes:This code is easily modified to
+'     be used in other programs
+'
+'Side Effects:Please use the most recent
+'     installs of Adobe Exchange or PDFWriter
+'     to ensure proper functionality.
+'This code is copyrighted and has limite
+'     d warranties.
+'Please see http://www.Planet-Source-Cod
+'     e.com/xq/ASP/txtCodeId.35321/lngWId.1/qx
+'     /vb/scripts/ShowCode.htm
+'for details.
+'**************************************
+
+#Const gloOutlookEin = 1    'Wenn 1 wird bei der Kompilierung Otlook mit eingebunden
+                            'Es muss unter extras Verweise MS Outlook eingebunden sein
+
+Public Function bGetRegValue(ByVal hKey As Long, ByVal sKey As String, ByVal sSubKey As String) As String
+    Dim lResult As Long
+    Dim phkResult As Long
+    Dim dwReserved As Long
+    Dim szBuffer As String
+    Dim lBuffSize As Long
+    Dim szBuffer2 As String
+    Dim lBuffSize2 As Long
+    Dim lIndex As Long
+    Dim LType As Long
+    Dim sCompKey As String
+    Dim bFound As Boolean
+    lIndex = 0
+    lResult = RegOpenKeyEx(hKey, sKey, 0, 1, phkResult)
+
+
+    Do While lResult = ERROR_SUCCESS And Not (bFound)
+        szBuffer = Space(255)
+        lBuffSize = Len(szBuffer)
+        szBuffer2 = Space(255)
+        lBuffSize2 = Len(szBuffer2)
+        lResult = RegEnumValue(phkResult, lIndex, szBuffer, lBuffSize, dwReserved, LType, szBuffer2, lBuffSize2)
+
+
+        If (lResult = ERROR_SUCCESS) Then
+            sCompKey = Left(szBuffer, lBuffSize)
+
+
+            If (sCompKey = sSubKey) Then
+                bGetRegValue = Left(szBuffer2, lBuffSize2 - 1)
+                RegCloseKey phkResult
+                Exit Function
+            End If
+        End If
+        lIndex = lIndex + 1
+    Loop
+    RegCloseKey phkResult
+End Function
+
+
+Public Function bSetRegValue(ByVal hKey As Long, ByVal lpszSubKey As String, ByVal sSetValue As String, ByVal sValue As String) As Boolean
+    On Error Resume Next
+    Dim phkResult As Long
+    Dim lResult As Long
+    Dim SA As SECURITY_ATTRIBUTES
+    Dim lCreate As Long
+    RegCreateKeyEx hKey, lpszSubKey, 0, "", REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, SA, phkResult, lCreate
+    lResult = RegSetValueEx(phkResult, sSetValue, 0, REG_SZ, sValue, CLng(Len(sValue) + 1))
+    RegCloseKey phkResult
+    bSetRegValue = (lResult = ERROR_SUCCESS)
+End Function
+
+
+Public Function RunReportAsPDF(RptName As String, sPDFPath As String, sPDFName As String)
+    '---------------------------------
+    'rptName = Microsoft Access report name
+    '     you
+    'want to create pdf from
+    'sPDFPath = the directory path where you
+    '     want
+    
+    'to create the pdf file (ex. - "c:\data\
+    '     ")
+    'sPDFName = the name of the pdf file you
+    '     are
+    'wanting to create (ex. - "file001.pdf")
+    '
+    '---------------------------------
+    Dim sMyDefPrinter As String
+    'on error Goto Err_
+    'Save current default printer
+    sMyDefPrinter = bGetRegValue(HKEY_CURRENT_USER, "Software\Microsoft\WIndows NT\CurrentVersion\Windows", "Device")
+    ' Set default printer to PDF Writer
+    bSetRegValue HKEY_CURRENT_USER, "Software\Microsoft\Windows NT\CurrentVersion\Windows", "Device", "Acrobat PDFWriter"
+    'Setting value for PDFFileName in the re
+    '     gistry stops file dialog box from appear
+    '     ing
+    bSetRegValue HKEY_CURRENT_USER, "Software\Adobe\Acrobat PDFWriter", "PDFFileName", sPDFPath + sPDFName
+    'Run the report
+
+
+    DoCmd.OpenReport RptName, acViewNormal
+Exit_:
+        ' Restore default printer
+        bSetRegValue HKEY_CURRENT_USER, "Software\Microsoft\WIndows NT\CurrentVersion\Windows", "Device", sMyDefPrinter
+        Exit Function
+Exit Function
+Err_:
+MsgErr "RunReportAsPDF", "modDrucken", Err.Description, Err.Number, Erl()
+Resume Exit_
+End Function
+
+'Orginal Bezeichnung Function ClipBoard_SetData(MyString As String)
+
+Function funCopyInZwischenablage(MyString As String)
+   Dim hGlobalMemory As Long, lpGlobalMemory As Long
+   Dim hClipMemory As Long, X As Long
+
+Exit Function
+Stop  'Hier ein Fehler ##64Bit
+
+
+   ' Allocate moveable global memory.
+   '-------------------------------------------
+   hGlobalMemory = GlobalAlloc(GHND, Len(MyString) + 1)
+
+   ' Lock the block to get a far pointer
+   ' to this memory.
+   lpGlobalMemory = GlobalLock(hGlobalMemory)
+
+   ' Copy the string to this global memory.
+   lpGlobalMemory = lstrcpy(lpGlobalMemory, MyString)
+
+   ' Unlock the memory.
+   If GlobalUnlock(hGlobalMemory) <> 0 Then
+      MsgBox "Could not unlock memory location. Copy aborted."
+      GoTo OutOfHere2
+   End If
+
+   ' Open the Clipboard to copy data to.
+   If OpenClipboard(0&) = 0 Then
+      MsgBox "Could not open the Clipboard. Copy aborted."
+      Exit Function
+   End If
+
+   ' Clear the Clipboard.
+   X = EmptyClipboard()
+
+   ' Copy the data to the Clipboard.
+   hClipMemory = SetClipboardData(CF_TEXT, hGlobalMemory)
+
+OutOfHere2:
+
+   If CloseClipboard() = 0 Then
+      MsgBox "Could not close Clipboard."
+   End If
+
+   End Function
+
+
+
+
+
+Function funDruckerWechseln(strneuerDrucker As String) As String
+'drucker auflisten
+Dim prtLoop As Printer
+Dim strSp As String
+Dim strDruckername As String
+Dim BolOk As Boolean
+Dim rs1 As DAO.Recordset
+
+If strneuerDrucker = "" Then
+    funDruckerWechseln = "Der gewählte Drucker ist nicht zugewiesen."
+    Exit Function
+End If
+
+'Markierten Datensatz aus Tabelle lesen und zuweisen
+Set rs1 = CurrentDbC.OpenRecordset("SELECT tblIni.* " & _
+                                  "FROM tblIni " & _
+        "WHERE (tblIni.Kennung like '" & strneuerDrucker & "');")
+        
+If rs1.RecordCount <> 0 Then
+    strDruckername = rs1!Wert2
+    rs1.Close
+    Set rs1 = Nothing
+Else
+    funDruckerWechseln = "Der Drucker ist nicht Datenbank."
+    Exit Function
+    rs1.Close
+    Set rs1 = Nothing
+End If
+
+For Each prtLoop In Application.Printers
+    With prtLoop
+        strSp = .DeviceName
+        If strSp = strDruckername Then BolOk = True
+    End With
+Next prtLoop
+
+If Not BolOk Then
+    funDruckerWechseln = "Der gewählte Drucker ist auf Ihrem System nicht installiert."
+    Exit Function
+End If
+
+' Aktuellen Standard Drucker merken
+strDruckerMerken = Application.Printer.DeviceName
+        
+'Neuen Drucker setzen (Name aus Systemsteuerung Drucker)
+Application.Printer = Application.Printers(strDruckername)
+
+'Drucken des Forms auf den Application Standarddrucker
+''
+
+End Function
+
+Function funDruckerVorher() As String
+
+
+
+'on error Goto Err_
+If Nz(strDruckerMerken) = "" Then
+    funDruckerVorher = "Zum alten Drucker kann nicht gewechselt werden!"
+    MsgBox (funDruckerVorher)
+    Exit Function
+End If
+
+'Alten Standard Drucker einstellen
+Application.Printer = Application.Printers(strDruckerMerken)
+
+
+Exit Function
+
+Exit_:
+Exit Function
+Err_:
+MsgErr "funDruckerVorher", "modDrucken", Err.Description, Err.Number, Erl()
+Resume Exit_
+End Function
+
+'Email an Kontakt senden
+'leicht abgewandelte Kopie aus der MS Auto97.hlp
+'Microsoft otlook 10.0 Objektlibary
+
+Function funSendEMail(strEMailEmpfaenger As String, _
+                        strBetreff As String, _
+                        strAnrede As String, _
+                        strText As String, _
+                        strAnhang As String, _
+                        lonNrBenutzer As Long)
+
+'Beep
+
+#If gloOutlookEin = 1 Then ' Bedingte kompilierung
+
+Dim sP1 As String
+Dim objOutlook As Object 'Outlook.Application
+Dim objOutlookMsg As Object 'Outlook.MailItem
+Dim objOutlookRecip As Object 'Outlook.Recipient
+Dim objOutlookAttach As Object 'Outlook.Attachment
+Dim rs1 As DAO.Recordset
+'Variablen für die Übergabe
+Dim varEmpf    'An:
+Dim varCC      'CC:
+Dim varBCC     'BCC:
+Dim varNachricht
+Dim varATT     'Dateipfad zum Attachment
+Dim strSchlusstext As String
+
+On Error GoTo Err_
+
+'Änderung 14.1.2006 Late binding für Otlook
+'Set objOutlook = CreateObject("Outlook.Application")
+
+
+If Nz(strAnhang) = "" Then 'Hier könnte der Dateinamen des Anhangs ausgewertet werden
+    strAnhang = ""
+End If
+'Der dem Benutzer zugeordnete Schlusstext wir ausgelesen
+Set rs1 = CurrentDbC.OpenRecordset("SELECT tblAdressenPersonal.AdressNr, tblAdressenPersonal.BriefAnhang " & _
+    "FROM tblAdressenPersonal " & _
+    "WHERE (((tblAdressenPersonal.AdressNr)= " & lonNrBenutzer & "));")
+    If rs1.RecordCount <> 0 Then
+        strSchlusstext = Nz(rs1!BriefAnhang)
+    End If
+    rs1.Close
+    Set rs1 = Nothing
+
+'Es wird der Text generiert Anrede untersucht
+        sP1 = strText & strSchlusstext
+
+    'Die beiden Werden zugewisen
+    gloStrEMailAn = ""
+    gloStrEMailCC = ""
+'Empfanger zuweisen
+    If Nz(strEMailEmpfaenger) = "" Then
+        DoCmd.OpenForm "NaviEMail", , , , , acDialog, strEMailEmpfaenger
+        strEMailEmpfaenger = gloStrEMailAn
+    Else
+        gloStrEMailAn = strEMailEmpfaenger
+        If msgJaNein("Sie haben als E-Mail Empfänger die Adresse " & vbCrLf & "'" & strEMailEmpfaenger & "'" & vbCrLf & "angegeben wollen Sie diese ergänzen oder ändern?") Then
+        DoCmd.OpenForm "NaviEMail", , , , , acDialog, strEMailEmpfaenger
+        strEMailEmpfaenger = gloStrEMailAn
+        End If
+    End If
+    varEmpf = gloStrEMailAn
+    varCC = gloStrEMailCC
+    varBCC = ""
+    'varBetreff = "GF " + Me!BelegArt + "-" + Me!Belegbezeichnung + " " + Me!Betreff
+    varNachricht = sP1
+    'Hier entscheiden Sie zwischen fest codiert und Pfadübergabe
+    'varATT = Me!Kopftext  'Pfad-Übergabe
+    varATT = strAnhang 'Anhang
+    ' Create the Outlook session.
+    Set objOutlook = CreateObject("Outlook.Application")
+    ' Create the message.
+    Set objOutlookMsg = objOutlook.CreateItem(0)  '(olMailItem)
+    With objOutlookMsg
+        'Die Variablen: olTo, olCC, olBCC wurden oben festgelegt!
+         ' Add the To recipient(s) to the message.
+         'set objOutlookRecip = varEmpf '.Recipients.Add(varEmpf)
+          .To = varEmpf
+          'objOutlookRecip.type = 1  'olTo
+         ' Add the CC recipient(s) to the message.
+         If varCC <> "" Then
+            Set objOutlookRecip = .Recipients.Add(varCC)
+            objOutlookRecip.Type = 2 'olCC
+         End If
+        ' Add the BCC recipient(s) to the message.
+'         Set objOutlookRecip = .Recipients.Add(varBCC)
+'         objOutlookRecip.Type = 3 'olBCC
+        ' Set the Subject, Body, and Importance of the message.
+        .Subject = strBetreff
+        .body = varNachricht      'Nur Text
+        '.HTMLBody = Nachricht   'HTML-Format
+        .Categories = "Info"
+        'Abstimmungs-Schaltflächen
+        '.VotingOptions = "Stimme zu!;Lehne ab!; Ist mir Wurscht!"
+        '.Importance = olImportanceHigh  'Dringlichkeit: Hoch
+        ' Ein Attachment zur Mail hinzufügen.
+        If Len(Trim(Nz([varATT]))) <> 0 Then 'Falls gar nichts ausgewählt
+          If strText <> "(Keine)" Then    'Falls File-Dialog abgebrochen gibt er (Keine) zurück.
+            Set objOutlookAttach = .Attachments.Add(varATT)
+          End If
+        End If
+        ' Empfängernamen überprüfen.
+       ' For Each objOutlookRecip In .Recipients
+        '    objOutlookRecip.Resolve
+        'Next
+        ' Nachricht vor dem Senden anzeigen?
+        .Display
+        '.Send
+    'Jetzt löschen wir den Inhalt des Datei-Anhang Feldes (ATT_Pfad)
+    'damit wieder mit leerem Feld begonnen wird.
+    'Me.ATT_Pfad.Value = ""
+  End With
+
+Exit Function
+'Fehler Behandlung
+
+Err_:
+    If Err.Number = -2113732605 Then
+       If modAbfrage("Otlook muss geöffnet sein." & vbCrLf & "Wollen Sie Otlook öffnen?") Then
+         Shell "C:\Programme\Microsoft Office\Office10\OUTLOOK.EXE /recycle", vbMinimizedNoFocus
+         Exit Function
+       Else
+         Exit Function
+       End If
+    End If
+    MsgErr "modDruck", "funSendEMail", Err.Description, Err.Number, Erl()
+
+#End If  ' Ender der Bedingten kompilierung
+
+End Function
+
+'Fragt beim drucken ohne Logo nach
+Function funDruckLogo(bolLogoEin As Boolean) As Boolean
+
+
+If bolLogoEin <> True Then
+    If msgJaNein("Wollen sie ohne LOGO drucken." & vbCrLf & _
+    "Bitte legen Sie das spezielle Papier in den Drucker.") = True Then
+        funDruckLogo = True
+    Else
+        funDruckLogo = False
+    End If
+Else
+    funDruckLogo = True
+End If
+
+End Function
+
+Public Function funDruck(frmForm As Form, strBerichtVorgabe As String, Optional exact As Boolean, Optional Preview As Boolean)
+
+'Neu 2018.07.13 noch in Production
+'-exact As Boolean 'Wenn es nur einen Namen gibt wird dieser direkt verwendet, frmdrucken wird nichtmehr benötigt
+'-Preview As Boolean 'Die Anzeige erfolgt als preview gedacht um eine Live voransicht zu geben.
+
+
+'Druckt die Berichte auf den verschiedenen Geräten
+'1) direkt drucken Standarddrucker
+'2) als Voransicht
+'3) als PDF`
+'4) als E-Mail
+'5) als Fax
+'6) an Drucker Nr2
+
+Dim strSp1 As String
+Dim strSp2 As String
+Dim strBericht As String
+
+Dim bolret As Boolean
+Dim strMeldung As String
+Dim lonNr As Long
+Dim bolHupf As Boolean
+
+'Wenn kein Betreff eigegeben wurde gibt es eine Meldung
+'On Error GoTo Err_
+
+    'löschen damit wenn Funktion nochmal aufgerufen wird nicht der Alte Bericht gewählt wird
+    gloAWStrBericht = ""
+    'Änderung am 10.11.2006 Möglichkeit verschiedene Berichte aus zu wählen
+    'Änderung immer mit * auswählen dann könne alle viele Berichte angucken 8.12.2006
+        
+    DoCmd.OpenForm "frmdrucken", , , , , acDialog, strBerichtVorgabe & "*"  'Hier wird nachgeschaut ob ein Mandant besteht und wenn ja wird das Form sofort wieder geschlossen
+    lonNr = gloAWDrucker
+    'Wenn keine Auswahl getroffen wurde Funktion beenden
+    If Nz(lonNr) = 0 Then Exit Function
+    
+    'Mit Preview kann eine Vorauswahl getroffen werden
+    If Preview Then
+        lonNr = 2 'Parametre überstimmt auswahl
+    Else
+'        DoCmd.OpenForm "frmdrucken", , , , , acDialog, strBerichtVorgabe & "*"  'Hier wird nachgeschaut ob ein Mandant besteht und wenn ja wird das Form sofort wieder geschlossen
+'        lonNr = gloAWDrucker
+'        'Wenn keine Auswahl getroffen wurde Funktion beenden
+'        If Nz(lonNr) = 0 Then Exit Function
+    End If
+    
+    
+    'Wenn der Globalen Variablen ein Bericht zugewiesen wurde wird dieser ausgewählt
+    'Diese Funktion ermöglicht über das FRMDrucken mehrer Berichte zu zu weisen
+    If Nz(gloAWStrBericht) <> "" Or Not exact Then
+        strBericht = gloAWStrBericht
+    Else
+        strBericht = strBerichtVorgabe
+    End If
+    
+
+    'Wenn Betreff in dem Form nicht vorhanden nicht prüfen
+    If FieldInFormExists(frmForm, "Betreff") Then
+        
+        If Nz(frmForm.Betreff, "") = "" Then
+            MsgBox LA("Bitte geben Sie einen Betreff ein um den Beleg leichter zu finden!")
+            Exit Function
+        End If
+        'Das Datum wir vor dem öffnen des Berichtes in die Datenfelder geschrieben
+        If IsNull(frmForm.Erstelldatum) Then frmForm.Erstelldatum = Date
+        If IsNull(frmForm.Wiedervorlagedatum) Then frmForm.Wiedervorlagedatum = frmForm.Erstelldatum + 10
+        
+        'vor dem Öffnen die Daten nochmals Aktualisieren
+        frmForm.Refresh
+        
+        strSp1 = frmForm.BelegArt & frmForm!Belegbezeichnung & "-" & frmForm.Rufname & "-" & Format(Now, "yyMMdd")
+        'Kopiert Bezeichnung in die Zwischenablage für den Ausdruck als PDF
+        funCopyInZwischenablage (strSp1)
+        gloLonBelegNr = Val(Nz(frmForm.BelegNr))
+            
+        If gloLonBelegNr = 0 Then Exit Function
+        Screen.MousePointer = 0
+    End If
+    
+    
+
+    If bolHupf = True Then strSp1 = "Ausdruck-" & Format(Now, "YYMMDD hhnnss")
+    strSp2 = funDirPDF & "\" & strSp1 & ".pdf"
+    
+    Select Case lonNr
+        Case 1 'Direkt am Standarddrucker
+            DoCmd.OpenReport strBericht, acViewNormal, , , acWindowNormal, strSp1
+        Case 2 'Als Voransicht
+            DoCmd.Close acReport, strBericht, acSaveYes
+            DoCmd.OpenReport strBericht, acViewPreview, , , acWindowNormal, strSp1
+        Case 3 'Als PDF
+                'Speichern auf Temporären Verzeichnis
+                'bolret = ConvertReportToPDF(strBericht, _
+                'vbNullString, strSp2, False, True, 0, "", "", 0, 0)
+                'Funktioniert ab Access 2010
+                DoCmd.OutputTo acOutputReport, strBericht, acFormatPDF, CurrentProject.Path & " ptArtikel_2007_2010_Alle.pdf"
+                
+                
+        Case 4 'als E-Mail
+                'Speichern in Temp Verzeichnis
+                'bolret = ConvertReportToPDF(strBericht, vbNullString, strSp2, False, False, 0, "", "", 0, 0)
+                'E-Mail senden
+                If strBericht = "berKurzbrief" Then
+                    'Wenn Kurzbrief Textstück drucken als E-Mailtext
+                    strMeldung = funSendEMail(Nz(frmForm.[E-Mail]), strSp1, frmForm.Anrede & " " & frmForm.Vorname & " " & frmForm.Nachname, Nz(frmForm.Textstück), strSp2, funBenutzerNr())
+                Else
+                    'Wenn <>Kurzbrief Kopftext drucken als E-Mailtext
+                    If bolHupf = True Then
+                    strMeldung = funSendEMail("", strSp1, "", "", strSp2, funBenutzerNr())
+                    Else
+                    'strSp2 = ""
+                    strMeldung = funSendEMail(Nz(frmForm.[E-Mail]), strSp1, frmForm.Anrede & " " & frmForm.Vorname & " " & frmForm.Nachname, Nz(frmForm.Kopftext), strSp2, funBenutzerNr())
+                    End If
+                End If
+        Case 5 'als Fax
+        
+            If Nz(frmForm.Fax) = "" Then
+                MsgBox ("Sie müssen eine Fax Nummer eingeben.")
+                Exit Function
+            End If
+            'Fax Drucker zuweisen
+            strMeldung = funDruckerWechseln("FAX")
+            If strMeldung <> "" Then
+                MsgErr "modDRuck", "funDruck Fax senden", strMeldung, 1, 1
+                Exit Function
+            End If
+            'Druck senden
+            DoCmd.OpenReport strBericht, acViewNormal, , , acDialog, strSp1
+            
+            funDruckerVorher
+            'Kopiert Fax Nummer in Zwischenablage
+            funCopyInZwischenablage (frmForm.Fax)
+        Case 6 'Drucker Nr 2
+        
+        Case 10 'in der Entwurfsansicht öffnen
+            DoCmd.OpenReport strBericht, acViewPreview
+            
+            
+        Case Else
+            Exit Function
+    End Select
+
+
+'ErrEx.CallGlobalErrorHandler
+
+
+End Function
+
+
+
+Function berichtMandant(sBerichtname As String) As String
+'Die Funktion sucht ob es den Bericht gibt.
+'Ist ein Mandant festgelegt wird der Bericht mit dem Sufix des Mandanten gesucht gibt es diesen Nicht wird der erste Bericht zurück gegeben
+
+Dim s1 As String
+Dim s2 As String
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+
+'Stop
+    s1 = funMandant() 'Prüft ob Mandant beteht
+    If s1 = "" Then                                       'Prüft ob Mandant besteht und Auflistung ausgewählt
+        berichtMandant = sBerichtname
+        Exit Function
+    End If
+        
+        s2 = sBerichtname & s1
+                                                                    'Sucht nach dem Bericht der Ausgewählt wurde mit Mandant
+        sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
+               "Name = '" & s2 & "' AND Type =-32764"
+
+        Set rs1 = CurrentDb.OpenRecordset(sSql)
+        
+        If Not rs1.EOF Then  'Wenn Bericht vorhanden Formular schließen und Bericht anzeigen
+            gloAWStrBericht = rs1!Name
+            gloAWDrucker = 2  'Schließt ab mit Voransicht
+            berichtMandant = rs1!Name
+            'DoCmd.Close acForm, "frmDrucken"
+            rs1.Close
+            Exit Function
+        Else   'Der Bericht mit Mandant nicht da suche bericht ohne Mandant nimm den ersten
+            sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
+               "Name Like '" & sBerichtname & "*' AND Type =-32764"
+             Set rs1 = CurrentDb.OpenRecordset(sSql)
+             If Not rs1.EOF Then  'Bericht ohne Mandant gefunden
+                berichtMandant = rs1!Name
+             Else   'Kein Bericht ohne Mandant
+                berichtMandant = ""
+             
+             End If
+             
+                
+        End If
+rs1.Close
+
+End Function
+
+
+
+
+Function BerichtFirma(Position As EnumPosition, Optional Aenderung As String) As String
+'Dient dazu, die Firmenspezifischen Felder in den Berichten mit Daten zu füllen
+'und diese zu speichern
+Dim sPosition As String
+Dim strSp1 As String
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+Dim AE As String
+Dim Man  As String
+
+Man = funMandant() 'Prüft ob Mandant besteht
+
+Select Case Position
+    Case 1
+        sPosition = "links"
+    Case 2
+        sPosition = "mitte"
+    Case 3
+        sPosition = "rechts"
+    Case 4
+        sPosition = "rechts2"
+        
+End Select
+
+AE = Nz(Aenderung, "")
+If AE = "" Then
+
+    sSql = "Kennung = 'Bericht' and Wert2 = '" & Position & "'" & " and Mandant='" & Man & "'"
+    strSp1 = Nz(DLookup("Freitext", "tblIniBericht", sSql), "")
+    BerichtFirma = strSp1
+Else
+    sSql = "SELECT * FROM tblIniBericht WHERE Kennung='Bericht' and Wert2='" & Position & "'" & " and Mandant='" & Man & "'"
+    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    With rs1
+        If .EOF Then
+            MsgBox LA("Nummer nicht vorhanden! Nr.:") & Position
+        Else
+            .Edit
+                rs1!Freitext = Aenderung
+                '.Fields(4).Value = "hfhfhg"  'AE
+                'Aenderung
+            .Update
+        End If
+        .Close
+    End With
+End If
+
+
+End Function
+
+
+
+
+Public Sub DruckVorlagenImport()
+'Ermöglicht das kopieren von Berichtsvorlagen aus anderen PS Versionen in das bestehende Frontend
+'MG 20190628
+
+
+Dim Rs2 As DAO.Recordset
+
+Dim DBextern As Database
+
+Dim sSql As String
+Dim Db2 As String
+
+Dim sList As String
+Dim sMandant As String
+
+Dim sName As String
+
+
+sMandant = "*" & InputBox("Geben Sie das Kurzzeichen des Mandanten an", "Eingabe Mandant", funMandant())
+
+
+sSql = "SELECT msysobjects.Name From msysobjects WHERE Type=-32764 AND Name like '" & sMandant & "'"
+
+Db2 = modFileDialog.funDateiAuswaehlen(Application.CurrentProject.Path, "*.*")
+
+
+Set DBextern = DBEngine.OpenDatabase(Db2)
+
+
+Set Rs2 = DBextern.OpenRecordset(sSql)
+
+With Rs2
+    sList = vbCrLf & vbCrLf
+    
+    If .EOF Then
+        MsgBox "Keine Daten."
+        .Close
+        Exit Sub
+    End If
+    While Not .EOF
+        sList = sList & .Fields("Name").Value & vbCrLf
+        .MoveNext
+    Wend
+    
+    
+    .MoveLast
+    If MsgBox("In der gewählten Datenbank wurden :" & .RecordCount & " Berichte gefunden. Willst du diese in die aktuelle DB kopieren?" & sList, vbYesNo, "Frage") <> vbYes Then
+        .Close
+        Exit Sub
+    End If
+    
+    .MoveFirst
+        
+    While Not .EOF
+        sName = .Fields("Name").Value
+        Debug.Print sName
+        DoCmd.TransferDatabase acImport, "Microsoft Access", _
+                           Db2, acReport, sName, sName
+        
+
+        
+        .MoveNext
+    Wend
+    .Close
+End With
+
+
+
+
+End Sub

@@ -1,0 +1,101 @@
+Option Compare Database
+Option Explicit
+
+Enum DokType
+    tyAngebot = 1
+    tyAuftragsbestaetigung = 2
+    tyLieferschein = 3
+    tyrechnung = 4
+    tyGutschrift = 5
+    tyMahnung = 6
+    tyKurzbrief = 7
+End Enum
+
+
+'Private m_app As App                    'Hauptobjekt
+'Private m_cdb As dao.Database           'CurrentDb-Ersatz
+Private m_User As User                   'Angemeldeter Benutzer
+Private m_Anschreiben As Anschreiben
+Private m_Rechnung As Rechnung
+Private m_Adresse As Adresse
+Private m_Projekt As Projekt
+Private m_Auftrag As Auftrag
+Private m_OpenargMg As OpenArgMG
+Private m_Artikel As Artikel
+Private m_Cad As CAD
+
+
+Public Property Get CAD() As Artikel
+    If m_Cad Is Nothing Then Set m_Cad = New CAD
+    Set CAD = m_Cad
+End Property
+
+
+
+Public Property Get Artikel() As Artikel
+    If m_Artikel Is Nothing Then Set m_Artikel = New Artikel
+    Set Artikel = m_Artikel
+End Property
+
+
+
+Public Property Get OpenArgMG() As OpenArgMG
+    If m_OpenargMg Is Nothing Then Set m_OpenargMg = New OpenArgMG
+    Set OpenArgMG = m_OpenargMg
+End Property
+
+
+
+Public Property Get User() As User
+    If m_User Is Nothing Then Set m_User = New User
+    Set User = m_User
+End Property
+
+Public Property Get Anschreiben() As Anschreiben
+    If m_Anschreiben Is Nothing Then Set m_Anschreiben = New Anschreiben
+    Set Anschreiben = m_Anschreiben
+End Property
+
+Public Property Get Rechnung() As Rechnung
+    If m_Rechnung Is Nothing Then Set m_Rechnung = New Rechnung
+    Set Rechnung = m_Rechnung
+End Property
+
+Public Property Get Projekt() As Projekt
+    If m_Projekt Is Nothing Then Set m_Projekt = New Projekt
+    Set Projekt = m_Projekt
+End Property
+
+Public Property Get Auftrag() As Auftrag
+    If m_Auftrag Is Nothing Then Set m_Auftrag = New Auftrag
+    Set Auftrag = m_Auftrag
+End Property
+
+
+Public Property Get Adresse() As Adresse
+    If m_Adresse Is Nothing Then Set m_Adresse = New Adresse
+    Set Adresse = m_Adresse
+End Property
+
+
+Public Sub PSDebug(VWert As Variant)
+
+    If MenFormularOpen("f_Debug") Then
+        Form_f_Debug.WertAnzeigen = CStr(VWert)
+    End If
+
+End Sub
+
+
+Public Function FormIsOpen(ArgName As String) As Boolean
+'Die Funktion prüft ob ein Formular mit dem Angegebenem Namen geöffnet ist.
+Dim sP1 As Long
+
+'on error Goto Err_
+'----------------------------------------
+FormIsOpen = False
+sP1 = SysCmd(acSysCmdGetObjectState, acForm, ArgName)
+If sP1 > 0 Then FormIsOpen = True
+'----------------------------------------
+
+End Function

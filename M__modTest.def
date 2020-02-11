@@ -1,0 +1,687 @@
+Option Compare Database
+Option Explicit
+
+Public tStart As Long
+
+Sub TestSplit()
+
+Dim Ar() As String
+Dim s1 As String
+Dim Sx As String
+Dim A As Long
+Dim sDateiName As String
+
+sDateiName = CurrentProject.Path & "\Split.txt"
+
+
+Open sDateiName For Input As #1    ' Datei zum Einlesen öffnen.
+Do While Not EOF(1)    ' Schleife bis Dateiende.
+    Input #1, Sx    ' Daten in zwei Variablen einlesen.
+    s1 = s1 & Sx
+Loop
+Close #1    ' Datei schließen.
+
+Stop
+';S1 = "ääöö;121212;" & vbCrLf & "121212;122121;121212;"
+
+Ar = Split(s1, ";")
+
+For A = 0 To UBound(Ar)
+    Debug.Print Ar(A)
+Next A
+
+
+'Stop
+
+
+
+
+
+
+End Sub
+
+Sub testZwischenablag()
+'Dim S1 As String
+'Dim oData As New DataObject
+'    'On Error Resume Next ' Brutal um falsche Formate abzuwürgen, gibt dann einen Leerstring
+'    oData.GetFromClipboard
+'    S1 = oData.GetText
+'
+
+End Sub
+
+Sub erledigttest()
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+
+
+sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr =20496"
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+With rs1
+    .Edit
+    .Fields("Erledigt").Value = Null
+    .Update
+    Debug.Print .Fields("Erledigt").Value
+    Debug.Print .RecordCount
+    .Close
+End With
+
+
+
+
+
+End Sub
+
+
+
+
+
+Sub testOpenArgs()
+
+PS.OpenArgMG.Laden ";;;;auf333;Dok33309;FRMNaviDokuTest;pro19923"
+
+Debug.Print PS.OpenArgMG.AuftragNr
+Debug.Print PS.OpenArgMG.DokumentNr
+Debug.Print PS.OpenArgMG.FormularBez
+Debug.Print PS.OpenArgMG.ProjektNr
+
+
+PS.OpenArgMG.Laden ""
+
+Debug.Print PS.OpenArgMG.AuftragNr
+Debug.Print PS.OpenArgMG.DokumentNr
+Debug.Print PS.OpenArgMG.FormularBez
+Debug.Print PS.OpenArgMG.ProjektNr
+
+
+PS.OpenArgMG.Laden "frmDasSuperFormular"
+
+Debug.Print PS.OpenArgMG.AuftragNr
+Debug.Print PS.OpenArgMG.DokumentNr
+Debug.Print PS.OpenArgMG.FormularBez
+Debug.Print PS.OpenArgMG.ProjektNr
+
+
+
+
+
+End Sub
+
+
+
+Sub testtblProjektbeschreibung()
+Dim oPK As PreisKalkulation
+
+Set oPK = New PreisKalkulation
+
+With oPK
+    .Aufschlag = 5
+    .ProzentAufschlag = 10
+    .Tabelle = "tblProjektbeschreibung"
+    .KeySuch = 533
+    .berechnen
+End With
+
+End Sub
+
+Sub testTblAufPositionen()
+Dim oPK As PreisKalkulation
+
+Set oPK = New PreisKalkulation
+
+With oPK
+    .Aufschlag = 5
+    .ProzentAufschlag = 10
+    .Tabelle = "tblAufPositionen"
+    .KeySuch = 523
+    .berechnen
+End With
+
+End Sub
+
+
+
+
+
+Sub testAssert()
+
+'Hält den code an wenn False
+Debug.Assert 1 = 2
+
+Debug.Print "OK"
+
+
+End Sub
+
+Sub testAnfrageBestellung()
+
+lonBelegnummer = 20395
+DoCmd.OpenForm "frmanfragenbestellungen", , , "tblAnschreiben.BelegNr = 20395"
+End Sub
+
+
+
+Sub MenTest()
+
+Dim itm As Form
+
+  '  While Rep
+        'Rep = False 'Für so lange wiederholung bis alle zu
+        For Each itm In Forms
+            
+            'If itm.Name <> "f_Start" Then
+                'DoCmd.Close acForm, itm.Name
+             Debug.Print itm.Name
+            'End If
+    
+        Next
+   ' Wend
+
+
+End Sub
+
+
+
+
+Public Function TagErzeugen(s1 As String) As String
+
+'Dim olApp As Outlook.Application
+'Dim olFld As Outlook.MAPIFolder
+'
+'
+'Set olApp = New Outlook.Application
+'Set olFld = olApp.GetNamespace("Mapi")
+
+'Password : t8rb8tq<dvMq
+'Benutzer:  Outlook@ dieprojektsoftware.de
+
+
+
+End Function
+
+Public Sub SetMailHTMLOutlook()
+
+''Von MZ am 26.6.2019
+'Dim olApp       As Outlook.Application
+'Dim olNsp       As Outlook.NameSpace
+'Dim olFld       As Outlook.MAPIFolder
+'Dim olItm       As Outlook.MailItem
+'Dim olIns       As Outlook.Inspector
+'Dim olPge       As Object
+'Dim ctl         As Object
+''Dim olPges       As Outlook.Pages
+''Dim olUpr       As Outlook.UserProperty
+''Dim ans         As VbMsgBoxResult
+'Dim INSText       As String
+'
+'
+'
+'Set olApp = New Outlook.Application
+'Set olNsp = olApp.GetNamespace("MAPI")
+''Set olFld = olNsp.Folders("Outlook@dieprojektsoftware.de") '.Folders("Posteingang").Folders("Entwurf")
+'
+'Set olItm = olApp.CreateItem(olMailItem) 'olFld.Items.Add(olMailItem)
+'
+'    With olItm
+'        Set olIns = .GetInspector     'Standard-Mail-Signatur verwenden!!!
+'        olIns.Display
+'        '.BodyFormat = olFormatHTML
+'        .Subject = "Mail von Access"
+''        .Attachments.Add Path & "Eingangsrechnungen.csv"
+'        .Recipients.Add "info@csafe.biz"
+'        INSText = _
+'            "<div class=WordSection1>" & _
+'            "<p class=MsoNormal><o:p>Hallo Marcus,</o:p></p>" & _
+'            "<p class=MsoNormal><o:p>&nbsp;</o:p></p>" & _
+'            "<p class=MsoNormal><o:p>anbei sende ich Ihnen nixcherungstechnik im letzten Monat.</o:p></p>"
+'        .HTMLBody = Replace(.HTMLBody, "<div class=WordSection1>", INSText)
+'        'Der gesamte Text steht in dem div-Tag <div class=WordSection1>...</div>
+'        'Dieser Tag ist die erste Zeile im <Body>. Dort kann man daher Text einfügen, der oben beginnt.
+'        '.Send 'direkt senden
+'        .Save
+'    End With
+
+
+
+
+End Sub
+
+
+
+
+Sub TESTArtikel()
+Dim oArtikel As Artikel
+
+Set oArtikel = New Artikel
+
+With oArtikel
+    .Laden (8)
+    Debug.Print "ID: " & .ID
+Debug.Print "Lieferant: " & .Lieferant
+Debug.Print "Bezeichnung: " & .Bezeichnung
+Debug.Print "Beschreibung: " & .Beschreibung
+Debug.Print "BeschreibungB: " & .BeschreibungB
+Debug.Print "Bestellnummer: " & .Bestellnummer
+Debug.Print "Preis_EK: " & .Preis_EK
+Debug.Print "Preis_Rabatt_pro: " & .Preis_Rabatt_pro
+Debug.Print "Preis_EK_mit_Rabatt: " & .Preis_EK_mit_Rabatt
+Debug.Print "Liefezeit: " & .Liefezeit
+Debug.Print "Bemerkung: " & .Bemerkung
+Debug.Print "Preis_VK: " & .Preis_VK
+Debug.Print "Lagerbestand: " & .Lagerbestand
+Debug.Print "Liefereinheit: " & .Liefereinheit
+Debug.Print "LieferMenge: " & .LieferMenge
+Debug.Print "PreisLiefereinheit: " & .PreisLiefereinheit
+Debug.Print "Mutter: " & .Mutter
+Debug.Print "GeaendertDat: " & .GeaendertDat
+Debug.Print "AngelegtDat: " & .AngelegtDat
+Debug.Print "Geaendertvon: " & .Geaendertvon
+Debug.Print "AngelegtVon: " & .AngelegtVon
+Debug.Print "Del: " & .Del
+Debug.Print "ArtGruppeNr: " & .ArtGruppeNr
+Debug.Print "ArtZeichnung: " & .ArtZeichnung
+Debug.Print "ArtDatenblatt: " & .ArtDatenblatt
+Debug.Print "Gewicht: " & .Gewicht
+Debug.Print "TeilArt: " & .TeilArt
+Debug.Print "ArtKaufteil: " & .ArtKaufteil
+Debug.Print "ArtLaserteil: " & .ArtLaserteil
+Debug.Print "ArtKantteil: " & .ArtKantteil
+Debug.Print "ArtGewinde: " & .ArtGewinde
+Debug.Print "ArtSchweißen: " & .ArtSchweißen
+Debug.Print "ArtDrehen: " & .ArtDrehen
+Debug.Print "ArtFraesen: " & .ArtFraesen
+Debug.Print "ArtSonstiges: " & .ArtSonstiges
+End With
+
+End Sub
+
+Sub testAdresse()
+
+Dim oAdresse As Adresse
+
+Set oAdresse = New Adresse
+
+With oAdresse
+    .Laden (1157)
+
+
+Debug.Print "AdressNr: " & .AdressNr
+Debug.Print "Rufname: " & .Rufname
+Debug.Print "Adresse1: " & .Adresse1
+Debug.Print "Adresse2: " & .Adresse2
+Debug.Print "Adresse3: " & .Adresse3
+Debug.Print "Strasse: " & .Strasse
+Debug.Print "PLZ: " & .PLZ
+Debug.Print "Ort: " & .Ort
+Debug.Print "Land: " & .Land
+Debug.Print "Telefon: " & .Telefon
+Debug.Print "Fax: " & .Fax
+Debug.Print "Handy: " & .Handy
+Debug.Print "EMail: " & .EMail
+Debug.Print "Webadresse: " & .Webadresse
+Debug.Print "Bemerkung: " & .Bemerkung
+Debug.Print "Kennwort: " & .Kennwort
+Debug.Print "Gruppe: " & .Gruppe
+Debug.Print "UnsereKuNr: " & .UnsereKuNr
+Debug.Print "LiAdresse1: " & .LiAdresse1
+Debug.Print "LiAdresse2: " & .LiAdresse2
+Debug.Print "LiAdresse3: " & .LiAdresse3
+Debug.Print "LiStrasse: " & .LiStrasse
+Debug.Print "LiPLZ: " & .LiPLZ
+Debug.Print "LiOrt: " & .LiOrt
+Debug.Print "LiLand: " & .LiLand
+Debug.Print "LiBemerkung: " & .LiBemerkung
+Debug.Print "ReAdresse1: " & .ReAdresse1
+Debug.Print "ReAdresse2: " & .ReAdresse2
+Debug.Print "ReAdresse3: " & .ReAdresse3
+Debug.Print "ReStrasse: " & .ReStrasse
+Debug.Print "RePLZ: " & .RePLZ
+Debug.Print "ReOrt: " & .ReOrt
+Debug.Print "ReLand: " & .ReLand
+Debug.Print "ReBemerkung: " & .ReBemerkung
+Debug.Print "BankKontoNr1: " & .BankKontoNr1
+Debug.Print "BankBLZ1: " & .BankBLZ1
+Debug.Print "BankName1: " & .BankName1
+Debug.Print "ZahlungSkonto: " & .ZahlungSkonto
+Debug.Print "ZahlungZeitraumSkonto: " & .ZahlungZeitraumSkonto
+Debug.Print "ZahlungRabatt: " & .ZahlungRabatt
+Debug.Print "ZahlungBemerkung: " & .ZahlungBemerkung
+Debug.Print "ZahlungBuchKontoNr: " & .ZahlungBuchKontoNr
+Debug.Print "ZahlungBuchKontoBez: " & .ZahlungBuchKontoBez
+Debug.Print "USINr: " & .USINr
+
+End With
+
+
+End Sub
+
+
+
+
+
+
+
+
+
+Sub testCAsm()
+
+Dim ML() As cAsm
+
+ReDim ML(4)
+ML(1).BezArt = "Test1"
+ML(2).BezArt = "Test2"
+ML(3).BezArt = "Test3"
+
+'ML(1) = "Test1"
+'ML(2) = "Test2"
+'ML(3) = "Test3"
+
+
+
+
+Stop
+
+ReDim Preserve ML(20)
+
+ML(13).BezArt = "Test13"
+
+Stop
+
+
+
+
+End Sub
+
+
+
+
+Public Sub test1()
+Dim ob As mRechte
+
+Set ob = New mRechte
+
+
+ob.BenutzerID = 2
+ob.OutputInTextDatei = False
+
+Debug.Print "ID", ob.BenutzerID
+Debug.Print "Name", ob.BenutzerName
+Debug.Print "allowed", ob.allowed
+'Debug.Print ob.Container
+Debug.Print "Form", ob.FormOpen_("frmStartAuftrag")
+Debug.Print "txtOut", ob.OutputInTextDatei
+
+Debug.Print "WHERE", ob.WHERE_("ProjektNr")
+
+
+
+Set ob = Nothing
+
+
+End Sub
+
+
+ 
+
+
+
+Sub test()
+
+Dim fso As Object
+Dim fFile As Object
+
+Set fso = CreateObject("Scripting.FileSystemObject")
+
+Set fFile = fso.GetFile("N:\_CAD\PdfDxf\22137x.pdf")
+
+MsgBox fFile.datelastmodified
+
+End Sub
+
+
+
+Public Sub TestQueries()
+   Dim obj As Object
+    
+   For Each obj In CurrentDb.QueryDefs
+         Debug.Print obj.Name & " " & obj.Properties("Description")
+   Next obj
+End Sub
+
+
+
+
+
+Public Sub KontextmenuesAusgeben()
+
+Dim cbr As CommandBar
+Dim S As Long
+Dim cbc As CommandBarControl
+
+For Each cbr In CommandBars
+
+If cbr.Type = 2 Then
+
+If InStr(1, cbr.Name, "cmd") <> 0 Then
+    Debug.Print cbr.Name
+End If
+'For Each cbc In cbr.Controls
+
+'Debug.Print , cbc.Caption
+
+'Next cbc
+'Stop
+End If
+
+Next cbr
+
+End Sub
+
+
+Sub CreateReportShortcutMenu()
+'    Dim cmbRightClick As Office.CommandBar
+'    Dim cmbcontrol As Office.CommandBarControl
+'    Dim A As Long
+'On Error Resume Next
+''Wenn Command Bar vorhanden erst löschen
+'
+'For Each cmbRightClick In CommandBars
+'
+'    If InStr(1, cmbRightClick.Name, "test") <> 0 Then
+'        Debug.Print cmbRightClick.Name
+'         CommandBars(cmbRightClick.Name).Delete
+'    End If
+'
+'Next cmbRightClick
+'
+''funMenDB
+'
+'   ' Create the shortcut menu.
+'    Set cmbRightClick = CommandBars.Add("test01", msoBarPopup, False, True)
+'
+'
+'
+'    With cmbRightClick
+'
+'
+'
+''    For A = tStart To tStart + 30
+''         Set cmbControl = .Controls.Add(msoControlButton, A, , , True)        ' msoControlButton
+''        cmbControl.Caption = "nr: " & A
+''         cmbControl.OnAction = "funTest"
+''
+''
+''    Next A
+'
+'    Set cmbcontrol = Controls.Add(msoControlButton, 316, , , True)    ' msoControlButton
+'    .Controls(.Controls.Count).BeginGroup = True
+'
+'    Set cmbcontrol = Controls.Add(msoControlButton, 316, , , True)      ' msoControlButton
+'         'cmbControl.Caption = "menue -"
+'         cmbcontrol.OnAction = "funTestM"
+'
+'
+'    Set cmbcontrol = CommandBars.Controls.Add(msoControlButton, 316, , , True)   ' msoControlButton
+'         cmbcontrol.Caption = "menue +"
+'         cmbcontrol.OnAction = "funTestP"
+'         '.Controls(.Controls.count).BeginGroup = True
+'
+'
+'    End With
+'
+'    Set cmbcontrol = Nothing
+'    Set cmbRightClick = Nothing
+End Sub
+Function funTest()
+MsgBox "Test"
+End Function
+
+Function funTestP()
+tStart = tStart + 30
+CreateReportShortcutMenu
+
+End Function
+Function funTestM()
+If tStart > 10 Then tStart = tStart - 30
+CreateReportShortcutMenu
+
+End Function
+
+Sub testx()
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+
+
+sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
+                                  "(((msysobjects.Name) Like '" & "berBestellungAnfrageCP" & "') AND " & _
+                                  "((msysobjects.Type)=-32764));"
+
+
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+If Not rs1.EOF Then
+While Not rs1.EOF
+    Debug.Print rs1!Name
+    rs1.MoveNext
+Wend
+End If
+
+
+
+End Sub
+
+
+'
+
+Public Sub test01()
+Dim oCad As CAD
+
+
+Set oCad = New CAD
+
+Debug.Print oCad.use
+Debug.Print oCad.Laenge
+Debug.Print oCad.Praefix
+Debug.Print oCad.PraefixLen
+Debug.Print oCad.Sufix
+Debug.Print oCad.SufixLen
+
+
+Debug.Print oCad.NummerPDF("1232")
+Debug.Print oCad.Nummer("12352")
+
+
+End Sub
+
+
+
+
+Sub cmbList()
+Dim cmbRightClick As Office.CommandBar
+Dim ctl As Object
+
+'Zeigt alle möglichen Command bars an und die darin enthaltenen Befehle
+
+On Error Resume Next
+'Wenn Command Bar vorhanden erst löschen
+
+For Each cmbRightClick In CommandBars
+  
+    Debug.Print "###", cmbRightClick.Index, cmbRightClick.Name
+    For Each ctl In CommandBars(cmbRightClick.Name).Controls
+        Debug.Print ctl.ID, ctl.Caption, ctl.OnAction   '', ctl.TooltipText
+        If InStr(1, ctl.Caption, "filt") <> 0 Then Stop
+    Next ctl
+    'Stop
+Next cmbRightClick
+
+End Sub
+
+
+Function tblArbeitenAnpassen()
+'Neu Tabelle Arbeiten jetzt mit fiSchlüssel wegen Verrechnung neues feld fiTaetigkeit
+Dim sSql As String
+Dim rs1 As DAO.Recordset
+
+MsgBox "Anpassen der Arbeitstabelle"
+
+sSql = "SELECT ArbeitNr, Taetigkeit, fiTaetigkeit " & _
+       "FROM tblArbeiten ORDER BY ArbeitNr"
+
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+With rs1
+    .MoveFirst
+    While Not .EOF
+        .Edit
+        Debug.Print Nz(.Fields("Taetigkeit"), "nix")
+        .Fields("fiTaetigkeit") = Nz(DLookup("Id", "tblTaetigkeiten", "Taetigkeit='" & .Fields("Taetigkeit") & "'"), 0)
+        .Update
+        .MoveNext
+    Wend
+    .Close
+End With
+
+MsgBox "abgeschlossen"
+
+End Function
+
+
+
+Sub testAdressePerson()
+Dim ADR As Adresse
+
+Set ADR = New Adresse
+
+With ADR
+    .PersonLaden (4021)
+    Debug.Print .PersonName
+    Debug.Print .PersonTelNr
+End With
+
+End Sub
+
+Sub testAuftrag()
+Dim Art As Artikel
+
+    Set Art = New Artikel
+    
+    With Art
+        
+        .AngelegtVon = funBenutzerKurzzeichen()
+        .AngelegtDat = Now
+        .Bezeichnung = "Bezeichnung neu"
+        .Lieferant = 20210
+        .Bestellnummer = "Best 122233"
+        .Liefereinheit = Nz(DLookup("Bezeichnung", "tblEinheiten", "Reihenfolge = 1"), "")
+        .LieferMenge = 1
+        .Bemerkung = "dies ist die Bemerkung"
+        .Beschreibung = "Dies ist eine Beschreibung"
+        .Beschreibung = "Dies ist eine Beschreibung in der Bestellung"
+        .Preis_EK = 111.23
+        Debug.Print Art.NeuAnlegen()
+    End With
+
+
+End Sub

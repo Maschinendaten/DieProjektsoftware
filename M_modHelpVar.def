@@ -1,0 +1,126 @@
+Option Compare Database
+Option Explicit
+
+'In jedem Formular muss in der Current EIgenschaft diese Zuweisung für die
+'Hilfe eingetragen werden. Am besten man nimt für den Variablennamen den
+'Orginalnamen desFormulars mit hlp_ davor so ist die Sache am einfachsten zu händeln.
+
+'Private Sub Form_Current()
+'Dim wert1 As Byte
+'Dim rs1 As DAO.Recordset
+'
+' 'Hilfe festlegen Globale Variablen einfügen
+' Form.HelpFile = hlp_Dateiname
+' Form.HelpContextId = hlp_FrmStart '(Dies ist der Name des Formulars)
+' end sub
+
+
+
+  Global Const hlp_Dateiname = "PS.HLP"
+  Global Const hlp_Inhalt = 1
+  Global Const hlp_Eingang = 2
+  Global Const hlp_Hauptmen = 3
+  Global Const hlp_Struktur = 4
+  Global Const hlp_KeineHilfe = 5
+  Global Const hlp_PSSoftwar = 6
+  ' No constant name entered for page 7
+  ' No constant name entered for page 8
+  ' No constant name entered for page 9
+  ' No constant name entered for page 10
+  ' No constant name entered for page 11
+  ' No constant name entered for page 12
+  ' No constant name entered for page 13
+  ' No constant name entered for page 14
+  ' No constant name entered for page 15
+  ' No constant name entered for page 16
+  ' No constant name entered for page 17
+  ' No constant name entered for page 18
+  ' No constant name entered for page 19
+  ' No constant name entered for page 20
+  Global Const hlp_ArbeitstundenProProjekt = 21
+  Global Const hlp_FrmAbspannQuit = 22
+  Global Const hlp_FrmAdresse = 23
+  Global Const hlp_FrmAdressenuebersicht = 24
+  Global Const hlp_FrmAktiveBestellung = 25
+  Global Const hlp_FrmAnfragenBestellungen = 26
+  Global Const hlp_FrmArbeiten = 27
+  Global Const hlp_FrmArbeiterauswahl = 28
+  Global Const hlp_FrmArbeiterZeitraum = 29
+  Global Const hlp_FrmArbeitsanweisungEdit = 30
+  Global Const hlp_FrmArbeitsanweisungsliste = 31
+  Global Const hlp_FrmArbeitsstunden = 32
+  Global Const hlp_FrmArtikel = 33
+  Global Const hlp_FrmArtikelStueckliste = 34
+  Global Const hlp_FrmAufDaten = 35
+  Global Const hlp_FrmAufDokumente = 36
+  Global Const hlp_FrmAufDokumenteAuflistung = 37
+  Global Const hlp_FrmAufPositionen = 38
+  Global Const hlp_FrmAuswahlProjektnummer = 39
+  Global Const hlp_FrmAuswertungArbeitsleistung = 40
+  Global Const hlp_FrmAuftragAlleDokumente = 41
+  Global Const hlp_FrmAWKalender = 42
+  Global Const hlp_FrmAZKlein = 43
+  Global Const hlp_FrmBenutzerHinweis1 = 44
+  Global Const hlp_FrmBerichte = 45
+  Global Const hlp_FrmDatenbanknutzer = 46
+  Global Const hlp_FrmDokuInfo = 47
+  Global Const hlp_FrmDokuInfoAlle = 48
+  Global Const hlp_FrmErsatzteilliste = 49
+  Global Const hlp_FrmFinanzen = 50
+  Global Const hlp_FrmFinanzenBasiswerte = 51
+  Global Const hlp_FrmFinanzenEingabeUebersicht = 52
+  Global Const hlp_FrmFinanzenUebersicht = 53
+  Global Const hlp_FrmGFEingang = 54
+  Global Const hlp_FrmGruppen = 55
+  Global Const hlp_FrmGruppenfestlegung = 56
+  Global Const hlp_FrmKalkulation = 57
+  Global Const hlp_FrmKennwort = 58
+  Global Const hlp_FrmKurzbrief = 59
+  Global Const hlp_FrmLogstatistik = 60
+  Global Const hlp_FrmMemofeldeingabe = 61
+  Global Const hlp_FrmNeueAdresse = 62
+  Global Const hlp_FrmNeueProjektAdresse = 63
+  Global Const hlp_FrmNeuesPersonal = 64
+  Global Const hlp_FrmNeuesProjekt1 = 65
+  Global Const hlp_FrmNeuesProjekt2 = 66
+  Global Const hlp_FrmNeuesProjekt3 = 67
+  Global Const hlp_FrmOrdner = 68
+  Global Const hlp_FrmOrdnerUVRegister = 69
+  Global Const hlp_FrmPersonal = 70
+  Global Const hlp_FrmPersonalUebersicht = 71
+  Global Const hlp_FrmPprojektbeschreibungAuflistung = 72
+  Global Const hlp_FrmProjektbeschreibung = 73
+  Global Const hlp_FrmProjektbeschreibungAuswahl = 74
+  Global Const hlp_FrmProjektbeschreibungDokumente = 75
+  Global Const hlp_FrmProjektbeschreibungKalkulation = 76
+  Global Const hlp_FrmProjektbeschreibungsverwaltung = 77
+  Global Const hlp_FrmProjektuebersicht = 78
+  Global Const hlp_FrmRechnungEingabe = 79
+  Global Const hlp_FrmRechnungsStatistik = 80
+  Global Const hlp_FrmStandardtexte = 81
+  Global Const hlp_FrmStart = 82
+  Global Const hlp_FrmStueckliste = 83
+  Global Const hlp_FrmStuecklisteBestellung = 84
+  Global Const hlp_FrmStuecklisteStatus = 85
+  Global Const hlp_FrmTelefonliste = 86
+  Global Const hlp_FrmTerminPlanung = 87
+  Global Const hlp_Frmtodo = 88
+  Global Const hlp_FrmToDoListe = 89
+  Global Const hlp_FrmUDokuInfo = 90
+  Global Const hlp_FrmUPersonen = 91
+  Global Const hlp_FrmVerhindernSchliessen = 92
+  Global Const hlp_FrmWarenannahme = 93
+  Global Const hlp_FrmWeltzeituhr = 94
+  Global Const hlp_FrmZwischenablage = 95
+  Global Const hlp_NaviAuftrag = 96
+  Global Const hlp_NaviAuftragAuswahl = 97
+  Global Const hlp_NaviKalkulation = 98
+  Global Const hlp_NaviKalkulationDetail = 99
+  Global Const hlp_NaviNeueAdresse = 100
+  Global Const hlp_NaviNeuerArtikel = 101
+  Global Const hlp_NaviProjektAuswahl = 102
+  Global Const hlp_Status = 103
+  Global Const hlp_frmFakKonten = 104
+  Global Const hlp_NaviAllgemein = 105
+  Global Const hlp_FrmPsToDo As Long = 106
+  

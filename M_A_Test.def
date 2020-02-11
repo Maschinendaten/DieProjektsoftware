@@ -1,0 +1,41 @@
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Compare Database
+Option Explicit
+
+Private m_Name As String
+
+Private m_Alter As Long
+
+
+Private Sub Class_Initialize()
+Debug.Print "Klasse Initialisieren"
+End Sub
+
+Private Sub Class_Terminate()
+Debug.Print "Klasse Beenden"
+End Sub
+
+
+Property Let NameX(WERT As String)
+m_Name = WERT
+End Property
+
+
+Public Property Get Alter() As Long
+Alter = Len(m_Name)
+End Property
+
+   
+Sub stest()
+MsgBox "test .lll"
+End Sub
+
+
+Function fTest() As Long
+
+
+
+End Function

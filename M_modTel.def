@@ -1,0 +1,212 @@
+Option Compare Database
+Option Explicit
+
+
+'Declare Function PtrSafe tapiRequestMakeCall Lib "tapi32.dll" (ByVal stNumber As String, ByVal stDummy1 As String, _
+'ByVal stDummy2 As String, ByVal stDummy3 As String) As Long
+
+
+Function funTelMail(s_RufNummer As String, _
+                    s_Bezeichnung_Nr As String, _
+                    s_Anrede As String, _
+                    s_Vorname As String, _
+                    s_Nachname As String)
+
+Dim strMeldung As String
+Dim RetVal As Long
+Dim s1 As String
+'Dim s2 As String
+'Dim s3 As String
+'Dim S4 As String
+'Dim s5 As String
+'Dim st As String
+'On Error GoTo Err_
+
+
+
+If Nz(s_Bezeichnung_Nr) <> "E-Mail" Then
+    'wenn Telephonnummer
+    If Nz(s_Bezeichnung_Nr) = "Tel" Or Nz(s_Bezeichnung_Nr) = "GSM" Then
+        
+        'Ab 2019 es gibt immer ein Form für jede telefon Aplikation zB. NaviTelephon_SoftPhone und NaviTelephon_FreePhone
+        'dem wird beim aufruf eine Nummer übergeben alle Funktionen des telephons werden in dem Form abgebildet
+        
+        s1 = Replace(s_RufNummer, " ", "") 'löscht leerzeichen
+        
+        DoCmd.OpenForm "NaviTelephon_SoftPhone", , , , , , s1
+        
+   
+   If Not MenFormularOpen("frmNotizenN1") Then 'Wenn Notizen schon offen ist wird keine neue Notiz angelegt
+        
+      If MsgBox(LA("Wollen Sie eine neu Notiz erstellen?"), vbYesNo) = vbYes Then
+        funNotizErstellen Val(Nz(Form_frmAdresse.AdressNr)), Val(Nz(Form_frmAdresse.LisPersonen.Column(0))), funProjektNummer(), st
+        
+        'Als 3 Parameter bei Open Args wird die Adressnummer übergeben
+        DoCmd.OpenForm "frmNotizenN1"   ', , , , , acDialog, "frmAdresse;0;" & CStr(Form_frmAdresse.AdressNr) & ";"
+      End If
+   End If
+        
+'        If Left(S1, 1) <> "+" Then
+'            Shell "C:\Programme\Skype\Phone\skype.exe /callto:+49" & MID(S1, 2)
+'        Else
+'            Shell "C:\Programme\Skype\Phone\skype.exe /callto:" & S1
+'        End If
+            
+        Exit Function
+        
+    End If
+  MsgBox ("Keine E-Mail Adresse")
+  Exit Function
+End If
+If Nz(s_RufNummer) = "" Then
+  MsgBox (LA("Keine Bezeichnung der Nummer eingegeben."))
+  Exit Function
+End If
+
+'Prüfen des Formulars ob alle Daten vorhanden sind
+If IsNull(s_Vorname) Then
+  MsgBox ("Geben Sie den Vornamen an.")
+  Exit Function
+End If
+If IsNull(s_Nachname) Then
+  MsgBox ("Geben Sie den Nachnamen an.")
+  Exit Function
+End If
+If IsNull(s_Anrede) Then
+  MsgBox ("Geben Sie die Anrede an.")
+  Exit Function
+End If
+
+strMeldung = funSendEMail(s_RufNummer, "", s_Anrede & " " & s_Vorname & " " & s_Nachname, "", "", funBenutzerNr())
+
+
+
+End Function
+
+
+Public Function funSendURL(ByVal sURL As String) As Boolean
+'    On Error GoTo Err_
+'    Dim HTTP_ As XMLHTTP
+'    Dim lStatus As Long
+'    'Dim test As Boolean
+'
+'    Set HTTP_ = CreateObject("Microsoft.XMLHTTP")
+'     HTTP_.send , sURL
+'        .send
+'        lStatus = .Status
+'    End With
+'    Set oHTTP = Nothing
+'    funSendURL = lStatus = 200
+'Err_:
+'    MsgBox Err.Description
+'    Beep
+End Function
+
+
+Function funNotizErstellen(lAdrID As Long, Optional lPersonID As Long, Optional lProID As Long, Optional sText As String)
+
+Dim rs1 As DAO.Recordset
+Dim sSql As String
+Dim lonDANr As Long
+Dim P1 As Long
+
+If lAdrID = 0 Then Exit Function
+'Die Nächste Datensatznummer wird gesucht
+lonDANr = funNextRecord("tblNotizen", "NoID")
+
+If lonDANr = 0 Then
+    MsgErr "frmNotizen", "TasteNeu", "Es kann keine Fortlaufende Datensatznummer angelegt werden", 1619, 0
+    Exit Function
+End If
+
+
+sSql = "SELECT * FROM  tblNotizen Where 1=0"
+
+Set rs1 = CurrentDb.OpenRecordset(sSql)
+
+rs1.AddNew
+    rs1.AddNew
+    rs1!NoId = lonDANr
+    rs1!NoVon = funBenutzerKurzzeichen()
+    rs1!NoAm = Now
+    rs1!NoGeVon = funBenutzerKurzzeichen()
+    rs1!NoGeAm = Now
+    rs1!NoProNr = lProID
+    rs1!NoPersNr = lPersonID
+    rs1!NoAdrNr = lAdrID
+    rs1!NoText = sText
+    'Rs1!NoAufNr = Val(Me!varAufNr)
+    P1 = InStr(1, Nz(sText), "#", vbBinaryCompare)
+    If P1 <> 0 Then
+        rs1!NoBetreff = Mid(sText, P1, 50)
+    End If
+    rs1.Update
+    rs1.Close
+Set rs1 = Nothing
+
+
+End Function
+
+
+
+Public Sub MakeCall(ByVal sTel As String)
+  Dim oTapi As Object 'TAPI3Lib.TAPI
+  Dim oAddr As Object 'ITAddress
+  Dim oCall As Object 'ITBasicCallControl
+  Const TAPIMEDIATYPE_AUDIO As Long = 8
+  Const LINEADDRESSTYPE_PHONENUMBER As Long = 1
+
+  'On Error GoTo Ende
+
+  'Verbindung zu TAPI
+  Set oTapi = CreateObject("TAPI.TAPI")
+  oTapi.Initialize
+  
+  'Verbindung zum Telefonapparat
+  For Each oAddr In oTapi.Addresses
+    'Debug.Print oAddr.addressname
+    If IsNumeric(oAddr.addressname) Then
+      'Meinen Apparat gefunden, Ruf aufbauen
+      Set oCall = oAddr.CreateCall(sTel, LINEADDRESSTYPE_PHONENUMBER, TAPIMEDIATYPE_AUDIO)
+      'jetzt anrufen
+      oCall.Connect False
+      Exit For
+    End If
+  Next
+Exit Sub
+
+Ende:
+MsgBox ("Es konnte nicht gewählt werden!")
+End Sub
+
+
+Function ClearNumber(ByVal sTel As String) As String
+  On Error GoTo Ende
+  'Regular-Expressions nutzen
+  Dim RegEx As Object
+  Set RegEx = CreateObject("VBScript.RegExp")
+  RegEx.Global = True 'Jedes Vorkommen soll ersetzt werden
+  
+  RegEx.Pattern = "[^\+0-9]*"       'alles entfernen, dass nicht + oder eine Ziffer ist,
+  sTel = RegEx.Replace(sTel, "")    'bis + oder Ziffer gefunden wird
+  
+  RegEx.Pattern = "^\+490"          'Ersetze +490 am Zeilenanfang durch 00
+  sTel = RegEx.Replace(sTel, "00")
+  
+  RegEx.Pattern = "^\+49"           'Ersetze +49 am Zeilenanfang durch 00
+  sTel = RegEx.Replace(sTel, "00")
+  
+  RegEx.Pattern = "\+*"             'verbliebene + entfernen
+  sTel = RegEx.Replace(sTel, "")
+  
+  RegEx.Pattern = "^000"            'Ersetze 000 am Zeilenanfang durch 00
+  sTel = RegEx.Replace(sTel, "00")
+  
+  RegEx.Pattern = "^0(?!0)"         'Ersetze eine einfache 0 am Zeilenanfang durch 00 für Amtsholung,
+  sTel = RegEx.Replace(sTel, "00")  'wenn auf die 0 eine andere Ziffer als 0 folgt (lookforward-Funktion)
+  
+  
+  'Rückgabe
+  ClearNumber = sTel
+Ende:
+End Function

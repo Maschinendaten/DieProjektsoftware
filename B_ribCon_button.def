@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<CommandBar name="ribCon_button">
+  <AdaptiveMenu value="false"/>
+  <Context value=""/>
+  <Description value="ribCon_button-Menü"/>
+  <Enabled value="true"/>
+  <Position value="5"/>
+  <Protection value="22"/>
+  <RowIndex value="-1"/>
+  <Type value="2"/>
+  <Visible value="false"/>
+  <Controls>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="button kopieren"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="1"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="button kopieren"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="false"/>
+      <Style value="0"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=CopyElement()"/>
+      <ImageData>Qk3aBQAAAAAAADYAAAAoAAAAEwAAABMAAAABACAAAAAAAKQFAAAAAAAAAAAAAAAAAAAAAAAA8PDw
+AKKfnP+in5z/op+c/6KfnP+in5z/op+c/6KfnP+in5z/op+c/6KfnP+in5z/op+c//Dw8ADw8PAA
+8PDwAPDw8ADw8PAA8PDwAPDw8ACin5z//fv5//37+f/8+fb//Pn1//v49P/79/P/+/fy//v18P/7
+9fD/+vTu/6KfnP/w8PAA8PDwAPDw8ADw8PAA8PDwAPDw8ADw8PAAop+c//37+f/9+/n/29nW/9vY
+1f/p5uL/+/bx//r17//58+3/+fPt//v18P+in5z/8PDwAPDw8ADw8PAA8PDwAPDw8ADw8PAA8PDw
+AKKfnP/9+/n//fv5/9vZ1v/b2NX/6ebi//v28f/69e//+fPt//nz7f/79fD/op+c//Dw8ADw8PAA
+8PDwAPDw8ADw8PAA8PDwAPDw8ACin5z//v37//79+//j4eH/ysjG/9rY1v/Nycf/zMnE/9PPyv/T
+z8r/+/fy/6KfnP+HhYL/h4WC/4eFgv+HhYL/h4WC//Dw8ADw8PAAop+c//7+/v/+/v7/1dXV/9zb
+2v/GxML/2tnX/83Jx//m4t7/5uLe//v39P+in5z/4NfP//rz7P/68+z/+vPs/4eFgv/w8PAA8PDw
+AKKfnP///////////93d3f/W1tb/zs7O/9TT0//BwL//uLWz/7i1s//q5+T/o56Y/+DXz//47uT/
++vPs//rz7P+HhYL/8PDwAPDw8ACin5z///////////////////////7+/v/+/v3//fz6//z59//8
++ff//Pn3/62noP+2r6j/0cnA//rz7P/68+z/h4WC//Dw8ADw8PAAop+c////////////1tbW/93d
+3f/Pz8//1dXV/9TU0//Qzsz/0M7M//z69/+2sKn/tq+o/+Ta0f/68+z/+vPs/4eFgv/w8PAA8PDw
+AKKfnP///////////9bW1v/d3d3/z8/P/9XV1f/U1NP/0M7M/9DOzP/8+vf/trCp/7avqP/k2tH/
++vPs//rz7P+HhYL/8PDwAPDw8ACin5z//////////////////////////////////v39//37+f/9
++/n//fv4/62oov+3r6r/0Mi///rz7P/68+z/h4WC//Dw8ADw8PAAop+c////////////////////
+/////////////+Xk4//T0M3/09DN/8C7tv+1r6r/8Onh//ju5f/68+z/+vPs/4eFgv/w8PAA8PDw
+AKKfnP/////////////////////////////////49/f/8Onj//Dp4/+3saz/vbiy/9HKxP/Mxb3/
++vPs//rz7P+HhYL/8PDwAPDw8ACin5z/////////////////////////////////6+nn/7m0sP+5
+tLD/7+rm//n07v/58uv/+PDn//rz7P/68+z/h4WC//Dw8ADw8PAAop+c/6KfnP+in5z/op+c/6Kf
+nP+Wk5D/tLGu/767uP/z8O3/8/Dt//v38v/69O//19HL/723sP+nopz/p6Kc/3Jtae7w8PAA8PDw
+APDw8ADw8PAA8PDwAPDw8ADw8PAAh4WC//38+//9+/n//Pn1//z59f/79vL/+vTv//Tt5//x6eH/
+j4h/+o+If/osKidZ8PDwAPDw8ADw8PAA8PDwAPDw8ADw8PAA8PDwAIeFgv/9/Pv//fv5//z59f/8
++fX/+/by//r07//07ef/8enh/4+If/qPiH/6LConWfDw8ADw8PAA8PDwAPDw8ADw8PAA8PDwAPDw
+8ACHhYL//fv6//37+f/8+vf//Pr3//z59f/79/P/6OHZ/4eBevUnJSNJJyUjSfDw8ADw8PAA8PDw
+APDw8ADw8PAA8PDwAPDw8ADw8PAAh4WC/4eFgv+HhYL/h4WC/4eFgv+HhYL/h4WC/2xpZOIdHBo4
+8PDwAPDw8ADw8PAA8PDwAA==</ImageData>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="button ausschneiden"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="2"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="button ausschneiden"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="false"/>
+      <Style value="0"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=CutElement()"/>
+      <ImageData>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
+8PDwAPDw8ADw8PAA8PDwAA==</ImageData>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="true"/>
+      <BuiltIn value="false"/>
+      <Caption value="button löschen"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="3"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="button löschen"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="false"/>
+      <Style value="0"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=DeleteElement()"/>
+      <ImageData>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
+AAAcWAAAHFjw8PAA8PDwAA==</ImageData>
+    </Control>
+  </Controls>
+</CommandBar>
