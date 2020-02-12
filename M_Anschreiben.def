@@ -235,7 +235,7 @@ Public Function Neu(Projektnummer As Long, Auftragsnummer As Long, BelegArt As D
 'Erstellt ein neues Anschreiben gibt die id des Anschreiben zurück
 Dim rs1 As DAO.Recordset
 Dim sSql As String
-
+Stop
 m_Projektnummer = Projektnummer
 m_BelegArt = BelegArt
 m_Formulartype = Formulartype

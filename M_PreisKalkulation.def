@@ -114,6 +114,7 @@ Dim sum_VK As Double
 Dim sum_ZS As Double
 Dim sum_E As Double
 
+
 Select Case True
     Case m_tabelle = "tblProjektbeschreibung" 'Kalkulation Angebot
         aw = 1
@@ -123,6 +124,7 @@ Select Case True
                 "Preis_Summe AS PreisSPr_, " & _
                 "Einzel_Kalkulation AS EKalk_, " & _
                 "Preis_Einzeln AS EPreis_ ," & _
+                "Preis_VK as EPreisKalk_ ," & _
                 "tblProjektbeschreibung.* " & _
                 "From tblProjektbeschreibung " & _
                 "WHERE Unternummer = " & m_KeySuch & " " & _
@@ -136,6 +138,7 @@ Select Case True
                 "Anzahl_Menge AS Menge_, " & _
                 "Einzel_Kalkulation AS EKalk_, " & _
                 "Preis_Einzeln AS EPreis_ ," & _
+                "Preis_VK as EPreisKalk_ ," & _
                 "tblAufPositionen.* " & _
                 "From tblAufPositionen " & _
                 "WHERE Auftragsnummer = " & m_KeySuch & " " & _
@@ -148,10 +151,13 @@ Select Case True
                 "Anzahl_Menge AS Menge_, " & _
                 "Einzel_Kalkulation AS EKalk_, " & _
                 "Preis_Einzeln AS EPreis_ ," & _
+                "Preis_VK as EPreisKalk_ ," & _
+                "Preis_Summe AS Summe_ ," & _
                 "tblProjektbeschreibungDokumente.* " & _
                 "FROM tblProjektbeschreibungDokumente " & _
                 "WHERE BelegNr = " & m_KeySuch & " " & _
                 "ORDER BY tblProjektbeschreibungDokumente.Pos_Nummer"
+        
         
 End Select
 
@@ -169,36 +175,47 @@ With rs1
                     'Nix machen
                 Case Right(.Fields("Pos_Nummer").Value, 3) = ".ZS"
                     'Zwischensumme erkannt
-                    .Fields("Preis_VK").Value = sum_ZS
-                    
+                    '.Fields("Preis_VK").Value = sum_ZS
+                    .Fields("Preis_Summe").Value = sum_ZS
+                
                     .Fields("Menge_").Value = Null
                     .Fields("Einheit").Value = Null
                     .Fields("EKalk_").Value = Null
                     .Fields("EPreis_").Value = Null
-                    
+                    'EPreisKalk_
                     
                     sum_ZS = 0
                 Case Left(.Fields("Pos_Nummer").Value, 5) = "Preis"
                     'Gesamtpreis erkannt
-                    .Fields("Preis_VK").Value = sum_VK + Aufschlag
+                    '         Preis_VK
+                    .Fields("Preis_Summe").Value = sum_VK + Aufschlag
                     
                     .Fields("Menge_").Value = Null
                     .Fields("Einheit").Value = Null
                     .Fields("EKalk_").Value = Null
                     .Fields("EPreis_").Value = Null
-                    
-                Case InStr(1, .Fields("Pos_Bezeichnung").Value, "(Option)") <> 0
+                    'EPreisKalk_
+                Case InStr(1, Nz(.Fields("Pos_Bezeichnung").Value, ""), "(Option)") <> 0
                     'Option erkannt nicht in Summe
-
-                    .Fields("Preis_VK").Value = Nz(.Fields("Menge_").Value, 0) * Nz(.Fields("EPreis_").Value, 0) * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
+                    'Preis_Summe
+                    '.Fields("Preis_VK").Value = Nz(.Fields("Menge_").Value, 0) * Nz(.Fields("EPreis_").Value, 0) * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
+                    .Fields("Preis_Summe").Value = Nz(.Fields("Menge_").Value, 0) * Nz(.Fields("EPreis_").Value, 0) * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
                     
                 Case Else
                 
                     'Hier alles was nicht besonders ist
                     If m_tabelle = "tblProjektbeschreibung" Then .Fields("Anzahl_Menge").Value = .Fields("Anzahl_Teile").Value * .Fields("Anzahl_Stueck").Value
-                    sum_E = Nz(.Fields("Menge_").Value, 0) * Nz(.Fields("EPreis_").Value, 0) * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
+                    
+                    .Fields("EPreisKalk_").Value = .Fields("EPreis_").Value * (1 + (Nz(.Fields("EKalk_").Value, 0) + ProzentAufschlag) / 100)
+                    
+                    sum_E = Nz(.Fields("Menge_").Value, 0) * .Fields("EPreisKalk_").Value
                     sum_E = CDbl(Format(sum_E, "0.00"))
-                    .Fields("Preis_VK").Value = sum_E
+                    '.Fields("Preis_VK").Value = sum_E
+                                        
+                    .Fields("Preis_Summe").Value = sum_E
+                    
+                    'EPreisKalk_
+                    
                     sum_VK = sum_VK + sum_E
                     sum_ZS = sum_ZS + sum_E
                     
