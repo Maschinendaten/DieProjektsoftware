@@ -6,7 +6,7 @@ Public tStart As Long
 Sub TestSplit()
 
 Dim Ar() As String
-Dim s1 As String
+Dim S1 As String
 Dim Sx As String
 Dim A As Long
 Dim sDateiName As String
@@ -17,14 +17,14 @@ sDateiName = CurrentProject.Path & "\Split.txt"
 Open sDateiName For Input As #1    ' Datei zum Einlesen öffnen.
 Do While Not EOF(1)    ' Schleife bis Dateiende.
     Input #1, Sx    ' Daten in zwei Variablen einlesen.
-    s1 = s1 & Sx
+    S1 = S1 & Sx
 Loop
 Close #1    ' Datei schließen.
 
 Stop
 ';S1 = "ääöö;121212;" & vbCrLf & "121212;122121;121212;"
 
-Ar = Split(s1, ";")
+Ar = Split(S1, ";")
 
 For A = 0 To UBound(Ar)
     Debug.Print Ar(A)
@@ -184,7 +184,7 @@ End Sub
 
 
 
-Public Function TagErzeugen(s1 As String) As String
+Public Function TagErzeugen(S1 As String) As String
 
 'Dim olApp As Outlook.Application
 'Dim olFld As Outlook.MAPIFolder

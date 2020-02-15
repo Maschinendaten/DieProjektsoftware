@@ -13,7 +13,7 @@ Sub CheckWeb()
 Dim IEApp 'As WebBrowserControl
 Dim IEDocument
 Dim sWWW As String
-Dim s1 As String
+Dim S1 As String
 Dim pqr As String
 
 PSDebug "checkWeb"
@@ -47,19 +47,19 @@ Do
 Loop Until IEApp.Busy = False
 Set IEDocument = IEApp.Document
 
-s1 = Mid(IEDocument.body.innerHTML, 6)
+S1 = Mid(IEDocument.body.innerHTML, 6)
 'Stop
 IEApp.quit
 
   'Debug.Print S1
-PSDebug s1
+PSDebug S1
 
-If InStr(1, s1, "alert-") <> 0 Then
+If InStr(1, S1, "alert-") <> 0 Then
     'Der Empfangene Text ist nicht die erwartete Tabelle sondern enthält einen Fehler
     MsgBox LA("Adresse stimmt nicht. f_Debug ")
     Exit Sub
 End If
-checkString (s1)
+checkString (S1)
 End Sub
 
 Private Function checkString(Sx As String) As Boolean

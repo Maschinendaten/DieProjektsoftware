@@ -103,7 +103,7 @@ Function SF(sTabelle As String, Optional sPraefix As String, Optional sSufix As 
 Dim tdf As DAO.TableDef
 Dim fld As DAO.Field
 Dim db As DAO.Database
-Dim s1 As String
+Dim S1 As String
 
 
     Set db = CurrentDb
@@ -112,15 +112,15 @@ Dim s1 As String
             For Each fld In tdf.Fields
                 'für eingabe in Code
                 If sPraefix = "" Then
-                    s1 = "rs1!" & fld.Name ', fld.Type, fld.Size
+                    S1 = "rs1!" & fld.Name ', fld.Type, fld.Size
                 Else
-                    s1 = sPraefix & fld.Name ', fld.Type, fld.Size
+                    S1 = sPraefix & fld.Name ', fld.Type, fld.Size
                 End If
                 If sSufix <> "" Then
                 
-                    s1 = s1 & sSufix
+                    S1 = S1 & sSufix
                 End If
-                Debug.Print s1
+                Debug.Print S1
             Next fld
        
         End If
@@ -135,7 +135,7 @@ Function SFf(sTabelle As String, Optional sPraefix As String, Optional sSufix As
 Dim tdf As DAO.TableDef
 Dim fld As DAO.Field
 Dim db As DAO.Database
-Dim s1 As String
+Dim S1 As String
 
 Debug.Print "With rs1"
 Debug.Print "if not .eof then"
@@ -146,15 +146,15 @@ Debug.Print "if not .eof then"
             For Each fld In tdf.Fields
                 'für eingabe in Code
                 If sPraefix = "" Then
-                    s1 = ".fields(" & Chr(34) & fld.Name & Chr(34) & ").Value"
+                    S1 = ".fields(" & Chr(34) & fld.Name & Chr(34) & ").Value"
                 Else
-                    s1 = sPraefix & ".fields(" & Chr(34) & fld.Name & Chr(34) & ").Value"
+                    S1 = sPraefix & ".fields(" & Chr(34) & fld.Name & Chr(34) & ").Value"
                 End If
                 If sSufix <> "" Then
                 
-                    s1 = s1 & sSufix
+                    S1 = S1 & sSufix
                 End If
-                Debug.Print "    " & s1
+                Debug.Print "    " & S1
             Next fld
        
         End If
@@ -171,14 +171,14 @@ Public Sub ch()
     'Gibt alle Asc Zeichen mit entsprechendem Code aus
 Dim A As Long
 Dim B As Long
-Dim s1 As String
+Dim S1 As String
 
     For A = 32 To 255
         B = B + 1
-        s1 = s1 & "H" & Hex(A) & "|" & A & " " & Chr(A) & "  "
+        S1 = S1 & "H" & Hex(A) & "|" & A & " " & Chr(A) & "  "
         If B = 5 Then
-            Debug.Print s1
-            s1 = ""
+            Debug.Print S1
+            S1 = ""
             B = 0
         End If
     Next A
@@ -193,7 +193,7 @@ Function SFm(sTabelle As String)
 Dim tdf As DAO.TableDef
 Dim fld As DAO.Field
 Dim db As DAO.Database
-Dim s1 As String
+Dim S1 As String
 
 
     Set db = CurrentDb
@@ -202,8 +202,8 @@ Dim s1 As String
             For Each fld In tdf.Fields
                 'für eingabe in Code
                 
-                    s1 = "m_" & fld.Name & "= .fields(" & Chr(34) & fld.Name & Chr(34) & ").value"
-                Debug.Print s1
+                    S1 = "m_" & fld.Name & "= .fields(" & Chr(34) & fld.Name & Chr(34) & ").value"
+                Debug.Print S1
             Next fld
        
         End If
@@ -234,7 +234,7 @@ Function SO(sTabelle As String, Optional NurBloeckeAnzeigen As ObjektBlock = 0)
 Dim tdf As DAO.TableDef
 Dim fld As DAO.Field
 Dim db As DAO.Database
-Dim s1 As String
+Dim S1 As String
 Dim s2 As String
 Dim s3 As String
 Dim S4 As String
@@ -244,7 +244,7 @@ Dim S4 As String
         If tdf.Name = sTabelle Then
             For Each fld In tdf.Fields
                 'für eingabe in Code
-                s1 = s1 & "Private m_" & fld.Name & " AS " & varType(fld.Type) & vbCrLf
+                S1 = S1 & "Private m_" & fld.Name & " AS " & varType(fld.Type) & vbCrLf
                 
                 s2 = s2 & "Public Property Get " & fld.Name & " () As " & varType(fld.Type) & ":"
                 s2 = s2 & "   " & fld.Name & "= m_" & fld.Name & ":"
@@ -269,11 +269,11 @@ Dim S4 As String
 
     Select Case NurBloeckeAnzeigen
         Case 0
-            Debug.Print s1
+            Debug.Print S1
             Debug.Print s2
             Debug.Print s3
         Case 1
-            Debug.Print s1
+            Debug.Print S1
         Case 2
             Debug.Print s2
         Case 3
@@ -360,7 +360,7 @@ Sub sm(Optional sMenueTabelle As String = "")
 Dim sSql As String
 Dim rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
-Dim s1 As String
+Dim S1 As String
 Dim Size As Long
 
 'Ersten 3 Zeichen entfernen PS spezifische Kontexmenues
@@ -376,7 +376,7 @@ sSql = "SELECT * FROM t_Menue WHERE MENAme Like '*" & sMenueTabelle & "'"
         .MoveFirst
         
         While Not .EOF
-         s1 = s1 & "SM(""" & .Fields("MeName").Value & vbCrLf
+         S1 = S1 & "SM(""" & .Fields("MeName").Value & vbCrLf
             If Size <> 1 Then
                 'Es gibt viele Treffer Menues anzeigen
                
@@ -385,7 +385,7 @@ sSql = "SELECT * FROM t_Menue WHERE MENAme Like '*" & sMenueTabelle & "'"
                 sSql = "SELECT * FROM t_MenueDat WHERE fiMeID=" & .Fields("MeID").Value
                 Set Rs2 = CurrentDb.OpenRecordset(sSql)
                 While Not Rs2.EOF
-                    s1 = s1 & Rs2!MdName & String(25 - Len(Rs2!MdName), " ") & Rs2!MdAktiv & vbTab & Rs2!MdAktion & vbTab & Rs2!MdTipp & vbCrLf
+                    S1 = S1 & Rs2!MdName & String(25 - Len(Rs2!MdName), " ") & Rs2!MdAktiv & vbTab & Rs2!MdAktion & vbTab & Rs2!MdTipp & vbCrLf
                     Rs2.MoveNext
                 Wend
                 Rs2.Close
@@ -394,7 +394,7 @@ sSql = "SELECT * FROM t_Menue WHERE MENAme Like '*" & sMenueTabelle & "'"
         Wend
         .Close
     End With
-    Debug.Print s1
+    Debug.Print S1
 End Sub
 
 

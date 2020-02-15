@@ -57,17 +57,17 @@ Function laForm(frm As Form)
 'Sucht in dem Form nach Bezeichnungen die Übersetzt werden sollen
 
     Dim ctl As Control
-    Dim s1 As String
+    Dim S1 As String
     On Error Resume Next
     
  
     
     For Each ctl In frm.Controls
         If Not IsNull(frm(ctl.Name)) Then
-            s1 = ctl.ControlTipText
-            If s1 <> "" Then    'And Err.Number <> 0 Then
+            S1 = ctl.ControlTipText
+            If S1 <> "" Then    'And Err.Number <> 0 Then
                 Debug.Print ctl.Name, ctl.ControlTipText
-                ctl.ControlTipText = LA(s1)
+                ctl.ControlTipText = LA(S1)
             End If
         End If
     Next ctl

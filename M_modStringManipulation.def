@@ -339,19 +339,19 @@ End Function
 
 
 
-Function funShowASC9(s1 As String) As String
+Function funShowASC9(S1 As String) As String
 Dim z1 As Long
 Dim s2 As String
 
-For z1 = 1 To Len(s1)
-Select Case Asc(Mid(s1, z1, 1))
+For z1 = 1 To Len(S1)
+Select Case Asc(Mid(S1, z1, 1))
     
     Case 9
         s2 = s2 & "*"
     Case 10
         s2 = s2 & "#"
     Case Else
-        s2 = s2 & Mid(s1, z1, 1)
+        s2 = s2 & Mid(S1, z1, 1)
 End Select
     
     

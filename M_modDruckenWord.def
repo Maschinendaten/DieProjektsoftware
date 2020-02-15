@@ -33,7 +33,7 @@ Dim tTmp As String
 Dim tDoc As String
 Dim rs1  As DAO.Recordset
 Dim A As Long
-Dim s1 As String
+Dim S1 As String
 Dim s2 As String
 Dim sPVorlage As String
 Dim sPAusgabe As String
@@ -83,11 +83,11 @@ With objWord
     rs1.MoveFirst
     'Es werden alle Bookmarks ersetzt die einzeln vorkommen
     For A = 0 To rs1.Fields.Count - 1
-        s1 = rs1.Fields(A).Name
+        S1 = rs1.Fields(A).Name
         s2 = Nz(rs1.Fields(A).Value, "")
         'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
-        If .ActiveDocument.Bookmarks.Exists(s1) Then
-            .ActiveDocument.Bookmarks(s1).Range.Text = s2
+        If .ActiveDocument.Bookmarks.Exists(S1) Then
+            .ActiveDocument.Bookmarks(S1).Range.Text = s2
         End If
     Next A
     
@@ -108,13 +108,13 @@ With objWord
         
         'Ersetze die Bookmarks in der Tabelle
         For A = 0 To rs1.Fields.Count - 1
-            s1 = "Txx" & rs1.Fields(A).Name
+            S1 = "Txx" & rs1.Fields(A).Name
             s2 = Nz(rs1.Fields(A).Value, "")
-            Debug.Print "f#D:", s1, Mid(s2, 1, 10)
+            Debug.Print "f#D:", S1, Mid(s2, 1, 10)
             'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
-            If .ActiveDocument.Bookmarks.Exists(s1) Then
-                .ActiveDocument.Bookmarks(s1).Range.Text = s2
-                Debug.Print "T#D:", s1, Mid(s2, 1, 10)
+            If .ActiveDocument.Bookmarks.Exists(S1) Then
+                .ActiveDocument.Bookmarks(S1).Range.Text = s2
+                Debug.Print "T#D:", S1, Mid(s2, 1, 10)
             End If
         Next A
         'Markiere die Tabelle um mit dem Cursor unter diese zu springen
@@ -383,7 +383,7 @@ Function funOpenWord(sDokuName As String)
 
 Dim wdDoc As Document
 Dim wdApp As Application
-Dim s1 As String
+Dim S1 As String
 
 Dim objWord
 
@@ -392,13 +392,13 @@ Dim objWord
 'nur zum testen
 'sDokuName = "C:\AA_MG\PS\Word_Berichte\Zimmermann\Ausgabe\brief.doc"
 
-s1 = sDokuName
+S1 = sDokuName
 'Set wdDoc = GetObject(S1)
 'Set wdApp = wdDoc.Application
 
 Set objWord = CreateObject("Word.Application")
 
-objWord.Documents.Add (s1)
+objWord.Documents.Add (S1)
 
 objWord.Visible = True
 'AppActivate objWord.Caption
@@ -491,7 +491,7 @@ Dim tTmp As String
 Dim tDoc As String
 Dim rs1  As DAO.Recordset
 Dim A As Long
-Dim s1 As String
+Dim S1 As String
 Dim s2 As String
 Dim sPVorlage As String
 Dim sPAusgabe As String
@@ -563,11 +563,11 @@ End If
 rs1.MoveFirst
 'Es werden alle Bookmarks ersetzt die einzeln vorkommen
 For A = 0 To rs1.Fields.Count - 1
-    s1 = rs1.Fields(A).Name
+    S1 = rs1.Fields(A).Name
     s2 = Nz(rs1.Fields(A).Value, "")
     'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
-    If .ActiveDocument.Bookmarks.Exists(s1) Then
-        .ActiveDocument.Bookmarks(s1).Range.Text = s2
+    If .ActiveDocument.Bookmarks.Exists(S1) Then
+        .ActiveDocument.Bookmarks(S1).Range.Text = s2
     End If
 Next A
 
@@ -588,11 +588,11 @@ End If
         
         'Ersetze die Bookmarks in der Tabelle
         For A = 0 To rs1.Fields.Count - 1
-            s1 = "Txx" & rs1.Fields(A).Name
+            S1 = "Txx" & rs1.Fields(A).Name
             s2 = Nz(rs1.Fields(A).Value, "")
             'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
-            If .ActiveDocument.Bookmarks.Exists(s1) Then
-                .ActiveDocument.Bookmarks(s1).Range.Text = s2
+            If .ActiveDocument.Bookmarks.Exists(S1) Then
+                .ActiveDocument.Bookmarks(S1).Range.Text = s2
             End If
         Next A
         'Markiere die Tabelle um mit dem Cursor unter diese zu springen

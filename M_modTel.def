@@ -14,7 +14,7 @@ Function funTelMail(s_RufNummer As String, _
 
 Dim strMeldung As String
 Dim RetVal As Long
-Dim s1 As String
+Dim S1 As String
 'Dim s2 As String
 'Dim s3 As String
 'Dim S4 As String
@@ -31,9 +31,9 @@ If Nz(s_Bezeichnung_Nr) <> "E-Mail" Then
         'Ab 2019 es gibt immer ein Form für jede telefon Aplikation zB. NaviTelephon_SoftPhone und NaviTelephon_FreePhone
         'dem wird beim aufruf eine Nummer übergeben alle Funktionen des telephons werden in dem Form abgebildet
         
-        s1 = Replace(s_RufNummer, " ", "") 'löscht leerzeichen
+        S1 = Replace(s_RufNummer, " ", "") 'löscht leerzeichen
         
-        DoCmd.OpenForm "NaviTelephon_SoftPhone", , , , , , s1
+        DoCmd.OpenForm "NaviTelephon_SoftPhone", , , , , , S1
         
    
    If Not MenFormularOpen("frmNotizenN1") Then 'Wenn Notizen schon offen ist wird keine neue Notiz angelegt

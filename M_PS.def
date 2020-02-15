@@ -99,3 +99,32 @@ If sP1 > 0 Then FormIsOpen = True
 '----------------------------------------
 
 End Function
+
+
+Function PositionPlus(VorgabePositionsnummer As String, Sprungweite) As String
+
+
+'15.2.2020 es wird die nächste Nummer basieren auf der VorgabePositionsnummer vergeben
+' der syntax der Positionen ist xx.nn die nn Nummer wird hochgezählt
+'Sprungweite ist die Zahl um die nn erhöt wir
+
+
+Dim z1 As Long
+Dim S1 As String
+
+        If Not IsNumeric(Right(VorgabePositionsnummer, 2)) Then
+            VorgabePositionsnummer = "99.00"
+        End If
+        z1 = Val(Right(VorgabePositionsnummer, 2))
+        z1 = z1 + Sprungweite
+        If z1 > 99 Then z1 = 99
+        If z1 < 1 Then z1 = 1
+        
+        If z1 > 9 Then
+            S1 = Left(VorgabePositionsnummer, 2) & "." & z1
+        Else
+            S1 = Left(VorgabePositionsnummer, 2) & ".0" & z1
+        End If
+        PositionPlus = S1
+
+End Function

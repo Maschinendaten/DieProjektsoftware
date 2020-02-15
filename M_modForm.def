@@ -147,7 +147,7 @@ Dim BitAdr As Long
 Dim intSp1 As Long
 Dim lPr As Long
 Dim Type_ As String
-Dim s1 As String
+Dim S1 As String
 Dim l1 As Long
 Dim z1 As Long
 Dim z2 As Long

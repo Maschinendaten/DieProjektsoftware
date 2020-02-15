@@ -8,7 +8,7 @@ Public Function SucheNaechsteNummer(AufNr As Long, PosNr As String) As String
 Dim rs1 As DAO.Recordset
 Dim sSql As String
 Dim z1 As Long
-Dim s1 As String
+Dim S1 As String
 
 sSql = "SELECT * FROM tblAufPositionen WHERE " & _
     "Auftragsnummer=" & AufNr & _
@@ -28,11 +28,11 @@ With rs1
         If z1 < 1 Then z1 = 1
         
         If z1 > 9 Then
-            s1 = Left(!Pos_Nummer, 2) & "." & z1
+            S1 = Left(!Pos_Nummer, 2) & "." & z1
         Else
-            s1 = Left(!Pos_Nummer, 2) & ".0" & z1
+            S1 = Left(!Pos_Nummer, 2) & ".0" & z1
         End If
-        SucheNaechsteNummer = s1
+        SucheNaechsteNummer = S1
     End If
     .Close
 
@@ -73,7 +73,8 @@ Dim z1 As Long
     With Rs2
         .AddNew
         .Fields("Auftragsnummer").Value = Auftragsnummer
-        .Fields("Pos_Nummer").Value = modAuftrag.SucheNaechsteNummer(Auftragsnummer, Pos_Nummer)  '(Form_frmAufDaten.ID, Form_frmAufDaten.Pos_Nummer)
+        '.Fields("Pos_Nummer").Value = modAuftrag.SucheNaechsteNummer(Auftragsnummer, Pos_Nummer)  '(Form_frmAufDaten.ID, Form_frmAufDaten.Pos_Nummer)
+        .Fields("Pos_Nummer").Value = PS.PositionPlus(Pos_Nummer, 2)
         .Fields("Pos_Bezeichnung").Value = Pos_Bezeichnung
         .Fields("Pos_Beschreibung").Value = Pos_Beschreibung
         .Fields("Anzahl_Menge").Value = Anzahl_Menge

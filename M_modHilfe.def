@@ -114,11 +114,11 @@ End Function
 
 Public Sub funWebHilfe(LinkAdresse As Long)
 Dim wshshell As Object
-Dim s1 As String
+Dim S1 As String
 
         Set wshshell = CreateObject("WScript.Shell")
         
-        s1 = "www.help.DieProjektSoftware.de/" & LinkAdresse
+        S1 = "www.help.DieProjektSoftware.de/" & LinkAdresse
         
-        wshshell.Run s1
+        wshshell.Run S1
 End Sub

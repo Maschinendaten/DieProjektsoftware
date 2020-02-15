@@ -640,19 +640,19 @@ Function berichtMandant(sBerichtname As String) As String
 'Die Funktion sucht ob es den Bericht gibt.
 'Ist ein Mandant festgelegt wird der Bericht mit dem Sufix des Mandanten gesucht gibt es diesen Nicht wird der erste Bericht zurück gegeben
 
-Dim s1 As String
+Dim S1 As String
 Dim s2 As String
 Dim sSql As String
 Dim rs1 As DAO.Recordset
 
 'Stop
-    s1 = funMandant() 'Prüft ob Mandant beteht
-    If s1 = "" Then                                       'Prüft ob Mandant besteht und Auflistung ausgewählt
+    S1 = funMandant() 'Prüft ob Mandant beteht
+    If S1 = "" Then                                       'Prüft ob Mandant besteht und Auflistung ausgewählt
         berichtMandant = sBerichtname
         Exit Function
     End If
         
-        s2 = sBerichtname & s1
+        s2 = sBerichtname & S1
                                                                     'Sucht nach dem Bericht der Ausgewählt wurde mit Mandant
         sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
                "Name = '" & s2 & "' AND Type =-32764"

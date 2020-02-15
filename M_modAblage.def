@@ -38,19 +38,19 @@ Sub DurchsucheAblage()
   Dim fs, F, f1, fc, S
     
     Dim l1 As Long
-    Dim s1 As String
+    Dim S1 As String
     Dim Ablage As TyAblage
     
     'Holt den Dateinamen der Ablage
-    s1 = funDirDokuTempAblage()
+    S1 = funDirDokuTempAblage()
     
     'Wenn Keine Vorgabe abbrechen
-    If s1 = "" Or Dir(s1, 16) = "" Then
+    If S1 = "" Or Dir(S1, 16) = "" Then
         Exit Sub
     End If
     
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set F = fs.GetFolder(s1)
+    Set F = fs.GetFolder(S1)
     Set fc = F.Files
     
     For Each f1 In fc
@@ -71,8 +71,8 @@ Sub DurchsucheAblage()
     Select Case Mid(Ablage.Datei, 1, 1)
     
         Case "P"  'Prüfe wenn P für Projekt erkannt
-            s1 = Mid(Ablage.Datei, 2, 4)
-            If Val(s1) > 999 And Val(s1) < 10000 Then    ' Eine projektummer besteht aus 4 Zahlen
+            S1 = Mid(Ablage.Datei, 2, 4)
+            If Val(S1) > 999 And Val(S1) < 10000 Then    ' Eine projektummer besteht aus 4 Zahlen
                 
                 If Mid(Ablage.Datei, 6, 1) = " " Then  'Nach der Nummer muss ein Leerzeichen kommen
                     If Nz(DLookup("ProjektNr", "tblProjekte", "ProjektNr=" & Mid(Ablage.Datei, 2, 4))) <> 0 Then 'die Projektnummer muss vorhanden sein
@@ -84,8 +84,8 @@ Sub DurchsucheAblage()
             
             
         Case "A"  'Prüfe wenn A für Artikel erkannt
-            s1 = Mid(Ablage.Datei, 2, 5)
-            If Val(s1) > 9999 And Val(s1) < 100000 Then    ' Eine Artikelnummer besteht aus 5 Zahlen
+            S1 = Mid(Ablage.Datei, 2, 5)
+            If Val(S1) > 9999 And Val(S1) < 100000 Then    ' Eine Artikelnummer besteht aus 5 Zahlen
                 If Mid(Ablage.Datei, 7, 1) = " " Then   'Nach der Nummer muss ein Leerzeichen kommen
                     If Nz(DLookup("ID", "tblArtikel", "ID=" & Mid(Ablage.Datei, 2, 4))) <> 0 Then 'die Projektnummer muss vorhanden sein
                         Ablage.ArtikelID = Val(Mid(Ablage.Datei, 2, 5))
@@ -131,7 +131,7 @@ Function funAblageBeleg(Ablage As TyAblage) As String
 
 Dim rs1 As DAO.Recordset
 Dim lNr As Long
-Dim s1 As String
+Dim S1 As String
 Set rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_Ablage WHERE False")
 
 
@@ -146,11 +146,11 @@ rs1.AddNew
      rs1!AbHerkunft = Nz(Ablage.Herkunft, "")
     
     If Nz(Ablage.Herkunft) = "link" Then
-        s1 = Ablage.Datei  'Wenn link keine Nummer voranstellen weil kein Dokument.
+        S1 = Ablage.Datei  'Wenn link keine Nummer voranstellen weil kein Dokument.
     Else
-        s1 = Format(lNr, "000000") & "_" & Ablage.Datei
+        S1 = Format(lNr, "000000") & "_" & Ablage.Datei
     End If
-    rs1!AbDatei = s1
+    rs1!AbDatei = S1
     
    rs1!ABDateiDatum = Ablage.DateiDatum
     rs1!AbDateiSize = Ablage.DateiSize
@@ -164,7 +164,7 @@ rs1.Close
 
 Set rs1 = Nothing
                         
-funAblageBeleg = s1
+funAblageBeleg = S1
 
 
 
@@ -172,17 +172,17 @@ funAblageBeleg = s1
 End Function
 
 
-Function funAbgelegteBelegAufrufen(s1 As String) As Boolean
+Function funAbgelegteBelegAufrufen(S1 As String) As Boolean
 'Ruft den Beleg aus dem Ablagesystem auf
 
 Dim s2 As String
 
-If Nz(s1) = "" Then
+If Nz(S1) = "" Then
     funAbgelegteBelegAufrufen = False
     Exit Function
 End If
 
-s2 = funDirDokuAblage() & "\" & s1
+s2 = funDirDokuAblage() & "\" & S1
 
 funRunDatei s2
 funAbgelegteBelegAufrufen = True 'Aufrufen der Datei hat funktioniert
@@ -193,7 +193,7 @@ End Function
 
 
 Function DateiAblegen(Ablage As TyAblage) As String
- Dim s1 As String
+ Dim S1 As String
  Dim s2 As String
  Dim s3 As String
 
@@ -207,12 +207,12 @@ Function DateiAblegen(Ablage As TyAblage) As String
     If s3 = "" Then DateiAblegen = "Kein Verzeichnis zum ablegen.": Exit Function
      
 'Holt den neuen Dateinamen für die Ablage mit Datenbankeintrag in die Tabellen t_Ablage
-    s1 = funAblageBeleg(Ablage)
+    S1 = funAblageBeleg(Ablage)
     
-    s1 = s1 & "." & Ablage.DateiType
+    S1 = S1 & "." & Ablage.DateiType
 
 'Kopiert die Datei in die Ablage
-    s3 = s3 & "\" & s1
+    s3 = s3 & "\" & S1
     FileCopy s2, s3
     
 'Kontrolliere ob Datei vorhanden

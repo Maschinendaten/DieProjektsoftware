@@ -9,13 +9,13 @@ Option Explicit
 
 Function funStart()
 'Das muss ganz am anfang sein wenn Runtime und die Verweise sind nicht OK
-Dim s1 As String
+Dim S1 As String
 
-s1 = FunVerweiseAnzeigen
+S1 = FunVerweiseAnzeigen
 
 'Wenn ein ungültiger Verweis erkannt wir zeigen wir die Verweise an.
-If InStr(1, s1, "broken") <> 0 Then
-    MsgBox s1
+If InStr(1, S1, "broken") <> 0 Then
+    MsgBox S1
 End If
 
 Call funStart2

@@ -2258,7 +2258,7 @@ MsgBox "funAnBestEMail"
 
 Dim d1 As String
 Dim D2 As String
-Dim s1 As String
+Dim S1 As String
 Dim s2 As String
 
 
@@ -2270,7 +2270,7 @@ End If
 With Form_frmAnfragenBestellungen
 
     'Standartvorlage über Mandant wenn der Mandant nicht gefunden wird wird der Standart verwendet
-    s1 = berichtMandant("ber_BestellungAnfrage")
+    S1 = berichtMandant("ber_BestellungAnfrage")
     
     
     'Prüfen Ob ein verzeichnis für die Ablage besteht
@@ -2312,20 +2312,20 @@ With Form_frmAnfragenBestellungen
         
         'Abhämgig von der Beleg Art die Dokumente erzeugen
         If .Beleg_Art = "Bestellung" Then
-            DoCmd.OutputTo acOutputReport, s1, acFormatPDF, d1
+            DoCmd.OutputTo acOutputReport, S1, acFormatPDF, d1
             DoCmd.OutputTo acOutputReport, "ber_BestellungWarenBegleitschein", acFormatPDF, D2
         
             Form_frmEMail.addAnhang = d1
             Form_frmEMail.addAnhang = D2
         Else
-            DoCmd.OutputTo acOutputReport, s1, acFormatPDF, d1
+            DoCmd.OutputTo acOutputReport, S1, acFormatPDF, d1
             Form_frmEMail.addAnhang = d1
         End If
     
     Else
         'Outlook Mail
         
-        DoCmd.OutputTo acOutputReport, s1, acFormatPDF, d1
+        DoCmd.OutputTo acOutputReport, S1, acFormatPDF, d1
             
         
         SendMailHTMLOutlook .EMail, "P" & .Projektnummer & " " & .Betreff, "Hier schreiben wir des zeug usw.", d1

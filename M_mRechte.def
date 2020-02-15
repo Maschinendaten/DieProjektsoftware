@@ -76,7 +76,7 @@ Public Function WHERE_(SVariable As String) As String
 'Die Rückgabe schaut z.B. so aus   WHERE Projekt=2345 or ProjektNr=222;
 Dim l1 As Long
 Dim lT As Long
-Dim s1 As String
+Dim S1 As String
 Dim sS As String  'Speicher String
 Dim lStart As Long
 Dim lEnde As Long
@@ -84,20 +84,20 @@ Dim lEnde As Long
 
 
 's1 = DLookup("Rechte", "tblAdressenPersonal", "AdressNr=" & funBenutzerNr)
-s1 = Me.Container
-l1 = InStr(1, s1, SVariable & ".WHERE=")
+S1 = Me.Container
+l1 = InStr(1, S1, SVariable & ".WHERE=")
 
 If Me.allowed = 0 Then   'Wenn nichts generell erlaubt ist kann spezielles erlaubt werden
     While l1 <> 0
         lStart = l1 + Len(SVariable & ".WHERE=")
-        lEnde = InStr(l1, s1, " ") - (l1 + Len(SVariable & ".WHERE="))
-        lT = InStr(l1, s1, Chr(13)) - (l1 + Len(SVariable & ".WHERE="))
+        lEnde = InStr(l1, S1, " ") - (l1 + Len(SVariable & ".WHERE="))
+        lT = InStr(l1, S1, Chr(13)) - (l1 + Len(SVariable & ".WHERE="))
         If lT < lEnde Then lEnde = lT
         
         If sS <> "" Then sS = sS & " OR " Else sS = " WHERE "
         
-        sS = sS & "(" & SVariable & "=" & Mid(s1, lStart, lEnde) & ") "
-        l1 = InStr(l1 + 4, s1, SVariable & ".WHERE=")
+        sS = sS & "(" & SVariable & "=" & Mid(S1, lStart, lEnde) & ") "
+        l1 = InStr(l1 + 4, S1, SVariable & ".WHERE=")
     Wend
 Else
     'wenn alles erlaubt ist kein Where
@@ -107,7 +107,7 @@ End If
 
 
 
-If s1 = "" Then
+If S1 = "" Then
     'Wenn keine Rechte festgelegt nix erlauben
     WHERE_ = "WHERE 1=0"
     Exit Function
@@ -161,7 +161,7 @@ End Function
 
 
 Private Function re(sAbfrage) As Long
-Dim s1 As String
+Dim S1 As String
 Dim l1 As Long
 
 re = -1
@@ -171,11 +171,11 @@ If sAbfrage = "" Then
 End If
 
 's1 = DLookup("Rechte", "tblAdressenPersonal", "AdressNr=" & funBenutzerNr)
-s1 = Me.Container
-l1 = InStr(1, s1, sAbfrage & "=")
+S1 = Me.Container
+l1 = InStr(1, S1, sAbfrage & "=")
 
 If l1 <> 0 Then
-    re = Val(Mid(s1, l1 + Len(sAbfrage) + 1, 8))
+    re = Val(Mid(S1, l1 + Len(sAbfrage) + 1, 8))
 End If
 
 'Debug.Print l1, s1

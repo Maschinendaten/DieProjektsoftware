@@ -169,13 +169,13 @@ Sub StatusAnpassenStueckliste(ID_Nummer As Long, _
 'Durch ändern der Auswahl wird der Status in der Einkaufsliste angepasst
 Dim rs1 As DAO.Recordset
 Dim sSql As String
-Dim s1 As String
+Dim S1 As String
 
 
-s1 = Nz(DLookup("StatusText", "tblAWStatusStueckliste", "StatusNr=" & StatusNr), "-")
+S1 = Nz(DLookup("StatusText", "tblAWStatusStueckliste", "StatusNr=" & StatusNr), "-")
 
 If WarnungAus = False Then
-If MsgBox("Wollen Sie die Artikel in der Einkaufsliste auf Status: " & s1 & " setzen?", vbYesNo) <> vbYes Then Exit Sub
+If MsgBox("Wollen Sie die Artikel in der Einkaufsliste auf Status: " & S1 & " setzen?", vbYesNo) <> vbYes Then Exit Sub
 End If
 sSql = "SELECT Status " & _
         "FROM tblStueckliste " & _

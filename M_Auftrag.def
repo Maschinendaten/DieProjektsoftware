@@ -299,6 +299,15 @@ Dim ReBe As Single 'Zwischenspeicher Rechnungsbetrag
 Dim lonReNr As Long 'Speichert die letzte Rechnungsnummer
 Dim sSql As String
 
+
+     If Me.Laden(AuftragNr) < 1 Then
+        'Fehler Auftrag gibt es nicht
+        MsgBox LA("Es gibt keinen Auftrag!"), , "Info"
+        Exit Function
+    End If
+
+
+
 'Stop    ' keine Lust mehr Std 20190921
 'Prüfe die Adresse im Auftrag mindestens Anschreiben muss es geben
    If PS.Adresse.Laden(m_fiAnschreibenAdresse) = False Then
@@ -306,6 +315,9 @@ Dim sSql As String
         Neu_Dokument = -1
         Exit Function
    End If
+
+   
+   
 'Wenn Rechnung suche letzte Rechnungsnummer
 If DokumentType = DokType.tyrechnung Or DokumentType = DokType.tyGutschrift Then
     Set rs1 = CurrentDbC.OpenRecordset("SELECT TOP 1 tblRechnung.reBelegNr2 " & _
@@ -321,11 +333,7 @@ If DokumentType = DokType.tyrechnung Or DokumentType = DokType.tyGutschrift Then
 End If
 
 
-    If Me.Laden(AuftragNr) < 1 Then
-        'Fehler Auftrag gibt es nicht
-        MsgBox LA("Es gibt keinen Auftrag!"), , "Info"
-        Exit Function
-    End If
+
 
   
   
@@ -376,12 +384,10 @@ End If
     PS.Anschreiben.fiLieferadresse = m_fiLieferAdresse
     PS.Anschreiben.fiAnschreibenAdresse = m_fiAnschreibenAdresse
     PS.Anschreiben.fiRechnungsadresse = m_fiRechnungsAdresse
-        
-'   Rs1!Kopftext = Nz(Rs2!TextGF, "")
-'   Rs1!Textstück = Nz(Rs2!TextKunde, "")
-'   rs1!Schlusstext
-        
-    
+    PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+    PS.Anschreiben.Adressnummer = m_fiAnschreibenAdresse
+    PS.Anschreiben.Waehrung = funDbText(5, "Waehrung")
+  
   
 'spezielle Einräge für die Dokumente
 Select Case DokumentType
@@ -389,43 +395,15 @@ Select Case DokumentType
        ' Stop
         PS.Anschreiben.BelegArt = PS.Anschreiben.DokTypeString(tyAuftragsbestaetigung) '  "-Auftragsbestätigung"
         PS.Anschreiben.Betreff = "AB-" & m_AufBezeichnung
-
-'        If Nz(Rs2!TextGF, "") <> "" And Nz(Rs2!TextKunde, "") <> "" Then
-'            Rs1!Kopftext = Rs2!TextKunde & vbCrLf & Rs2!TextGF
-'        Else
-'            If Nz(Rs2!TextGF, "") <> "" Then Rs1!Kopftext = Rs2!TextGF
-'            If Nz(Rs2!TextKunde, "") <> "" Then Rs1!Kopftext = Rs2!TextKunde
-'        End If
-'        Rs1!Adressnummer = Rs2!fiAnschreibenAdresse
-'        Rs1!AnschreibenAdresse = Rs2!AnschreibenAdresse
-        PS.Anschreiben.Waehrung = funDbText(5, "Waehrung")
+        
         PS.Anschreiben.Speichern
-        'Rs1.Update
-        'Rs1.Close
-        'Set Rs1 = Nothing
-        'Rs2.Close
-        'Set Rs2 = Nothing
+
         
     Case DokType.tyrechnung  ' "RE"
         PS.Anschreiben.BelegArt = "-Rechnung"
         PS.Anschreiben.Betreff = "RE-" + m_AufBezeichnung
-        PS.Anschreiben.Adressnummer = m_fiAnschreibenAdresse
-        PS.Anschreiben.AnschreibenAdresse = m_AnschreibenAdresse
-        PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+
         PS.Anschreiben.Speichern
-        
-'        If Nz(Rs2!TextGF, "") <> "" And Nz(Rs2!TextKunde, "") <> "" Then
-'            Rs1!Kopftext = Rs2!TextKunde & vbCrLf & Rs2!TextGF
-'        Else
-'            If Nz(Rs2!TextGF, "") <> "" Then Rs1!Kopftext = Rs2!TextGF
-'            If Nz(Rs2!TextKunde, "") <> "" Then Rs1!Kopftext = Rs2!TextKunde
-'        End If
-
-
-        
-        'Set Rs1 = Nothing
-        'Rs2.Close
-        'Set Rs2 = Nothing
         
         
         'Die Rechnung wird in der Tabelle Rechnunng angelegt
@@ -461,27 +439,14 @@ Select Case DokumentType
     Case DokType.tyLieferschein  ' "Li"
             PS.Anschreiben.BelegArt = "-Lieferschein"
             PS.Anschreiben.Betreff = "Li-" & m_AufBezeichnung
-            PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
             
             PS.Anschreiben.Speichern
-'            If Nz(Rs2!TextGF, "") <> "" And Nz(Rs2!TextKunde, "") <> "" Then
-'                Rs1!Kopftext = Rs2!TextKunde & vbCrLf & Rs2!TextGF
-'            Else
-'                If Nz(Rs2!TextGF, "") <> "" Then Rs1!Kopftext = Rs2!TextGF
-'                If Nz(Rs2!TextKunde, "") <> "" Then Rs1!Kopftext = Rs2!TextKunde
-'            End If
-            
-            'Rs1!Adressnummer = Rs2!fiAnschreibenAdresse
-            'Rs1!AnschreibenAdresse = Rs2!AnschreibenAdresse
-'        Rs1.Update
-'        Rs1.Close
-'        Rs2.Close
                
         
     Case DokType.tyGutschrift  ' "Gu"
             PS.Anschreiben.BelegArt = "-Gutschrift"
             PS.Anschreiben.Betreff = "Li-" + m_AufBezeichnung
-            PS.Anschreiben.Rufname = PS.Adresse.RufnameAusAdressNr(m_fiAnschreibenAdresse)
+
             If Nz(m_TextGF, "") <> "" And Nz(m_TextKunde, "") <> "" Then
                 PS.Anschreiben.Kopftext = m_TextKunde & vbCrLf & m_TextGF
             Else
@@ -490,10 +455,7 @@ Select Case DokumentType
             End If
          PS.Anschreiben.Speichern
          
-'        Rs1.Update
-'        Rs1.Close
-'        Rs2.Close
-        'Die Gutschrift wird in der Tabelle Rechnunng angelegt
+
         sSql = "SELECT * FROM tblRechnung WHERE False"
         Set rs1 = CurrentDbC.OpenRecordset(sSql)
         If rs1.Updatable Then
@@ -538,12 +500,15 @@ If MitDetailDaten Then
             'Unterscheiden ob Preis oder ZS
                 rs1!Anzahl_Menge = Rs2!Anzahl_Menge
                 rs1!Einheit = Rs2!Einheit
+                rs1!Einzel_Kalkulation = Rs2!Einzel_Kalkulation
+                rs1!Preis_einzeln = Rs2!Preis_einzeln
                 rs1!Preis_VK = Rs2!Preis_VK
-                If Nz(Rs2!Anzahl_Menge, "") = 0 Then
-                    rs1!St_Preis_VK = 0
-                Else
-                    rs1!St_Preis_VK = Rs2!Preis_VK / Rs2!Anzahl_Menge  'Rs2!Preis_einzeln
-                End If
+                rs1!Preis_Summe = Rs2!Preis_Summe
+'                If Nz(Rs2!Anzahl_Menge, "") = 0 Then
+'                    rs1!St_Preis_VK = 0
+'                Else
+'                    rs1!St_Preis_VK = Rs2!Preis_VK / Rs2!Anzahl_Menge  'Rs2!Preis_einzeln
+'                End If
             
             
             rs1!Drucken_Preis = Rs2!Drucken_Preis
@@ -635,5 +600,57 @@ Select Case ZielDokType        'Das gewünschte Ziel muss ausgewählt sein  PS.Ans
 
 End Select
 Copy_Dokument = idDok
+
+End Function
+
+Public Function NeueAuftragsPosition(Auftragsnummer As Long, _
+            Pos_Nummer As String, _
+            Optional ArtikelID As Long = 0, _
+            Optional Pos_Bezeichnung As String = "leer", _
+            Optional Pos_Beschreibung As String = "", _
+            Optional Anzahl_Menge As Double = 1, _
+            Optional Einheit As String = "St", _
+            Optional Preis_einzeln As Double = 1, _
+            Optional Einzel_Kalkulation As Double = 0, _
+            Optional Drucken_Pos As Boolean = True, _
+            Optional Drucken_Preis As Boolean = True, _
+            Optional Drucken_Menge As Boolean = True) As Long
+         
+'Legt eine neue Auftragsposition in einem bestehenden Auftrag an
+'Die übergeben auftragsnummer muss vorhanden sein
+
+Dim Rs2 As DAO.Recordset
+Dim strSql As String
+Dim z1 As Long
+    
+'Auftragsnummer für nachfolgende Berechnungen
+'varAufNr = Me!ID
+
+''Projektnummer für nachfolgende Berechnungen
+'funProjektNummer (Me!ProNr)
+   
+   
+    strSql = "SELECT * FROM tblAufPositionen WHERE FALSE"
+    Set Rs2 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+    With Rs2
+        .AddNew
+        .Fields("Auftragsnummer").Value = Auftragsnummer
+        .Fields("Pos_Nummer").Value = modAuftrag.SucheNaechsteNummer(Auftragsnummer, Pos_Nummer)  '(Form_frmAufDaten.ID, Form_frmAufDaten.Pos_Nummer)
+        .Fields("Pos_Bezeichnung").Value = Pos_Bezeichnung
+        .Fields("Pos_Beschreibung").Value = Pos_Beschreibung
+        .Fields("Anzahl_Menge").Value = Anzahl_Menge
+        .Fields("Einheit").Value = Einheit
+        .Fields("Preis_einzeln").Value = Preis_einzeln
+        .Fields("Einzel_Kalkulation").Value = Einzel_Kalkulation
+        .Fields("Drucken_Pos").Value = Drucken_Pos
+        .Fields("Drucken_Preis").Value = Drucken_Preis
+        .Fields("Drucken_Menge").Value = Drucken_Menge
+        .Fields("ArtikelID").Value = ArtikelID
+        z1 = .Fields("ID").Value   'Achtung bei SQL server
+        Rs2.Update
+        Rs2.Close
+    End With
+    NeueAuftragsPosition = z1
+
 
 End Function
