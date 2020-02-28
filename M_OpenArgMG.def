@@ -30,7 +30,7 @@ Public Property Get DokumentNr() As Long:       DokumentNr = m_DokumentNr: End P
 Public Sub Laden(Openarg_ As String)
 
 
-Dim S1
+Dim s1
 Dim A As Long
 
 'Beim laden löschen
@@ -41,25 +41,25 @@ m_DokumentNr = 0
 
 
 
-S1 = Split(Openarg_, ";")
+s1 = Split(Openarg_, ";")
 
-For A = 0 To UBound(S1)
+For A = 0 To UBound(s1)
 
     Select Case True
-        Case Left(S1(A), 3) = "Pro"       'Projektnummer
-            m_ProjektNr = Val(Mid(S1(A), 4))
+        Case Left(s1(A), 3) = "Pro"       'Projektnummer
+            m_ProjektNr = Val(Mid(s1(A), 4))
         
-        Case Left(S1(A), 3) = "Auf"    'Auftragsnummer
-            m_AuftragNr = Val(Mid(S1(A), 4))
+        Case Left(s1(A), 3) = "Auf"    'Auftragsnummer
+            m_AuftragNr = Val(Mid(s1(A), 4))
             
-        Case Left(S1(A), 3) = "For"  'For und nicht FRM weil sich das beist
-            m_FormularBez = Mid(S1(A), 4)
+        Case Left(s1(A), 3) = "For"  'For und nicht FRM weil sich das beist
+            m_FormularBez = Mid(s1(A), 4)
         
-        Case Left(S1(A), 3) = "Dok"  'Nummer vom Dokument vorher lonBelegnummer
-            m_DokumentNr = Val(Mid(S1(A), 4))
+        Case Left(s1(A), 3) = "Dok"  'Nummer vom Dokument vorher lonBelegnummer
+            m_DokumentNr = Val(Mid(s1(A), 4))
             
-        Case Left(S1(A), 3) = "Zfi"
-            m_ZurueckFilter = Val(Mid(S1(A), 4))
+        Case Left(s1(A), 3) = "Zfi"
+            m_ZurueckFilter = Val(Mid(s1(A), 4))
         
             
     End Select

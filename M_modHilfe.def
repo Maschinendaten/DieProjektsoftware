@@ -8,7 +8,7 @@ Public Function HilfeSuchen(strNameForm As String, strBezImForm As String, Optio
 'Es zu dem Formular bzw. zu dem feld keine Hilfe gibt
 'es wird benötigt die Tabelle "tblHilfe"
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim StrWhere As String
 Dim strHilfID As String
 Dim sSql As String
@@ -18,9 +18,9 @@ Dim HelpID As Long
 
     
     sSql = "SELECT * FROM tblHilfe WHERE strNameForm = '" & strNameForm & "'"
-    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
     
-    With rs1
+    With Rs1
         If .EOF Then
             'Kein Datensatz neu anlege
             .AddNew
@@ -114,11 +114,11 @@ End Function
 
 Public Sub funWebHilfe(LinkAdresse As Long)
 Dim wshshell As Object
-Dim S1 As String
+Dim s1 As String
 
         Set wshshell = CreateObject("WScript.Shell")
         
-        S1 = "www.help.DieProjektSoftware.de/" & LinkAdresse
+        s1 = "www.help.DieProjektSoftware.de/" & LinkAdresse
         
-        wshshell.Run S1
+        wshshell.Run s1
 End Sub

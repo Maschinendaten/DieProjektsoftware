@@ -171,7 +171,7 @@ Public Function RufnameAusAdressNr(Adressnummer As Long) As String
 End Function
 
 Public Function Laden(AdressNr As Variant) As Boolean
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 If IsNull(AdressNr) Then
@@ -180,9 +180,9 @@ If IsNull(AdressNr) Then
 End If
 
 sSql = "SELECT * FROM tblAdressen WHERE AdressNr=" & AdressNr
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If .EOF Then
         Laden = False
     Else
@@ -245,11 +245,14 @@ Dim A As String
 A = ""
 
 A = A & "<b>" & Nz(m_Adresse1) & "</b>" & "<BR>"
-A = A & Nz(m_Strasse) & "<BR>"
-If Nz(m_Land) <> "" Then
-    A = A & "<b>" & Nz(m_Land) & "-<b>"
+If Nz(m_Adresse2, "") <> "" Then
+    A = A & Nz(m_Adresse2) & "<BR>"
 End If
+A = A & Nz(m_Strasse) & "<BR>"
 A = A & "<b>" & Nz(m_PLZ) & "</b>" & " " & Nz(m_Ort)
+If Nz(m_Land) <> "" Then
+    A = A & "<br><b>" & Nz(m_Land) & "<b>"
+End If
 
 AdresseRTF = A
 
@@ -262,16 +265,16 @@ Public Function PersonLaden(IDPerson As Long) As Boolean
 
 
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim A As String
 Dim B As String
 
 sSql = "SELECT * FROM tblPersonen WHERE ID=" & IDPerson
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If Not .EOF Then
         m_PersonAnrede = Nz(.Fields("Anrede").Value, "")
         m_PersonVorname = Nz(.Fields("Vorname").Value, "")

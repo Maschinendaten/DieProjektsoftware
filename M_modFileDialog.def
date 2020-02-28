@@ -102,7 +102,7 @@ End Function
 
 'Wenn ein Projektverzeichnis vorhanden ist wird zu diesem gewechselt
 Function funChangeProDir(ProjektNr As Long)
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strDrive As String
 Dim strDir As String
 Dim strSp1 As String
@@ -213,20 +213,20 @@ funDirPDFpro = strSp1
 End Function
 
 Function funDirDokuAblage() As String
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
 
 
 
-S1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirDokuAb'"), "")
+s1 = Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirDokuAb'"), "")
 
 funDirDokuAblage = ""
  
-If Dir(S1, 16) = "" Or S1 = "" Then
-    MsgBox ("Das Verzeichnis : [" & S1 & "] ist nicht vorhanden.?" & _
+If Dir(s1, 16) = "" Or s1 = "" Then
+    MsgBox ("Das Verzeichnis : [" & s1 & "] ist nicht vorhanden.?" & _
     vbCrLf & vbCrLf & "Das Verzeichnis muss unter Extras|Stammdate|Verzeichnise angelegt oder angepasst werden.")
 Else 'Verzeichnis ist vorhanden
-    funDirDokuAblage = S1
+    funDirDokuAblage = s1
 End If
 
 
@@ -238,39 +238,39 @@ Function funDirDokuTempAblage(Optional NeuOrdner As Boolean) As String
 'vorhanden ist wird nachgefragt ob es erzeugtwerden soll wenn nein wird "" zurück gegeben.
 
 
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
 Dim s3 As String
 
 
-S1 = funLadeReg("Ablage", "Dir", "")  'Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirDokuTemp'"), "")
-s3 = S1
+s1 = funLadeReg("Ablage", "Dir", "")  'Nz(DLookup("Wert2", "tblIni", "Wert1 like 'DirDokuTemp'"), "")
+s3 = s1
 funDirDokuTempAblage = ""
  
 'Wenn neuer Ordner Speicher leeren
 If NeuOrdner = True Then
     
-    S1 = ""
+    s1 = ""
 End If
 
 
-If Dir(S1, 16) = "" Or S1 = "" Then
+If Dir(s1, 16) = "" Or s1 = "" Then
         s2 = MsgBox("Das Verzeichnis :[" & s3 & "] wird als Verzeichnis für die Temp Ablage festgelegt." & _
             vbCrLf & vbCrLf & "Wenn Ja wählen Sie ein Verzeichnis auf Ihrem lokalen Computer das Sie als temporäre Ablage nutzen wollen.", 3)
         '6=Ja 7=Nein 2=Abbrechen
         Select Case s2
             Case "6"
-                S1 = funVerzeichnisAuswaehlen("")
-                If S1 <> "" Then
-                    funSpeicherReg "Ablage", "Dir", S1
-                    funDirDokuTempAblage = S1
+                s1 = funVerzeichnisAuswaehlen("")
+                If s1 <> "" Then
+                    funSpeicherReg "Ablage", "Dir", s1
+                    funDirDokuTempAblage = s1
                 End If
             
             Case Else
                 Exit Function
         End Select
 Else 'Verzeichnis ist vorhanden
-    funDirDokuTempAblage = S1
+    funDirDokuTempAblage = s1
 End If
 
 

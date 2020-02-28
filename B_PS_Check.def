@@ -38,7 +38,7 @@
       <BuiltIn value="false"/>
       <Caption value="PDFvorhanden"/>
       <DescriptionText value=""/>
-      <Enabled value="false"/>
+      <Enabled value="true"/>
       <HelpContextId value="0"/>
       <HelpFile value=""/>
       <Id value="1"/>
@@ -55,29 +55,6 @@
       <HyperlinkType value="0"/>
       <OnAction value="=funCheckPDFVorhanden()"/>
       <FaceId value="7790"/>
-    </Control>
-    <Control id="1">
-      <BeginGroup value="true"/>
-      <BuiltIn value="false"/>
-      <Caption value="Hilfe"/>
-      <DescriptionText value=""/>
-      <Enabled value="true"/>
-      <HelpContextId value="0"/>
-      <HelpFile value=""/>
-      <Id value="1"/>
-      <Index value="3"/>
-      <Parameter value=""/>
-      <Priority value="3"/>
-      <Tag value=""/>
-      <TooltipText value="Hilfe aufrufen"/>
-      <Type value="1"/>
-      <Visible value="true"/>
-      <BuiltInFace value="true"/>
-      <Style value="3"/>
-      <ShortcutText value=""/>
-      <HyperlinkType value="0"/>
-      <OnAction value="=funWebHilfe(&quot;Link &quot;)"/>
-      <FaceId value="1954"/>
     </Control>
   </Controls>
 </CommandBar>

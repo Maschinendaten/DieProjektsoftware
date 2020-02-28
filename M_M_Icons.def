@@ -48,7 +48,7 @@ End Sub
 
 
 Public Sub IconAusDB(Optional MenueName As String)
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
 
 
@@ -71,41 +71,41 @@ Dim cmb As CommandBar
     Else
         sSql = "SELECT MeID ,MeName ,MeArt FROM t_Menue WHERE MeAktiv=true And MeName='" & MenueName & "'  ORDER BY  MeID"
     End If
-    PSDebug sSql
+    PS.DebugPrint sSql
     Set Rs2 = CurrentDb.OpenRecordset(sSql)
  
     While Not Rs2.EOF '[WEND MENU Name]
     
     'Wenn Command Bar vorhanden erst gezielt löschen
     DelMenue ("PS_" & Rs2!MeName)
-    PSDebug "DelMenue: " & Rs2!MeName & " " & (Timer - gloT)
+    PS.DebugPrint "DelMenue: " & Rs2!MeName & " " & (Timer - gloT)
     
-    'PSDebug Rs2!MeName
+    'ps.debugprint Rs2!MeName
       ' Symbolleiste erzeugen
         Set cmb = CommandBars.Add(Name:="PS_" & Rs2!MeName, Position:=msoBarPopup)
         sSql = "SELECT * FROM t_MenueDat WHERE MDaktiv=True and fiMeiD=" & Rs2!MeID & " ORDER BY fiMeID, MdID"
-        Set rs1 = CurrentDb.OpenRecordset(sSql)
+        Set Rs1 = CurrentDb.OpenRecordset(sSql)
         
         'Unterpunkte erzeugen
         
             With cmb
-                While Not rs1.EOF '[WEND Menue]
+                While Not Rs1.EOF '[WEND Menue]
                     ' Die Symbole einfügen
-                    PSDebug "Not.EOF"
+                    PS.DebugPrint "Not.EOF"
                     If Rs2!meart = 0 Then
                         With .Controls.Add(msoControlButton)
-                            .Caption = Nz(rs1!MdName, "nix")
-                            .OnAction = Nz(rs1!MdAktion, "")
-                            .FaceId = rs1!MdIconNr
+                            .Caption = Nz(Rs1!MdName, "nix")
+                            .OnAction = Nz(Rs1!MdAktion, "")
+                            .FaceId = Rs1!MdIconNr
                             .Style = msoButtonIconAndCaption
-                            .BeginGroup = Nz(rs1!MdNeueGruppe, False)
-                            .TooltipText = Nz(rs1!MdTipp, "")
-                            .Enabled = rs1!MDEnabled
+                            .BeginGroup = Nz(Rs1!MdNeueGruppe, False)
+                            .TooltipText = Nz(Rs1!MdTipp, "")
+                            .Enabled = Rs1!MDEnabled
                         End With
                     Else
                         'Nachfolgend Standart Menues bekommen Ihre Funktionen von MSAccess
-                        With .Controls.Add(msoControlButton, rs1!MdIconNr, , , True)
-                        PSDebug "EOF"
+                        With .Controls.Add(msoControlButton, Rs1!MdIconNr, , , True)
+                        PS.DebugPrint "EOF"
 '                            .Caption = Rs1!MdName
 '                            .OnAction = Nz(Rs1!MdAktion, "")
 '                            .FaceId = Rs1!MdIconNr
@@ -115,15 +115,15 @@ Dim cmb As CommandBar
                         End With
                             
                     End If
-                    rs1.MoveNext
+                    Rs1.MoveNext
                 Wend '[WEND Menue]
-                rs1.Close
+                Rs1.Close
             End With
             
 
        Rs2.MoveNext
     Wend '[WEND MENU Name]
-    PSDebug "Menue neu erzeugt: " & (Timer - gloT)
+    PS.DebugPrint "Menue neu erzeugt: " & (Timer - gloT)
 '    Debug.Print Rs1!MdName, Nz(Rs1!MdAktion, ""), Rs1!MdIconNr
         
  
@@ -138,14 +138,14 @@ Public Sub MenueEintragEnablen(MenueName As String, NrReihenfolge As Long, Enabl
 'Durch
 
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 sSql = "SELECT MDEnabled " & _
      "FROM t_Menue INNER JOIN t_MenueDat ON t_Menue.MeID = t_MenueDat.fiMeID " & _
      "WHERE MeName='" & MenueName & "'  AND MdID=" & NrReihenfolge
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If Not .EOF Then
         .Edit
             .Fields(0).Value = Enabled

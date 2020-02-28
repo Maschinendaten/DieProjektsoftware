@@ -38,7 +38,7 @@ End Function
 
 
 Function funMenBeenden()
-  Dim rs1, Rs2 As DAO.Recordset
+  Dim Rs1, Rs2 As DAO.Recordset
   Dim lonNr As Long
   Dim StrNachname As String
   Dim strSql As String
@@ -55,14 +55,14 @@ Function funMenBeenden()
   lonNr = Nz(Form_frmDatenbanknutzer.Nummer) 'aus dem Anmeldeformular wir die Nummer entnommen
     'Eintragen des Benutzers in die Tabelle tblLog zum auslogen
     strSql = "SELECT * FROM tblLog WHERE 1=0"
-    Set rs1 = CurrentDbC.OpenRecordset(strSql) 'Öffne eine Tabelle
-    rs1.AddNew 'erstelle einen neuen Datensatz
-        rs1!BenutzerNr = lonNr
-        rs1!Zeit = Now
-        rs1!Status = "geht"
-        rs1.Update
-    rs1.Close
-    Set rs1 = Nothing
+    Set Rs1 = CurrentDbC.OpenRecordset(strSql) 'Öffne eine Tabelle
+    Rs1.AddNew 'erstelle einen neuen Datensatz
+        Rs1!BenutzerNr = lonNr
+        Rs1!Zeit = Now
+        Rs1!Status = "geht"
+        Rs1.Update
+    Rs1.Close
+    Set Rs1 = Nothing
     
     'StrNachname = Form_frmDatenbanknutzer.Datenbanknutzer  'funBenutzerKurzzeichen '
     strSql = "SELECT Nachname,Anwesend_syst FROM tblAdressenPersonal " & _
@@ -436,14 +436,14 @@ End Function
 
 
 Function funMenErsatzteilListe()
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 
     If funProNr() <> 0 Then '[IF 1]
     'Es wird nachgeschaut ob es schon eine Stückliste zu disem Projekt gibt
-    Set rs1 = CurrentDbC.OpenRecordset("SELECT Projektnummer " & _
+    Set Rs1 = CurrentDbC.OpenRecordset("SELECT Projektnummer " & _
     "FROM tblStueckliste WHERE ((tblStueckliste.Projektnummer =" & funProNr() & "))")
-        If rs1.EOF And rs1.BOF Then  '[IF 2]
+        If Rs1.EOF And Rs1.BOF Then  '[IF 2]
             'Wenn kein Ordner anfragen ob Ordner erstellen
             MsgBox ("Sie müssen erst eine Stückliste erstellen," & vbCrLf & _
             "bevor Sie eine Ersatzteilliste bearbeiten können")
@@ -451,13 +451,13 @@ Dim rs1 As DAO.Recordset
             DoCmd.OpenForm "frmErsatzteilliste", acNormal
         End If
     End If
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
 
 End Function
 
 Function funMenOrdner()
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim ProNr As Long
 
 ProNr = funProjektNummer()
@@ -466,26 +466,26 @@ ProNr = funProjektNummer()
 'DoCmd.OpenForm "NaviProjektAuswahl", acNormal, , , , acDialog
 If ProNr <> 0 Then '[IF 1]
     'Es wird nachgeschaut ob es schon einen Ordner gibt zu dem Projekt
-    Set rs1 = CurrentDbC.OpenRecordset("SELECT Projektnummer " & _
+    Set Rs1 = CurrentDbC.OpenRecordset("SELECT Projektnummer " & _
     "FROM tblOrdner WHERE (((tblOrdner.Projektnummer) =" & ProNr & "))")
-    If rs1.RecordCount <> 0 Then '[IF 2]
+    If Rs1.RecordCount <> 0 Then '[IF 2]
         'Öffnet das Formular wenn der Ordner vorhanden ist
         DoCmd.OpenForm "frmOrdner"
     Else
         'Wenn kein Ordner anfragen ob Ordner erstellen
         If modAbfrage("Wollen Sie einen Ordner zu dem Projekt " & ProNr & " anlegen?") Then '[IF 3]
             'Es wird ein neuer Datensatz mit einer neuen Dokumentnummer erstellt
-            Set rs1 = CurrentDbC.OpenRecordset("tblOrdner")
-            rs1.AddNew    'Neuen Datensatz anlegen
-            rs1!Projektnummer = ProNr
-            rs1!OrdnerBezeichnung = "#Neu#"
-            rs1.Update
+            Set Rs1 = CurrentDbC.OpenRecordset("tblOrdner")
+            Rs1.AddNew    'Neuen Datensatz anlegen
+            Rs1!Projektnummer = ProNr
+            Rs1!OrdnerBezeichnung = "#Neu#"
+            Rs1.Update
             'Öffnet den Ordner nach dem anlegen
             DoCmd.OpenForm "frmOrdner"
         End If '[IF 3]
     End If '[IF 2]
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
 End If '[IF 1]
 
 End Function
@@ -716,7 +716,7 @@ End Function
 '                                              P_DA = Gu (Gutschrift)
 '---------------------------------------------------------------------------------------
 Function Neues_Pro_Dokument(P_Pro_Nr As Long, P_DA As String) As Long
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
 Dim sSql As String
 Dim BN As Long    ' Zwischenspeicher Belegnummer
@@ -726,15 +726,15 @@ Dim lonReNr As Long 'Speichert die letzte Rechnungsnummer
 ''on error Goto Neues_Auf_Dokument_Error
 'Suche letzte Rechnungsnummer
 If P_DA = "RE" Or P_DA = "Gu" Then
-    Set rs1 = CurrentDbC.OpenRecordset("SELECT TOP 1 tblRechnung.reBelegNr2 " & _
+    Set Rs1 = CurrentDbC.OpenRecordset("SELECT TOP 1 tblRechnung.reBelegNr2 " & _
     "FROM tblRechnung " & _
     "ORDER BY tblRechnung.reBelegNr2 DESC;")
     'Wenn noch keine Rechnung vorhanden ist Startnummer fragen
-    If rs1.RecordCount <> 1 Then
+    If Rs1.RecordCount <> 1 Then
         lonReNr = Val(InputBox("Bitte geben Sie die Startnummer der Rechnungen ein. Die Nummer lauttet 20040001 für die erste Rechnung im Jahr 2004.", "Eingabe der Startrechnungsnummer", "20040001"))
     Else
         'Wenn Rechnung vorhanden Rechnungsnummer auf addieren
-        lonReNr = rs1!ReBelegNr2 + 1
+        lonReNr = Rs1!ReBelegNr2 + 1
     End If
 End If
 
@@ -746,111 +746,111 @@ End If
             "FROM tblAdressen INNER JOIN tblProjekte ON tblAdressen.AdressNr = tblProjekte.AdressNr " & _
             "WHERE (((tblProjekte.ProjektNr)=" & Str(P_Pro_Nr) & "));")
     sSql = "SELECT * FROM tblAnschreiben WHERE False"
-    Set rs1 = CurrentDbC.OpenRecordset(sSql)
-    rs1.AddNew    'Neuen Datensatz anlegen
+    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+    Rs1.AddNew    'Neuen Datensatz anlegen
      
     'Allgemeine Einträge für alles gültig
-    rs1!Kurzzeichenersteller = PS.User.Kurzzeichen()
+    Rs1!Kurzzeichenersteller = PS.User.Kurzzeichen()
     
-    rs1!Projektnummer = P_Pro_Nr
-    rs1!Formulartype = "frmProDokumente"
+    Rs1!Projektnummer = P_Pro_Nr
+    Rs1!Formulartype = "frmProDokumente"
     'Höchste Nr Suchen oder Vorgabewert
     BN = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
-    rs1!BelegNr = BN
-    rs1!Belegbezeichnung = CStr(P_Pro_Nr) & "-" & CStr(BN) & "-" & PS.User.Kurzzeichen()
-    rs1!Kopftext = ""
-    rs1![Textstück] = ""
+    Rs1!BelegNr = BN
+    Rs1!Belegbezeichnung = CStr(P_Pro_Nr) & "-" & CStr(BN) & "-" & PS.User.Kurzzeichen()
+    Rs1!Kopftext = ""
+    Rs1![Textstück] = ""
   
  'spezielle Einräge für die Dokument
 Select Case P_DA
     Case "AB"    ' Auftragsbestätigung
-        rs1!BelegArt = "-Auftragsbestätigung"
-        rs1!Betreff = "AB-" & Rs2!AufBezeichnung
-        rs1!Adressnummer = Rs2!AdressNr
-        rs1!Rufname = Rs2!Rufname
-        rs1!Adresse1 = Rs2!Adresse1
-        rs1!Adresse2 = Rs2!Adresse2
-        rs1!Adresse3 = Rs2!Adresse3
-        rs1![Strasse] = Rs2!Strasse
-        rs1!Land = Rs2!Land
-        rs1!PLZ = Rs2!PLZ
-        rs1!Ort = Rs2!Ort
-        rs1!Waehrung = funDbText(5, "Waehrung")
-        rs1.Update
-        rs1.Close
-        Set rs1 = Nothing
+        Rs1!BelegArt = "-Auftragsbestätigung"
+        Rs1!Betreff = "AB-" & Rs2!AufBezeichnung
+        Rs1!Adressnummer = Rs2!AdressNr
+        Rs1!Rufname = Rs2!Rufname
+        Rs1!Adresse1 = Rs2!Adresse1
+        Rs1!Adresse2 = Rs2!Adresse2
+        Rs1!Adresse3 = Rs2!Adresse3
+        Rs1![Strasse] = Rs2!Strasse
+        Rs1!Land = Rs2!Land
+        Rs1!PLZ = Rs2!PLZ
+        Rs1!Ort = Rs2!Ort
+        Rs1!Waehrung = funDbText(5, "Waehrung")
+        Rs1.Update
+        Rs1.Close
+        Set Rs1 = Nothing
         Rs2.Close
         Set Rs2 = Nothing
 
     Case "RE"    ' Rechnung
-        rs1!BelegArt = "-Rechnung"
+        Rs1!BelegArt = "-Rechnung"
         'rs1!BelegNr2 = lonReNr
         'rs1!BelegArt = 1
-            rs1!Betreff = "RE-" + Rs2!Projektbezeichnung
-            rs1!Rufname = Rs2!Rufname
-            rs1!Adressnummer = Rs2!AdressNr
-            rs1!Adresse1 = Rs2!Adresse1
-            rs1!Adresse2 = Rs2!Adresse2
-            rs1!Adresse3 = Rs2!Adresse3
-            rs1!Strasse = Rs2!Strasse
-            rs1!Land = Rs2!Land
-            rs1!PLZ = Rs2!PLZ
-            rs1!Ort = Rs2!Ort
-        rs1.Update
-        rs1.Close
+            Rs1!Betreff = "RE-" + Rs2!Projektbezeichnung
+            Rs1!Rufname = Rs2!Rufname
+            Rs1!Adressnummer = Rs2!AdressNr
+            Rs1!Adresse1 = Rs2!Adresse1
+            Rs1!Adresse2 = Rs2!Adresse2
+            Rs1!Adresse3 = Rs2!Adresse3
+            Rs1!Strasse = Rs2!Strasse
+            Rs1!Land = Rs2!Land
+            Rs1!PLZ = Rs2!PLZ
+            Rs1!Ort = Rs2!Ort
+        Rs1.Update
+        Rs1.Close
         Rs2.Close
         
         'Die Rechnung wird in der Tabelle Rechnunng angelegt
         sSql = "SELECT * FROM tblRechnung WHERE FALSE"
-        Set rs1 = CurrentDbC.OpenRecordset(sSql)
-        If rs1.Updatable Then
-            rs1.AddNew    'Neuen Datensatz anlegen
-            rs1!BelegNr = BN
-            rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
-            rs1!ReBelegart = 1 '1 ist Rechnung
-            rs1!AufNr = 0
-            rs1!ProjekktNr = P_Pro_Nr
-            rs1!AngelegtVon = funBenutzerKurzzeichen
-            rs1!AngelegtAm = Date
+        Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+        If Rs1.Updatable Then
+            Rs1.AddNew    'Neuen Datensatz anlegen
+            Rs1!BelegNr = BN
+            Rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
+            Rs1!ReBelegart = 1 '1 ist Rechnung
+            Rs1!AufNr = 0
+            Rs1!ProjekktNr = P_Pro_Nr
+            Rs1!AngelegtVon = funBenutzerKurzzeichen
+            Rs1!AngelegtAm = Date
             'rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
             
         '#### vorbelegten Textfelder
-            rs1!SummeText = funDbText(5, "SummeText")
-            rs1!MwstText = funDbText(5, "MwstText")
-            rs1!AuftragnettoText = funDbText(5, "SummeText")
-            rs1!BereitsBezahltText = funDbText(5, "BereitsBezahltText")
-            rs1!ZuZahlenderBetragText = funDbText(5, "ZuZahlenderBetragText")
-            rs1!RechnungsbetragText = funDbText(5, "RechnungsbetragText")
-            rs1!MwstWert = Val(funDbText(5, "MwstWert"))
-            rs1!Zahlungsbedingungen = funDbText(5, "Zahlungsbedingungen")
-            rs1!Waehrung = funDbText(5, "Waehrung")
+            Rs1!SummeText = funDbText(5, "SummeText")
+            Rs1!MwstText = funDbText(5, "MwstText")
+            Rs1!AuftragnettoText = funDbText(5, "SummeText")
+            Rs1!BereitsBezahltText = funDbText(5, "BereitsBezahltText")
+            Rs1!ZuZahlenderBetragText = funDbText(5, "ZuZahlenderBetragText")
+            Rs1!RechnungsbetragText = funDbText(5, "RechnungsbetragText")
+            Rs1!MwstWert = Val(funDbText(5, "MwstWert"))
+            Rs1!Zahlungsbedingungen = funDbText(5, "Zahlungsbedingungen")
+            Rs1!Waehrung = funDbText(5, "Waehrung")
         '#### vorbelegten Textfelder
-            rs1.Update
-            rs1.Close
-            Set rs1 = Nothing
+            Rs1.Update
+            Rs1.Close
+            Set Rs1 = Nothing
         End If
                             
     Case "Li"   'Lieferschein
-            rs1!BelegArt = "-Lieferschein"
-            rs1!Betreff = "Li-" & Rs2!AufBezeichnung
-            rs1!Rufname = Rs2!Rufname
-            rs1!Adressnummer = Rs2!AdressNr
-            rs1!Adresse1 = Rs2!Adresse1
-            rs1!Adresse2 = Rs2!Adresse1
-            rs1!Adresse3 = Rs2!Adresse1
-            rs1![Strasse] = Rs2!Strasse
-            rs1!Land = Rs2!Land
-            rs1!PLZ = Rs2!PLZ
-            rs1!Ort = Rs2!Ort
-            rs1.Update
-            rs1.Close
-            Set rs1 = Nothing
+            Rs1!BelegArt = "-Lieferschein"
+            Rs1!Betreff = "Li-" & Rs2!AufBezeichnung
+            Rs1!Rufname = Rs2!Rufname
+            Rs1!Adressnummer = Rs2!AdressNr
+            Rs1!Adresse1 = Rs2!Adresse1
+            Rs1!Adresse2 = Rs2!Adresse1
+            Rs1!Adresse3 = Rs2!Adresse1
+            Rs1![Strasse] = Rs2!Strasse
+            Rs1!Land = Rs2!Land
+            Rs1!PLZ = Rs2!PLZ
+            Rs1!Ort = Rs2!Ort
+            Rs1.Update
+            Rs1.Close
+            Set Rs1 = Nothing
             Rs2.Close
             Set Rs2 = Nothing
     Case "Gu"  'Gutschrift
-            rs1.Update
-            rs1.Close
-            Set rs1 = Nothing
+            Rs1.Update
+            Rs1.Close
+            Set Rs1 = Nothing
         
 End Select
 ' ###########  für Projektdokument keine Daten übernehmen extra Auswahl
@@ -872,7 +872,7 @@ End Function
 
 Function menFunKurzbrief()
 Dim stLinkCriteria As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim BN As Long  ' Für die übergabe der Belegnummer
 Dim ProNr As Long
 
@@ -894,19 +894,19 @@ If ProNr <> 0 Then '[IF 1]
   "einen neuen Beleg erstellen ?") Then ' [IF 2] Aufruf der Funktion Abfrag gibt true zurück wenn ja
   
     'Es wird ein neuer Datensatz mit einer neuen Dokumentnummer erstellt
-    Set rs1 = CurrentDbC.OpenRecordset("tblAnschreiben")
-    rs1.AddNew    'Neuen Datensatz anlegen
+    Set Rs1 = CurrentDbC.OpenRecordset("tblAnschreiben")
+    Rs1.AddNew    'Neuen Datensatz anlegen
     'rs1.MoveLast
     'lonProjektnummer = Me!ProjektNr 'Übernahme der Projektnummer für Auswahl
-    rs1!Kurzzeichenersteller = funBenutzerKurzzeichen
-    rs1!Projektnummer = funProjektNummer()
-    rs1!Formulartype = "frmKurzbrief"
+    Rs1!Kurzzeichenersteller = funBenutzerKurzzeichen
+    Rs1!Projektnummer = funProjektNummer()
+    Rs1!Formulartype = "frmKurzbrief"
     'Höchste Nr Suchen oder Vorgabewert
     BN = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
-    rs1!BelegNr = BN
-    rs1.Update
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1!BelegNr = BN
+    Rs1.Update
+    Rs1.Close
+    Set Rs1 = Nothing
     'MsgBox ("Die Belegnummer ist: " + Str(lonProjektnummer) + "-" + Str(BN) + "-" + Forms![frmDatenbanknutzer]![Kurzzeichen])
     'zuweisen der Belegnummer zur Globalen Variablen
     lonBelegnummer = BN
@@ -1019,7 +1019,7 @@ End Function
 Function funMenDirOpen(Optional ProNr_)
 'Öffnet das zu dem Projekt gehörende Verzeichnis
 Dim txtSp1 As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim ProNr As Long
 Dim strDir1 As String
 Dim strDir2 As String
@@ -1043,16 +1043,16 @@ If ProNr = 0 Then Exit Function
 strSql = "SELECT tblProjekte.Verzeichnis, tblProjekte.ProjektNr, tblAdressen.Rufname " & _
     "FROM tblAdressen INNER JOIN tblProjekte ON tblAdressen.AdressNr = tblProjekte.AdressNr " & _
     "WHERE (tblProjekte.ProjektNr= " & Str(ProNr) & ");"
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
     
    
     
 'Verzeichnis besteht Explorer wird aufgerufen
-If Nz(rs1!Verzeichnis) <> "" Then
-    If Dir(rs1!Verzeichnis, vbDirectory) <> "" Then
-        Shell "explorer.exe " & rs1!Verzeichnis, vbNormalFocus
-        rs1.Close
-        Set rs1 = Nothing
+If Nz(Rs1!Verzeichnis) <> "" Then
+    If Dir(Rs1!Verzeichnis, vbDirectory) <> "" Then
+        Shell "explorer.exe " & Rs1!Verzeichnis, vbNormalFocus
+        Rs1.Close
+        Set Rs1 = Nothing
         
         funChangeProDir (ProNr)
         Exit Function
@@ -1060,7 +1060,7 @@ If Nz(rs1!Verzeichnis) <> "" Then
 End If
 
 strLauf = Left(funDirProjekte(), 3)   '"z:\"
-strDir1 = Mid(funDirProjekte(), 4, 150) & "\" & rs1!Rufname & "\"  '"Aa_p\" & Rs1!Rufname & "\"
+strDir1 = Mid(funDirProjekte(), 4, 150) & "\" & Rs1!Rufname & "\"  '"Aa_p\" & Rs1!Rufname & "\"
 strDir2 = "P" & CStr(ProNr) & "\"
 
 Select Case MsgBox(LA("Es gibt noch kein Projekt Verzeichnis.") & vbCrLf & _
@@ -1077,8 +1077,8 @@ Select Case MsgBox(LA("Es gibt noch kein Projekt Verzeichnis.") & vbCrLf & _
         txtSp1 = Dir(strLauf & strDir1, vbDirectory)
         If txtSp1 <> "." Then
             ChDir (Mid(funDirProjekte(), 4, 150))
-            MkDir (rs1!Rufname)  'txtSp1)
-            ChDir (rs1!Rufname)
+            MkDir (Rs1!Rufname)  'txtSp1)
+            ChDir (Rs1!Rufname)
             Abbr = True
         End If
         'Prüft ob Projektverzeichnisvorhanden
@@ -1086,15 +1086,15 @@ Select Case MsgBox(LA("Es gibt noch kein Projekt Verzeichnis.") & vbCrLf & _
         If txtSp1 <> "." Then
             If Abbr = False Then
                 ChDir (Mid(funDirProjekte(), 4, 150))       '    "aa_p")
-                ChDir (rs1!Rufname)
+                ChDir (Rs1!Rufname)
             End If
             MkDir ("P" & CStr(ProNr))
         End If
-        rs1.Edit
-        rs1!Verzeichnis = strLauf & strDir1 & strDir2
-        rs1.Update
-        rs1.Close
-        Set rs1 = Nothing
+        Rs1.Edit
+        Rs1!Verzeichnis = strLauf & strDir1 & strDir2
+        Rs1.Update
+        Rs1.Close
+        Set Rs1 = Nothing
         Shell "explorer.exe " & strLauf & strDir1 & strDir2, vbNormalFocus
         'Exit Function
 
@@ -1102,11 +1102,11 @@ Select Case MsgBox(LA("Es gibt noch kein Projekt Verzeichnis.") & vbCrLf & _
         If MsgBox(LA("Wollen Sie selbst ein Verzeichnis auswählen?"), vbYesNoCancel, "Selbst ein Verzeichnis") = vbYes Then
             txtSp1 = funVerzeichnisAuswaehlen(funDirProjekte())
             If txtSp1 <> "" Then
-                rs1.Edit
-                rs1!Verzeichnis = txtSp1
-                rs1.Update
-                rs1.Close
-                Set rs1 = Nothing
+                Rs1.Edit
+                Rs1!Verzeichnis = txtSp1
+                Rs1.Update
+                Rs1.Close
+                Set Rs1 = Nothing
                 Shell "explorer.exe " & txtSp1, vbNormalFocus
             End If
          Exit Function
@@ -1125,37 +1125,37 @@ End Function
 
 Function funMenDirNew()
 Dim txtSp1 As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim ProNr As Long
 'on error Goto Err_
    
 ProNr = funProjektNummer
 If ProNr <> 0 Then
     'Nachscauen ob Verzeichnis zum Projekt besteht
-    Set rs1 = CurrentDbC.OpenRecordset("SELECT ProjektNr, Verzeichnis " & _
+    Set Rs1 = CurrentDbC.OpenRecordset("SELECT ProjektNr, Verzeichnis " & _
         "FROM tblProjekte WHERE (tblProjekte.ProjektNr= " & Str(ProNr) & ");")
-   If modAbfrage("Wollen Sie das bestehnde Verzeichnis:" & vbCrLf & rs1!Verzeichnis & vbCrLf & "überschreiben?") Then
+   If modAbfrage("Wollen Sie das bestehnde Verzeichnis:" & vbCrLf & Rs1!Verzeichnis & vbCrLf & "überschreiben?") Then
         txtSp1 = funVerzeichnisAuswaehlen(funDirProjekte())
         If txtSp1 <> "" Then
-            rs1.Edit
-            rs1!Verzeichnis = txtSp1
-            rs1.Update
+            Rs1.Edit
+            Rs1!Verzeichnis = txtSp1
+            Rs1.Update
             'rs1.Close
             'Set rs1 = Nothing
             Shell "explorer.exe " & txtSp1, vbNormalFocus
             Exit Function
         Else  ' Wenn keins wird gelöscht
             If modAbfrage("Wollen Sie das bestehnde Verzeichnis:" & _
-                vbCrLf & rs1!Verzeichnis & vbCrLf & "Löschen?") Then
-                rs1.Edit
-                rs1!Verzeichnis = ""
-                rs1.Update
+                vbCrLf & Rs1!Verzeichnis & vbCrLf & "Löschen?") Then
+                Rs1.Edit
+                Rs1!Verzeichnis = ""
+                Rs1.Update
             End If
             Exit Function
         End If
     End If
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
 End If
 
 Exit Function
@@ -1424,7 +1424,7 @@ Public Function funPopUPArtikel_10()
 'Refresh Daten neu aus der Artikeldatenbank laden
 'Refresht den Artikel wird aufgerufen vom Kontexmenue
 'Die Nr 10 kommt aus der Festlegung in der Menue Tabelle
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
 Dim MutterMenge As Double
 Dim GruppeMenge As Double
@@ -1438,7 +1438,7 @@ Dim liD As Long
         Exit Function
     End If
         
-        PSDebug "PopUPArtikel 10"
+        PS.DebugPrint "PopUPArtikel 10"
         
         With PopUpArtikelObj
             Select Case .ZielTabelleName
@@ -1453,36 +1453,36 @@ Dim liD As Long
                     
                      'öffne Einkaufsliste nur die Mutter
                     sSql = "SELECT * FROM tblStueckliste WHERE Mutter_ID_Stueck = " & .ZielTabelleID & " AND ID_Nummer=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
                     'Lese Menge von Mutter
-                    If Not rs1.EOF Then
-                        MutterMenge = Nz(rs1.Fields("Menge").Value, 0)
-                        PSDebug "Menge:" & MutterMenge & "Anzahl=" & rs1.RecordCount
+                    If Not Rs1.EOF Then
+                        MutterMenge = Nz(Rs1.Fields("Menge").Value, 0)
+                        PS.DebugPrint "Menge:" & MutterMenge & "Anzahl=" & Rs1.RecordCount
                     End If
                                         
                     'Die Artikel die der Mutter beim einfügen zugeordnet wurden, nicht die Teile in der Gruppe
                     sSql = "SELECT * FROM tblStueckliste WHERE Mutter_ID_Stueck = " & .ZielTabelleID & " AND NOT ID_Nummer=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
-                    If Not rs1.EOF Then
-                        rs1.MoveLast
-                        rs1.MoveFirst
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+                    If Not Rs1.EOF Then
+                        Rs1.MoveLast
+                        Rs1.MoveFirst
                     End If
-                    PSDebug "Artikel in EK Liste:" & rs1.RecordCount
+                    PS.DebugPrint "Artikel in EK Liste:" & Rs1.RecordCount
                     
 
                     
                     
                     'Durchlaufe Einkaufsliste Artikel und refreshe mit angepaster Menge
-                    While Not rs1.EOF
+                    While Not Rs1.EOF
                         'Abfangen wenn die Artikel ID 0 ist
-                        If Nz(rs1.Fields("ArtikelID").Value, -3) = -3 Then
-                            rs1.Edit
-                                rs1.Fields("ST_Check").Value = "KEIN Artikel mehr"
-                                rs1.Fields("Menge").Value = 0
-                            rs1.Update
+                        If Nz(Rs1.Fields("ArtikelID").Value, -3) = -3 Then
+                            Rs1.Edit
+                                Rs1.Fields("ST_Check").Value = "KEIN Artikel mehr"
+                                Rs1.Fields("Menge").Value = 0
+                            Rs1.Update
                         Else
                             'Die Mengedie in der Gruppen Liste gespeichert ist
-                            GruppeMenge = Nz(DLookup("menge", "tblArtikelgruppen", "Artikel_Nr_Mutter=" & .ID & " AND Artikel_Nr_Kind=" & rs1.Fields("ArtikelID").Value), -2)
+                            GruppeMenge = Nz(DLookup("menge", "tblArtikelgruppen", "Artikel_Nr_Mutter=" & .ID & " AND Artikel_Nr_Kind=" & Rs1.Fields("ArtikelID").Value), -2)
                             If GruppeMenge = -2 Then
                                 ' Rs1!ST_Check = "gelöscht"
                                 'in der Einkaufsliste steht 0 damit der User überlegen kann ob er löschen wll
@@ -1490,16 +1490,16 @@ Dim liD As Long
                                 GruppeMenge = MutterMenge * GruppeMenge
                             End If
                             
-                            StuecklisteArtikelRefresh rs1.Fields("ID_Nummer").Value, _
+                            StuecklisteArtikelRefresh Rs1.Fields("ID_Nummer").Value, _
                                                 GruppeMenge, _
-                                                Nz(rs1.Fields("ArtikelID").Value, 0)
+                                                Nz(Rs1.Fields("ArtikelID").Value, 0)
                         End If
                         
 
 
                                                 
             
-                        rs1.MoveNext
+                        Rs1.MoveNext
                     Wend
                     
                     
@@ -1513,13 +1513,13 @@ Dim liD As Long
                         Rs2.MoveFirst
                     End If
                     
-                    PSDebug "Anzahl Kinder:" & Rs2.RecordCount
+                    PS.DebugPrint "Anzahl Kinder:" & Rs2.RecordCount
                     
                     While Not Rs2.EOF
                         liD = Nz(DLookup("id_nummer", "tblStueckliste", "Mutter_ID_Stueck=" & .ZielTabelleID & " AND Artikelid=" & Rs2!Artikel_Nr_Kind), -1)
-                        PSDebug "Mutter_ID_Stueck=" & .ZielTabelleID & "Artikelid=" & Rs2!Artikel_Nr_Kind
+                        PS.DebugPrint "Mutter_ID_Stueck=" & .ZielTabelleID & "Artikelid=" & Rs2!Artikel_Nr_Kind
                         If liD = -1 Then  'Einen Entdeckt und jetzt anfügen
-                            PSDebug "STOP Artikelid=" & Rs2!Artikel_Nr_Kind
+                            PS.DebugPrint "STOP Artikelid=" & Rs2!Artikel_Nr_Kind
                             GruppeMenge = Rs2.Fields("menge").Value
                             StuecklisteArtikelRefresh -1, _
                                                             GruppeMenge * MutterMenge, _
@@ -1530,7 +1530,7 @@ Dim liD As Long
                         Rs2.MoveNext
                     Wend
                     
-                    rs1.Close
+                    Rs1.Close
                     Rs2.Close
                 Else
                     'Ferfresh mit Funktion nur diesen Einen Artikel
@@ -1563,96 +1563,112 @@ Dim liD As Long
                 Case "tblAufPositionen"
                     'die Auflistung die Im Auftrag steht #################
                     sSql = "SELECT * FROM tblAufPositionen WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-                    If Not rs1.EOF Then
-                        rs1.Edit
-                            rs1!Pos_Bezeichnung = .Bezeichnung
-                            rs1!Pos_Beschreibung = .Beschreibung
-                            rs1!Einheit = .Liefereinheit
-                            rs1!Preis_einzeln = IIf(.PreisAuswahl = 0, .Preis_VK, .Preis_EK_mit_Rabatt)  '.Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
-                            rs1!Preis_VK = rs1!Preis_einzeln * (1 + Nz(rs1!Einzel_Kalkulation, 0) / 100)
-                            rs1!Preis_Summe = rs1!Preis_VK * rs1!Anzahl_Menge
+                    If Not Rs1.EOF Then
+                        Rs1.Edit
+                            Rs1!Pos_Bezeichnung = .Bezeichnung
+                            Rs1!Pos_Beschreibung = .Beschreibung
+                            Rs1!Einheit = .Liefereinheit
+                            Rs1!Preis_einzeln = IIf(.PreisAuswahl = 0, .Preis_VK, .Preis_EK_mit_Rabatt)  '.Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
+                            Rs1!Preis_VK = Rs1!Preis_einzeln * (1 + Nz(Rs1!Einzel_Kalkulation, 0) / 100)
+                            Rs1!Preis_Summe = Rs1!Preis_VK * Rs1!Anzahl_Menge
                             
-                        rs1.Update
+                        Rs1.Update
                     End If
-                    rs1.Close
+                    Rs1.Close
                    
                    
                     
                 Case "tblProjektbeschreibung"
                     'die Auflistung der Dokumente in der Kalkulation #################
                     sSql = "SELECT * FROM tblProjektbeschreibung WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
 
 
 
 
 
-                    If Not rs1.EOF Then
-                        rs1.Edit
-                            rs1!Pos_Bezeichnung = .Bezeichnung
-                            rs1!Pos_Beschreibung = .Beschreibung
-                            rs1!Einheit = .Liefereinheit
-                            rs1!Anzahl_Menge = Nz(rs1!Anzahl_Stueck, 0) * Nz(rs1!Anzahl_Teile, 0)
-                            rs1!Preis_einzeln = IIf(.PreisAuswahl = 0, .Preis_VK, .Preis_EK_mit_Rabatt) '   EK_mit Rabatt? Oder EK_Liste
-                            rs1!Preis_VK = rs1!Preis_einzeln * (1 + Nz(rs1!Einzel_Kalkulation, 0) / 100)
-                            rs1!Preis_Summe = rs1!Preis_VK * rs1!Anzahl_Menge
-                            rs1!Lieferzeit = .Liefezeit
+                    If Not Rs1.EOF Then  'Andere Sprache kann ja auch sein ... 1 ist imme deutsch
+                        Rs1.Edit
+                        If .Sprache = 1 Or Not (funDatensatzVorhanden("tblartLang", "ALIDAR", .ZielArtikelID)) Then
+                            Rs1!Pos_Bezeichnung = .Bezeichnung
+                            Rs1!Pos_Beschreibung = .Beschreibung
+                        Else
+                            sSql = "SELECT tblArtLang.ALidAR, tblArtLang.ALLang, tblArtLang.ALBez, tblArtLang.ALBesch " & _
+                            "FROM tblArtLang WHERE tblArtLang.ALidAR = " & .ZielArtikelID & " AND tblArtLang.ALLang= " & .Sprache
+                            Set Rs2 = CurrentDbC.OpenRecordset(sSql)
+                            If Not Rs2.EOF Then
+                                Rs1!Pos_Bezeichnung = Rs2!ALBez
+                                Rs1!Pos_Beschreibung = Rs2!ALBesch
+                                
+                            End If
+                            Rs2.Close
+                        End If
+                            
+                            
+                            
+                            
+                            Rs1!Einheit = .Liefereinheit
+                            Rs1!Anzahl_Menge = Nz(Rs1!Anzahl_Stueck, 0) * Nz(Rs1!Anzahl_Teile, 0)
+                            Rs1!Preis_einzeln = IIf(.PreisAuswahl = 0, .Preis_VK, .Preis_EK_mit_Rabatt) '   EK_mit Rabatt? Oder EK_Liste
+                            Rs1!Preis_VK = Rs1!Preis_einzeln * (1 + Nz(Rs1!Einzel_Kalkulation, 0) / 100)
+                            Rs1!Preis_Summe = Rs1!Preis_VK * Rs1!Anzahl_Menge
+                            Rs1!Lieferzeit = .Liefezeit
                             'Rs1!St_Preis_VK = .Preis_VK
                             
-                        rs1.Update
+                        Rs1.Update
                     End If
-                    rs1.Close
+                    Rs1.Close
                
                 Case "tblProjektbeschreibungDokumente"
                     'Stop
                     'die Auflistung der Dokumente in den Anschreiben gilt auch für Auftrag #################
                     sSql = "SELECT * FROM tblProjektbeschreibungDokumente WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-                    If Not rs1.EOF Then
-                        rs1.Edit
-                            rs1!Pos_Bezeichnung = .Bezeichnung
+                    If Not Rs1.EOF Then
+                        Rs1.Edit
+                            Rs1!Pos_Bezeichnung = .Bezeichnung
                             'ANBeschreibung
-                            rs1!Pos_Beschreibung = .Beschreibung
-                            rs1!Einheit = .Liefereinheit
+                            Rs1!Pos_Beschreibung = .Beschreibung
+                            Rs1!Einheit = .Liefereinheit
                             'RS1!Anzahl_Menge = Nz(RS1!Anzahl_Stueck, 0) * Nz(RS1!Anzahl_Teile, 0)
-                            rs1!Preis_einzeln = IIf(.PreisAuswahl = 0, .Preis_VK, .Preis_EK_mit_Rabatt) '.Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
-                            rs1!Preis_VK = rs1!Preis_einzeln * (1 + Nz(rs1!Einzel_Kalkulation, 0) / 100)
+                            Rs1!Preis_einzeln = IIf(.PreisAuswahl = 0, .Preis_VK, .Preis_EK_mit_Rabatt) '.Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
+                            Rs1!Preis_VK = Rs1!Preis_einzeln * (1 + Nz(Rs1!Einzel_Kalkulation, 0) / 100)
                             
-                            rs1!Preis_Summe = rs1!Preis_VK * rs1!Anzahl_Menge
-                            rs1!Lieferzeit = .Liefezeit
+                            Rs1!Preis_Summe = Rs1!Preis_VK * Rs1!Anzahl_Menge
+                            Rs1!Lieferzeit = .Liefezeit
                             'Rs1!St_Preis_VK = .Preis_VK
                             
-                        rs1.Update
+                        Rs1.Update
                     End If
-                    rs1.Close
+                    Rs1.Close
                
                Case "tblStuecklisteBestellung"
                     sSql = "SELECT * " & _
                              "FROM tblStuecklisteBestellung WHERE SbID = " & .ZielTabelleID
                     
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql) 'Tabelle in die die Daten geschrieben werden
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql) 'Tabelle in die die Daten geschrieben werden
                     
-                    If Not rs1.EOF Then
-                        rs1.Edit
-                            rs1!GF_Bezeichnung = .Bezeichnung
-                            rs1!Bestell_Nr = .Bestellnummer
+                    If Not Rs1.EOF Then
+                        Rs1.Edit
+                            Rs1!GF_Bezeichnung = .Bezeichnung
+                            Rs1!Bestell_Nr = .Bestellnummer
                             'Rs1!Menge = .M
-                            rs1!Liefereinheit = .Liefereinheit
-                            rs1!PreisStueck = .Preis_VK
-                            rs1!BesondereVereinbarung = .BeschreibungB
-                            rs1!Besteller = PS.User.Kurzzeichen
+                            Rs1!Liefereinheit = .Liefereinheit
+                            Rs1!PreisStueck = .Preis_VK
+                            Rs1!BesondereVereinbarung = .BeschreibungB
+                            Rs1!Besteller = PS.User.Kurzzeichen
                             'Me!ArtikelID = Rs1!ArtikelID
-                            rs1!Rabatt = .Preis_Rabatt_pro
-                            rs1!PreisBrut = .Preis_EK_mit_Rabatt
+                            Rs1!Rabatt = .Preis_Rabatt_pro
+                            Rs1!PreisBrut = .Preis_EK_mit_Rabatt
                             
                             'Me!Gruppe = Rs1!Gruppe
-                        rs1.Update
+                        Rs1.Update
                     End If
-                    rs1.Close
+                    Rs1.Close
                       
                
                
@@ -1673,7 +1689,7 @@ Public Function funPopUPArtikel_11()
 'Die Nr 11 kommt aus der festlegung in der Menue Tabelle
 Dim pufNeuAnlegenID As Long
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
         If PopUpArtikelObj Is Nothing Then
             MsgBox "Programmfehler es muss ein Objekt vorhanden sein PS_Kontex"
@@ -1688,40 +1704,40 @@ Dim rs1 As DAO.Recordset
                     'In der Stückliste den Datensatz suchen und aus diesem einen neuen Artikel erzeugen
                     'ZielTabelleID is hier Quasie die Quelle
                     sSql = "SELECT * FROM tblStueckliste WHERE ID_Nummer=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
                     
-                        If Not rs1.EOF Then
-                            .Lieferant = rs1!Lieferant_Adress_Nr        'Adresnummer des Lieferanten
+                        If Not Rs1.EOF Then
+                            .Lieferant = Rs1!Lieferant_Adress_Nr        'Adresnummer des Lieferanten
                             '.LieferantRufnameEXT = Rs1!Lieferant        'Holt den Rufname aus der Adresstabelle
                             'Rs1!Beschreibung = .Beschreibung           'für die Bestellung wird übernommen
-                            .Bezeichnung = rs1!GF_Bezeichnung
-                            .BeschreibungB = Nz(rs1!BesondereVereinbarung, " ")
-                            .Bestellnummer = rs1!Bestell_Nr
-                            .Liefereinheit = rs1!Liefereinheit
-                            .PreisLiefereinheit = Nz(rs1!PreisBrut, 0)
+                            .Bezeichnung = Rs1!GF_Bezeichnung
+                            .BeschreibungB = Nz(Rs1!BesondereVereinbarung, " ")
+                            .Bestellnummer = Rs1!Bestell_Nr
+                            .Liefereinheit = Rs1!Liefereinheit
+                            .PreisLiefereinheit = Nz(Rs1!PreisBrut, 0)
                             .LieferMenge = 1
-                            .Preis_EK_mit_Rabatt = rs1!PreisStueck      'Nz(Rs1!Preis_EK_mit_Rabatt)
-                            .Preis_EK = Nz(rs1!PreisBrut, 0)
-                            .Preis_Rabatt_pro = Nz(rs1!Rabatt, 0)
-                            .Bezeichnung = rs1!GF_Bezeichnung
-                            .ArtMinPreis = Nz(rs1!ST_MinKosten, 0)
-                            .ArtMaxPreis = Nz(rs1!St_MaxKosten, 0)
+                            .Preis_EK_mit_Rabatt = Rs1!PreisStueck      'Nz(Rs1!Preis_EK_mit_Rabatt)
+                            .Preis_EK = Nz(Rs1!PreisBrut, 0)
+                            .Preis_Rabatt_pro = Nz(Rs1!Rabatt, 0)
+                            .Bezeichnung = Rs1!GF_Bezeichnung
+                            .ArtMinPreis = Nz(Rs1!ST_MinKosten, 0)
+                            .ArtMaxPreis = Nz(Rs1!St_MaxKosten, 0)
                             
                         'Und zum schluss die ID Anpassen
                         pufNeuAnlegenID = .NeuAnlegen
-                        PSDebug "PopUPArtikel 11 neue ID:" & pufNeuAnlegenID
+                        PS.DebugPrint "PopUPArtikel 11 neue ID:" & pufNeuAnlegenID
         
                         If pufNeuAnlegenID > 0 Then  '
                             'Neu anlegen hat funktioniert Ziel Artikel ID zuweisen
-                            rs1.Edit
-                                rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
-                            rs1.Update
+                            Rs1.Edit
+                                Rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
+                            Rs1.Update
                         Else
                             MsgBox LA("Fehler beim anlegen " & pufNeuAnlegenID)
                         End If
                             
                     End If
-                    rs1.Close
+                    Rs1.Close
                     
                     
                 Case "tblAufPositionen"
@@ -1733,20 +1749,20 @@ Dim rs1 As DAO.Recordset
                            "FROM tblAufPositionen INNER JOIN tblAufDaten ON tblAufPositionen.Auftragsnummer = tblAufDaten.ID " & _
                            "WHERE tblAufPositionen.ID = " & .ZielTabelleID   '4132"
                     
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
-                    If rs1!fiAnschreibenAdresse = 0 Then
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+                    If Rs1!fiAnschreibenAdresse = 0 Then
                         MsgBox LA("Keine Adresse gewählt!")
                     Else
-                        If Not rs1.EOF Then
-                            .Lieferant = rs1!fiAnschreibenAdresse        'Adresnummer des Lieferanten ode des Kunden für den der Artikel ist
+                        If Not Rs1.EOF Then
+                            .Lieferant = Rs1!fiAnschreibenAdresse        'Adresnummer des Lieferanten ode des Kunden für den der Artikel ist
                             '.LieferantRufnameEXT = mPS.funAressnummerRufname(Rs1!fiAnschreibenAdresse)         'Holt den Rufname aus der Adresstabelle
-                            .Bezeichnung = rs1!Pos_Bezeichnung
-                            .BeschreibungB = Nz(rs1!Pos_Beschreibung, "")  'Kopiert in Beschreibung Bestellun
-                            .Beschreibung = Nz(rs1!Pos_Beschreibung, "")   'Kopiert in Beschreibung Angebot
+                            .Bezeichnung = Rs1!Pos_Bezeichnung
+                            .BeschreibungB = Nz(Rs1!Pos_Beschreibung, "")  'Kopiert in Beschreibung Bestellun
+                            .Beschreibung = Nz(Rs1!Pos_Beschreibung, "")   'Kopiert in Beschreibung Angebot
                             '.Bestellnummer = Rs1!Bestell_Nr
-                            .Liefereinheit = rs1!Einheit
-                            .Preis_EK_mit_Rabatt = rs1!Preis_einzeln      'Nz(Rs1!Preis_EK_mit_Rabatt)
-                            .Preis_EK = rs1!Preis_einzeln
+                            .Liefereinheit = Rs1!Einheit
+                            .Preis_EK_mit_Rabatt = Rs1!Preis_einzeln      'Nz(Rs1!Preis_EK_mit_Rabatt)
+                            .Preis_EK = Rs1!Preis_einzeln
                             .Preis_Rabatt_pro = 0
                             '.Bezeichnung = Rs1!GF_Bezeichnung
                             '.ArtMinPreis = Nz(Rs1!ST_MinKosten, 0)
@@ -1754,19 +1770,19 @@ Dim rs1 As DAO.Recordset
                             
                         'Und zum schluss die ID Anpassen
                         pufNeuAnlegenID = .NeuAnlegen
-                        PSDebug "PopUPArtikel 11 neue ID:" & pufNeuAnlegenID
+                        PS.DebugPrint "PopUPArtikel 11 neue ID:" & pufNeuAnlegenID
         
                         If pufNeuAnlegenID > 0 Then  '
                             'Neu anlegen hat funktioniert Ziel Artikel ID zuweisen
-                            rs1.Edit
-                                rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
-                            rs1.Update
+                            Rs1.Edit
+                                Rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
+                            Rs1.Update
                         Else
                             MsgBox LA("Fehler beim anlegen " & pufNeuAnlegenID)
                         End If
                             
                         End If
-                    rs1.Close
+                    Rs1.Close
                    End If 'Prüfen Adresse 0
                    
                     
@@ -1774,13 +1790,13 @@ Dim rs1 As DAO.Recordset
                     'Exit Function  'noch nicht ok
                     'die Auflistung der Dokumente in den Anschreiben #################
                     sSql = "SELECT * FROM tblProjektbeschreibung WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
-Stop
-                    If Not rs1.EOF Then
-                            .Bezeichnung = rs1!Pos_Bezeichnung
-                            .Beschreibung = rs1!Pos_Beschreibung
-                            .Liefereinheit = rs1!Einheit
-                            .Preis_VK = rs1!Preis_einzeln      'Oder EK mit Rabatt? Oder EK_Liste
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+'Stop
+                    If Not Rs1.EOF Then
+                            .Bezeichnung = Rs1!Pos_Bezeichnung
+                            .Beschreibung = Rs1!Pos_Beschreibung
+                            .Liefereinheit = Rs1!Einheit
+                            .Preis_VK = Rs1!Preis_einzeln      'Oder EK mit Rabatt? Oder EK_Liste
                             'rs1!Preis_Summe = .Preis_VK * rs1!Anzahl_Menge
                             'rs1!Lieferzeit = .Liefezeit
                             'Rs1!St_Preis_VK = .Preis_VK
@@ -1790,47 +1806,47 @@ Stop
                         pufNeuAnlegenID = .NeuAnlegen
                                                     If pufNeuAnlegenID > 0 Then  '
                             'Neu anlegen hat funktioniert Ziel Artikel ID zuweisen
-                            rs1.Edit
-                                rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
-                            rs1.Update
+                            Rs1.Edit
+                                Rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
+                            Rs1.Update
                         Else
                             MsgBox LA("Fehler beim anlegen " & pufNeuAnlegenID)
                         End If
                     End If
-                    rs1.Close
+                    Rs1.Close
                 Case "tblProjektbeschreibungDokumente"
                     'die Auflistung der Dokumente in den Anschreiben #################
                     sSql = "SELECT * FROM tblProjektbeschreibungDokumente WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-                    If Not rs1.EOF Then
+                    If Not Rs1.EOF Then
                         'RS1.Edit
-                            .Bezeichnung = rs1!Pos_Bezeichnung
-                            .Beschreibung = rs1!Pos_Beschreibung
-                            .Liefereinheit = rs1!Einheit
+                            .Bezeichnung = Rs1!Pos_Bezeichnung
+                            .Beschreibung = Rs1!Pos_Beschreibung
+                            .Liefereinheit = Rs1!Einheit
                             'RS1!Anzahl_Menge = Nz(RS1!Anzahl_Stueck, 0) * Nz(RS1!Anzahl_Teile, 0)
-                            .Preis_VK = rs1!St_Preis_VK     'Oder EK mit Rabatt? Oder EK_Liste
-                            .Preis_VK = rs1!Preis_VK ' * RS1!Anzahl_Menge
-                            .Liefezeit = rs1!Lieferzeit
+                            .Preis_VK = Rs1!St_Preis_VK     'Oder EK mit Rabatt? Oder EK_Liste
+                            .Preis_VK = Rs1!Preis_VK ' * RS1!Anzahl_Menge
+                            .Liefezeit = Rs1!Lieferzeit
                             'Rs1!St_Preis_VK = .Preis_VK
                             
                             
                             'Und zum schluss die ID Anpassen
                             pufNeuAnlegenID = .NeuAnlegen
-                            PSDebug "PopUPArtikel 11 neue ID:" & pufNeuAnlegenID
+                            PS.DebugPrint "PopUPArtikel 11 neue ID:" & pufNeuAnlegenID
         
                             If pufNeuAnlegenID > 0 Then  '
                                 'Neu anlegen hat funktioniert Ziel Artikel ID zuweisen
-                                rs1.Edit
-                                    rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
-                                rs1.Update
+                                Rs1.Edit
+                                    Rs1!ArtikelID = pufNeuAnlegenID  'ID von dem neue Datensatz
+                                Rs1.Update
                             Else
                                 MsgBox LA("Fehler beim anlegen " & pufNeuAnlegenID)
                             End If
                                
                         'RS1.Update
                     End If
-                    rs1.Close
+                    Rs1.Close
                     
 
             End Select
@@ -1853,7 +1869,7 @@ Public Function funPopUPArtikel_12()
             Exit Function
         End If
         
-        PSDebug "PopUPArtikel 12"
+        PS.DebugPrint "PopUPArtikel 12"
         
         With PopUpArtikelObj
             DoCmd.OpenForm "frmArtikelInfo", , , "ID=" & .ZielArtikelID
@@ -1873,7 +1889,7 @@ Public Function funPopUPArtikel_13()
             Exit Function
         End If
         
-        PSDebug "PopUPArtikel 13"
+        PS.DebugPrint "PopUPArtikel 13"
         
         With PopUpArtikelObj
             PS.Artikel.MutterBerechnen .ZielArtikelID, .Projektnummer
@@ -1910,7 +1926,7 @@ Public Function funPopUPArtikel_16()
 'Die Nr 16 kommt aus der festlegung in der Menue Tabelle
 Dim pufNeuAnlegenID As Long
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
 
         If PopUpArtikelObj Is Nothing Then
@@ -1918,7 +1934,7 @@ Dim Rs2 As DAO.Recordset
             Exit Function
         End If
         
-        PSDebug "PopUPArtikel 16 Nur Kopie von refresh 16.5.2019"
+        PS.DebugPrint "PopUPArtikel 16 Nur Kopie von refresh 16.5.2019"
         
         
         With PopUpArtikelObj
@@ -1950,32 +1966,32 @@ Dim Rs2 As DAO.Recordset
                             "WHERE Artikel_Nr_Mutter = " & .ID & _
                             " ORDER BY Reihenfolge"
                         
-                        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                        Set Rs1 = CurrentDbC.OpenRecordset(sSql)
                         
                         sSql = "SELECT * FROM tblStueckliste WHERE False"
                         Set Rs2 = CurrentDbC.OpenRecordset(sSql)
                            'Ale Artikel die der Mutter zugeordnet sind weren in die Stückliste eingefügt
-                            While Not rs1.EOF
+                            While Not Rs1.EOF
                                 Rs2.AddNew
                                     Rs2!Projektnummer = .Projektnummer  'Von Stückliste
                                     'Rs2!Gruppe = .ID     'ID von Mutter
-                                    Rs2!ArtikelID = rs1!Artikel_Nr_Kind
-                                    Rs2!Lieferant_Adress_Nr = rs1!Lieferant       'Adresnummer des Lieferanten
-                                    Rs2!Lieferant = mPS.AdresseRufNameVonID(rs1!Lieferant)
+                                    Rs2!ArtikelID = Rs1!Artikel_Nr_Kind
+                                    Rs2!Lieferant_Adress_Nr = Rs1!Lieferant       'Adresnummer des Lieferanten
+                                    Rs2!Lieferant = mPS.AdresseRufNameVonID(Rs1!Lieferant)
                                     'Die Menge ist der Produktwert die Multiplikation von Menge der Mutter * Menge der Kinder
-                                    Rs2!Menge = rs1!Menge * Nz(DLookup("Menge", "tblStueckliste", "ID_Nummer=" & .ZielTabelleID), 1)
-                                    Rs2!Liefereinheit = rs1!Liefereinheit
+                                    Rs2!menge = Rs1!menge * Nz(DLookup("Menge", "tblStueckliste", "ID_Nummer=" & .ZielTabelleID), 1)
+                                    Rs2!Liefereinheit = Rs1!Liefereinheit
                                     '.LieferantRufnameEXT =         'Holt den Rufname aus der Adresstabelle
                                     'Rs1!Beschreibung = .Beschreibung           'für die Bestellung wird übernommen
-                                    Rs2!GF_Bezeichnung = rs1!Bezeichnung
-                                    Rs2!BesondereVereinbarung = Nz(rs1!BeschreibungB, " ")
-                                    Rs2!Bestell_Nr = rs1!Bestellnummer
-                                    Rs2!PreisStueck = rs1!Preis_EK_mit_Rabatt     'Nz(Rs1!Preis_EK_mit_Rabatt)
-                                    Rs2!PreisBrut = rs1!Preis_EK
-                                    Rs2!Rabatt = rs1!Preis_Rabatt_pro
-                                    Rs2!GF_Bezeichnung = rs1!Bezeichnung
-                                    Rs2!ST_MinKosten = Nz(rs1!ArtMinPreis, 0)
-                                    Rs2!St_MaxKosten = Nz(rs1!ArtMaxPreis, 0)
+                                    Rs2!GF_Bezeichnung = Rs1!Bezeichnung
+                                    Rs2!BesondereVereinbarung = Nz(Rs1!BeschreibungB, " ")
+                                    Rs2!Bestell_Nr = Rs1!Bestellnummer
+                                    Rs2!PreisStueck = Rs1!Preis_EK_mit_Rabatt     'Nz(Rs1!Preis_EK_mit_Rabatt)
+                                    Rs2!PreisBrut = Rs1!Preis_EK
+                                    Rs2!Rabatt = Rs1!Preis_Rabatt_pro
+                                    Rs2!GF_Bezeichnung = Rs1!Bezeichnung
+                                    Rs2!ST_MinKosten = Nz(Rs1!ArtMinPreis, 0)
+                                    Rs2!St_MaxKosten = Nz(Rs1!ArtMaxPreis, 0)
                                     Rs2!Angelegt_von = PS.User.Kurzzeichen()
                                     Rs2!Besteller = PS.User.Kurzzeichen()
                                     Rs2!Angelegt_am = Now
@@ -1989,41 +2005,41 @@ Dim Rs2 As DAO.Recordset
                                     
                                     
                                 Rs2.Update
-                                rs1.MoveNext
+                                Rs1.MoveNext
                             Wend
                             
-                            rs1.Close
+                            Rs1.Close
                             Rs2.Close
                             
                             'Setzt die Gruppe in der Stückliste der Mutter auch auf die ID der Mutter setzen
                             sSql = "SELECT gruppe, Mutter_ID, Mutter_ID_Stueck  FROM tblStueckliste WHERE ID_Nummer=" & .ZielTabelleID
-                            Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                            Set Rs1 = CurrentDbC.OpenRecordset(sSql)
                             
-                            If Not rs1.EOF Then
-                                rs1.Edit
-                                    rs1.Fields("Gruppe").Value = .ID
-                                    rs1.Fields("Mutter_ID").Value = .ID
-                                    rs1.Fields("Mutter_ID_Stueck").Value = .ZielTabelleID
-                                rs1.Update
+                            If Not Rs1.EOF Then
+                                Rs1.Edit
+                                    Rs1.Fields("Gruppe").Value = .ID
+                                    Rs1.Fields("Mutter_ID").Value = .ID
+                                    Rs1.Fields("Mutter_ID_Stueck").Value = .ZielTabelleID
+                                Rs1.Update
                             End If
-                            rs1.Close
+                            Rs1.Close
                     End If
                             
                 Case "xxtblAufPositionen"
                     Exit Function 'noch nicht ok
                     'die Auflistung die Im Auftrag steht #################
                     sSql = "SELECT * FROM tblAufPositionen WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-                    If Not rs1.EOF Then
-                        rs1.Edit
-                            rs1!Pos_Bezeichnung = .Bezeichnung
-                            rs1!Pos_Beschreibung = .Beschreibung
-                            rs1!Einheit = .Liefereinheit
-                            rs1!Preis_einzeln = .Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
-                        rs1.Update
+                    If Not Rs1.EOF Then
+                        Rs1.Edit
+                            Rs1!Pos_Bezeichnung = .Bezeichnung
+                            Rs1!Pos_Beschreibung = .Beschreibung
+                            Rs1!Einheit = .Liefereinheit
+                            Rs1!Preis_einzeln = .Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
+                        Rs1.Update
                     End If
-                    rs1.Close
+                    Rs1.Close
                    
                    
                     
@@ -2031,16 +2047,16 @@ Dim Rs2 As DAO.Recordset
                     Exit Function  'noch nicht ok
                     'die Auflistung der Dokumente in den Anschreiben #################
                     sSql = "SELECT * FROM tblProjektbeschreibungDokumente WHERE ID=" & .ZielTabelleID
-                    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+                    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-                    If Not rs1.EOF Then
-                            rs1!Pos_Bezeichnung = .Bezeichnung
-                            rs1!Pos_Beschreibung = .Beschreibung
-                            rs1!Einheit = .Liefereinheit
-                            rs1!St_Preis_VK = .Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
-                            rs1!Preis_VK = rs1!Anzahl_Menge * .Preis_VK
+                    If Not Rs1.EOF Then
+                            Rs1!Pos_Bezeichnung = .Bezeichnung
+                            Rs1!Pos_Beschreibung = .Beschreibung
+                            Rs1!Einheit = .Liefereinheit
+                            Rs1!St_Preis_VK = .Preis_VK   'Oder EK mit Rabatt? Oder EK_Liste
+                            Rs1!Preis_VK = Rs1!Anzahl_Menge * .Preis_VK
                     End If
-                    rs1.Close
+                    Rs1.Close
                
             End Select
 
@@ -2058,7 +2074,7 @@ Public Function funPopUPArtikel_20()
             Exit Function
         End If
         
-        PSDebug "funPopUPArtikel_20 OPEN PDF "
+        PS.DebugPrint "funPopUPArtikel_20 OPEN PDF "
         
         With PopUpArtikelObj
         
@@ -2114,7 +2130,7 @@ Private Sub StuecklisteArtikelRefresh(ZielTabelleID As Long, _
 'Wenn die Zieltabelle -1 ist ist der Artikel nicht vorhanden und soll neu angelegt werden
 
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim oArtikel As Artikel
 Dim NeuerDatensatz As Boolean
 Set oArtikel = New Artikel
@@ -2126,7 +2142,7 @@ Set oArtikel = New Artikel
 
     With oArtikel
         .Laden (ArtikelID)
-        PSDebug "Artikel.:" & ArtikelID & "MengeMutter:" & MengeArtikel
+        PS.DebugPrint "Artikel.:" & ArtikelID & "MengeMutter:" & MengeArtikel
         'In der Stückliste den Datensatz refreshen aus der Artikeldatenbank
         If NeuerDatensatz Then
             sSql = "SELECT * FROM tblStueckliste WHERE FALSE"
@@ -2134,59 +2150,59 @@ Set oArtikel = New Artikel
             sSql = "SELECT * FROM tblStueckliste WHERE ID_Nummer=" & ZielTabelleID
         End If
         
-        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        Set Rs1 = CurrentDbC.OpenRecordset(sSql)
         
         
             If NeuerDatensatz Then
-                rs1.AddNew
-                    rs1!ST_Check = "Mit refresh ergänzt"
-                    rs1!ArtikelID = ArtikelID
-                    rs1!Mutter_ID = Mutter_ID
-                    rs1!Mutter_ID_Stueck = Mutter_ID_Stueck
+                Rs1.AddNew
+                    Rs1!ST_Check = "Mit refresh ergänzt"
+                    Rs1!ArtikelID = ArtikelID
+                    Rs1!Mutter_ID = Mutter_ID
+                    Rs1!Mutter_ID_Stueck = Mutter_ID_Stueck
                     'Status muss auch angelegt werden
-                    rs1!Status = mPS.StatusNeu(rs1!ID_Nummer, 10, 0, "", "Refresh von Mutter")
-                    rs1!Besteller = PS.User.Kurzzeichen()
+                    Rs1!Status = mPS.StatusNeu(Rs1!ID_Nummer, 10, 0, "", "Refresh von Mutter")
+                    Rs1!Besteller = PS.User.Kurzzeichen()
             Else
-                If Not rs1.EOF Then
-                    rs1.Edit
+                If Not Rs1.EOF Then
+                    Rs1.Edit
                 Else
-                    rs1.Close
+                    Rs1.Close
                     Exit Sub
                 End If
             End If
             
-                rs1!Projektnummer = PopUpArtikelObj.Projektnummer
-                rs1!Lieferant_Adress_Nr = .Lieferant  'mPS.AdresseIDVonRufname(.Lieferant)      'Adresnummer des Lieferanten
-                rs1!Lieferant = mPS.AdresseRufNameVonID(.Lieferant) 'Holt den Rufname aus der Adresstabelle
+                Rs1!Projektnummer = PopUpArtikelObj.Projektnummer
+                Rs1!Lieferant_Adress_Nr = .Lieferant  'mPS.AdresseIDVonRufname(.Lieferant)      'Adresnummer des Lieferanten
+                Rs1!Lieferant = mPS.AdresseRufNameVonID(.Lieferant) 'Holt den Rufname aus der Adresstabelle
                 'Rs1!Beschreibung = .Beschreibung    'für die Bestellung wird übernommen
-                rs1!BesondereVereinbarung = .BeschreibungB
-                rs1!Bestell_Nr = .Bestellnummer
-                rs1!Liefereinheit = Nz(.Liefereinheit, "St.")
-                If Len(rs1!Liefereinheit) = 0 Then rs1!Liefereinheit = "St."
-                rs1!PreisStueck = .Preis_EK_mit_Rabatt '   Nz(Rs1!Preis_EK_mit_Rabatt)
-                rs1!PreisBrut = .Preis_EK
-                rs1!Rabatt = .Preis_Rabatt_pro
-                rs1!GF_Bezeichnung = .Bezeichnung
-                rs1!ST_MinKosten = .ArtMinPreis
-                rs1!St_MaxKosten = .ArtMaxPreis
-                rs1!CAD_Index = .CAD_Index
+                Rs1!BesondereVereinbarung = .BeschreibungB
+                Rs1!Bestell_Nr = .Bestellnummer
+                Rs1!Liefereinheit = Nz(.Liefereinheit, "St.")
+                If Len(Rs1!Liefereinheit) = 0 Then Rs1!Liefereinheit = "St."
+                Rs1!PreisStueck = .Preis_EK_mit_Rabatt '   Nz(Rs1!Preis_EK_mit_Rabatt)
+                Rs1!PreisBrut = .Preis_EK
+                Rs1!Rabatt = .Preis_Rabatt_pro
+                Rs1!GF_Bezeichnung = .Bezeichnung
+                Rs1!ST_MinKosten = .ArtMinPreis
+                Rs1!St_MaxKosten = .ArtMaxPreis
+                Rs1!CAD_Index = .CAD_Index
                 Select Case MengeArtikel
                     Case Is >= 0
-                        rs1!Menge = MengeArtikel
+                        Rs1!menge = MengeArtikel
                     Case -1
                         'mache nix
                     Case -2
                         'Der Datensatz existiert nicht mehr in der CAD Liste nur in der Stückliste
-                        rs1!ST_Check = "gelöscht"
-                        rs1!Menge = 0
+                        Rs1!ST_Check = "gelöscht"
+                        Rs1!menge = 0
                 End Select
                 
                 
                 
                 
-            rs1.Update
+            Rs1.Update
             
-        rs1.Close
+        Rs1.Close
     End With
 End Sub
 
@@ -2217,26 +2233,26 @@ End Function
 Function funAnBestCopy()
 MsgBox "funAnBestCopy"
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim z1 As Long
 Dim strSp1 As String
 
 Form_frmAnfragenBestellungen.varZA = ""
 
-Set rs1 = CurrentDb.OpenRecordset("SELECT * FROM tblStuecklisteBestellung " & _
+Set Rs1 = CurrentDb.OpenRecordset("SELECT * FROM tblStuecklisteBestellung " & _
     "WHERE BelegNr = " & Form_frmAnfragenBestellungen.BelegNr & _
     "ORDER BY tblStuecklisteBestellung.Positionsnummer;")
     
-If rs1.RecordCount <> 0 Then
-    rs1.MoveFirst
-    For z1 = 1 To rs1.RecordCount
-        Form_frmAnfragenBestellungen.varZA = Form_frmAnfragenBestellungen.varZA & rs1!Bestell_Nr & "," & rs1!Menge & vbCrLf
-        rs1.MoveNext
+If Rs1.RecordCount <> 0 Then
+    Rs1.MoveFirst
+    For z1 = 1 To Rs1.RecordCount
+        Form_frmAnfragenBestellungen.varZA = Form_frmAnfragenBestellungen.varZA & Rs1!Bestell_Nr & "," & Rs1!menge & vbCrLf
+        Rs1.MoveNext
     Next z1
 End If
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 If IsNull(Form_frmAnfragenBestellungen.varZA) Then strSp1 = modMemofeld(" ") _
  Else: Form_frmAnfragenBestellungen.varZA = modMemofeld(Form_frmAnfragenBestellungen.varZA)
@@ -2258,7 +2274,7 @@ MsgBox "funAnBestEMail"
 
 Dim d1 As String
 Dim D2 As String
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
 
 
@@ -2270,7 +2286,7 @@ End If
 With Form_frmAnfragenBestellungen
 
     'Standartvorlage über Mandant wenn der Mandant nicht gefunden wird wird der Standart verwendet
-    S1 = berichtMandant("ber_BestellungAnfrage")
+    s1 = berichtMandant("ber_BestellungAnfrage")
     
     
     'Prüfen Ob ein verzeichnis für die Ablage besteht
@@ -2312,20 +2328,20 @@ With Form_frmAnfragenBestellungen
         
         'Abhämgig von der Beleg Art die Dokumente erzeugen
         If .Beleg_Art = "Bestellung" Then
-            DoCmd.OutputTo acOutputReport, S1, acFormatPDF, d1
+            DoCmd.OutputTo acOutputReport, s1, acFormatPDF, d1
             DoCmd.OutputTo acOutputReport, "ber_BestellungWarenBegleitschein", acFormatPDF, D2
         
             Form_frmEMail.addAnhang = d1
             Form_frmEMail.addAnhang = D2
         Else
-            DoCmd.OutputTo acOutputReport, S1, acFormatPDF, d1
+            DoCmd.OutputTo acOutputReport, s1, acFormatPDF, d1
             Form_frmEMail.addAnhang = d1
         End If
     
     Else
         'Outlook Mail
         
-        DoCmd.OutputTo acOutputReport, S1, acFormatPDF, d1
+        DoCmd.OutputTo acOutputReport, s1, acFormatPDF, d1
             
         
         SendMailHTMLOutlook .EMail, "P" & .Projektnummer & " " & .Betreff, "Hier schreiben wir des zeug usw.", d1

@@ -9,13 +9,13 @@ Option Explicit
 
 Function funStart()
 'Das muss ganz am anfang sein wenn Runtime und die Verweise sind nicht OK
-Dim S1 As String
+Dim s1 As String
 
-S1 = FunVerweiseAnzeigen
+s1 = FunVerweiseAnzeigen
 
 'Wenn ein ungültiger Verweis erkannt wir zeigen wir die Verweise an.
-If InStr(1, S1, "broken") <> 0 Then
-    MsgBox S1
+If InStr(1, s1, "broken") <> 0 Then
+    MsgBox s1
 End If
 
 Call funStart2
@@ -35,8 +35,8 @@ Dim cmb As CommandBar
 'C:\Users\gut\Daten\PS\PS_Run\PS2_006.accdb /CMD Debug
  gloDebug = Replace(Command, " ", "") = "Debug"
  
-'Andere Variante Abfrage Datei psdebug.txt im gleichen Verzeichnis
-If Dir(CurrentProject.Path & "\" & "psdebug.txt") = "psdebug.txt" Then gloDebug = True
+'Andere Variante Abfrage Datei ps.debugprint.txt im gleichen Verzeichnis
+If Dir(CurrentProject.Path & "\" & "ps.debugprint.txt") = "ps.debugprint.txt" Then gloDebug = True
 
 
 
@@ -192,10 +192,10 @@ Dim cmb As CommandBar
         'Schaltet alle Menueleiste aus
           
         'Blendet alle Menüs aus
-        For Each cmb In CommandBars
-           cmb.Enabled = False
-        '    wert1 = wert1 & cmb.Name & " /" & cmb.Enabled & vbCrLf
-        Next
+'        For Each cmb In CommandBars
+'           cmb.Enabled = False
+'        '    wert1 = wert1 & cmb.Name & " /" & cmb.Enabled & vbCrLf
+'        Next
    
 
 End Sub

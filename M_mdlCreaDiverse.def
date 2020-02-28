@@ -79,7 +79,7 @@ Dim Auswahl4 As CommandBarButton
 
 Dim Test3 As CommandBar
 Dim Eintrag1 As CommandBarControl
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
 Dim Rs3 As DAO.Recordset
 Dim lonZ1 As Long
@@ -94,21 +94,21 @@ Dim strSql As String
 'Öffnet die Daten der Menueleisten
 
 'gloLonLevel = 255 'xxx zum testen
-Set rs1 = CurrentDbC.OpenRecordset("tblmen", dbOpenDynaset, dbSeeChanges)
-rs1.MoveLast
+Set Rs1 = CurrentDbC.OpenRecordset("tblmen", dbOpenDynaset, dbSeeChanges)
+Rs1.MoveLast
 lonRC = 1 ' Rs1.RecordCount 'xxxx 1 da die zweite Menueleiste nicht korekt erzeugt wird.
-rs1.MoveFirst
+Rs1.MoveFirst
 'Abfrage ob Menueleiste vorhanden
-If rs1.EOF And rs1.BOF Then
+If Rs1.EOF And Rs1.BOF Then
     MsgBox ("Es gibt keine Menueleiste")
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
     Exit Function
 End If
 
 'Schleife für menueleisten
 For lonZ1 = 1 To lonRC
-    strSp1 = rs1!MeName
+    strSp1 = Rs1!MeName
     'Löscht wenn vorhanden die alte Menueleiste
     If BarFind(strSp1) = True Then
         'MsgBox "Menüleiste vorhanden - wird gelöscht."
@@ -117,7 +117,7 @@ For lonZ1 = 1 To lonRC
 
     'Erzeugt die Menueleiste neu
     'Set CreaBar = CommandBars.Add(Rs1!mename, Rs1!meart, True, False)
-    Set CreaBar = CommandBars.Add(rs1!MeName, msoBarTop, True, True)
+    Set CreaBar = CommandBars.Add(Rs1!MeName, msoBarTop, True, True)
     CommandBars(strSp1).Visible = True
     'CommandBars(strSp1).Position = msoBarTop
     
@@ -130,7 +130,7 @@ For lonZ1 = 1 To lonRC
     
     'Öffnet die Daten der ersten ebene der Menueleiste
     Set Rs2 = CurrentDbC.OpenRecordset("SELECT tblMenSym.* " & _
-    "FROM tblMenSym WHERE (tblMenSym.MsMeID = " & rs1!MeID & ") ORDER BY tblMenSym.MsID;", dbOpenDynaset, dbSeeChanges)
+    "FROM tblMenSym WHERE (tblMenSym.MsMeID = " & Rs1!MeID & ") ORDER BY tblMenSym.MsID;", dbOpenDynaset, dbSeeChanges)
     Rs2.MoveFirst 'MoveLast
     Do While Not Rs2.EOF  ' For lonZ2 = 1 To Rs2.RecordCount
        
@@ -170,11 +170,11 @@ For lonZ1 = 1 To lonRC
 HupfRs3:  ' Sprungmarke wenn keine Unterdatensätze
     If Rs2.EOF <> True Then Rs2.MoveNext
     Loop 'Next lonZ2
-If rs1.EOF <> True Then rs1.MoveNext
+If Rs1.EOF <> True Then Rs1.MoveNext
 Next lonZ1
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 Rs2.Close
 Set Rs2 = Nothing
 Rs3.Close

@@ -89,7 +89,7 @@ Dim za(4) As String
 Dim lvarNr As Long
 
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 'Hallo Das Programm soll die Stückliste von Solid Edge einlesen wenn diese mit Text kopieren kopiert wird
 ' Die Stückliste muss sein Pos.Nummer | Menge | Dateiname
@@ -108,7 +108,7 @@ Dim rs1 As DAO.Recordset
 lArt = 3 'Das ist die Solid Edge Version Darauf achten das kein leeres Solid Edge offen ist
 
 
-Set rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_ExternSE WHERE 1=0")
+Set Rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_ExternSE WHERE 1=0")
 
  
   spZW = ClipBoard_GetData()
@@ -270,18 +270,18 @@ Debug.Print varTab(lZeile, 1), varTab(lZeile, 2), varTab(lZeile, 3)
     End If 'lart=3
         
         
-Set rs1 = CurrentDb.OpenRecordset("t_ExternSE")
+Set Rs1 = CurrentDb.OpenRecordset("t_ExternSE")
         
 If lArt = 1 Then
     For z1 = 2 To lZeile
-        rs1.AddNew
-            rs1!SEProjekt = lProNr
-            rs1!SEPosNr = Val(varTab(z1, 1))
-            rs1!SEMenge = Val(varTab(z1, 2))
-            rs1!SEDateiname = varTab(z1, 3)
-            rs1!SELieferant = varTab(z1, 4)
-            rs1!SEBemerkung = varTab(z1, 6)
-        rs1.Update
+        Rs1.AddNew
+            Rs1!SEProjekt = lProNr
+            Rs1!SEPosNr = Val(varTab(z1, 1))
+            Rs1!SEMenge = Val(varTab(z1, 2))
+            Rs1!SEDateiname = varTab(z1, 3)
+            Rs1!SELieferant = varTab(z1, 4)
+            Rs1!SEBemerkung = varTab(z1, 6)
+        Rs1.Update
     Next z1
 End If
 
@@ -289,15 +289,15 @@ End If
 
 If lArt = 2 Then 'Eigenschaften der Vorkommnisse
     For z1 = 1 To lZeile
-        rs1.AddNew
+        Rs1.AddNew
             
-            rs1!SEProjekt = lProNr
-            rs1!SEPosNr = z1
-            rs1!SEMenge = 0
-            rs1!SEDateiname = varTab(z1, 1)
-            rs1!SELieferant = varTab(z1, 2)
-            rs1!SEBemerkung = varTab(z1, 3)
-        rs1.Update
+            Rs1!SEProjekt = lProNr
+            Rs1!SEPosNr = z1
+            Rs1!SEMenge = 0
+            Rs1!SEDateiname = varTab(z1, 1)
+            Rs1!SELieferant = varTab(z1, 2)
+            Rs1!SEBemerkung = varTab(z1, 3)
+        Rs1.Update
     Next z1
 End If
 
@@ -305,25 +305,25 @@ If lArt = 3 Then 'trift zu wenn die Daten von PSArtikel direkt aus dem ASM komme
     For z1 = 7 To lZeile 'Der Start ist da wo die sinnvollen Werte anfangen
         
         If InStr(1, varTab(z1, 1), "_") = 0 Then  'Sorgt dafür das Dateinamen mit '_' ausgeschlossen werden
-            rs1.AddNew
+            Rs1.AddNew
                 
-                rs1!SEProjekt = lProNr
+                Rs1!SEProjekt = lProNr
                 'rs1!SEPosNr = z1
-                rs1!SEGruppe = sGruppe
-                rs1!SEMenge = varTab(z1, 3)
-                rs1!SEDateiname = varTab(z1, 1)
-                rs1!SE_ArtikelNr = Val(varTab(z1, 2))
+                Rs1!SEGruppe = sGruppe
+                Rs1!SEMenge = varTab(z1, 3)
+                Rs1!SEDateiname = varTab(z1, 1)
+                Rs1!SE_ArtikelNr = Val(varTab(z1, 2))
                 'rs1!SELieferant = varTab(z1, 2)
                 'rs1!SEBemerkung =""
-            rs1.Update
+            Rs1.Update
        End If
     Next z1
 End If
 
 
 
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
     
         'Die gefundenen spalten werden angezeigt
 '    MsgBox "Nachfolgend die einzelnen Spalten:" & vbCrLf & _
@@ -339,19 +339,19 @@ End Function
 
 
 
-Function funShowASC9(S1 As String) As String
+Function funShowASC9(s1 As String) As String
 Dim z1 As Long
 Dim s2 As String
 
-For z1 = 1 To Len(S1)
-Select Case Asc(Mid(S1, z1, 1))
+For z1 = 1 To Len(s1)
+Select Case Asc(Mid(s1, z1, 1))
     
     Case 9
         s2 = s2 & "*"
     Case 10
         s2 = s2 & "#"
     Case Else
-        s2 = s2 & Mid(S1, z1, 1)
+        s2 = s2 & Mid(s1, z1, 1)
 End Select
     
     
@@ -389,7 +389,7 @@ Dim varTab(400, 11) As String
 Dim lvarNr As Long
 
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 '1) Das Programm liest die Arbeitsstunden aus der Zwischenablage.
 '2) und Trägt die daten in die Arbeitstabelle ein
@@ -471,17 +471,17 @@ If msgJaNein("Soll die vorhandene Tabelle gelöscht werden?") = True Then
 End If
         
         
-Set rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_tempArbeit WHERE FALSE")
+Set Rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_tempArbeit WHERE FALSE")
 
 For z1 = 2 To lZeile
     'Debug.Print varTab(z1, 4) & Chr(9) & MID(varTab(z1, 5), 1, 10) & Chr(9) & Format(Val(varTab(z1, 8)), "0.00")
     'rs1!ID
-    rs1.AddNew
-    rs1!ProjektNr = lProNr
-    rs1!Bezeichnung = varTab(z1, 4)
-    rs1!Datum = Nz(Mid(varTab(z1, 5), 1, 10))
-    rs1!Dauer = Format(Val(varTab(z1, 8)), "0.00")
-    rs1.Update
+    Rs1.AddNew
+    Rs1!ProjektNr = lProNr
+    Rs1!Bezeichnung = varTab(z1, 4)
+    Rs1!Datum = Nz(Mid(varTab(z1, 5), 1, 10))
+    Rs1!Dauer = Format(Val(varTab(z1, 8)), "0.00")
+    Rs1.Update
 
 Next z1
 
@@ -489,8 +489,8 @@ Next z1
 
 
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
         'Die gefundenen spalten werden angezeigt
 '    MsgBox "Nachfolgend die einzelnen Spalten:" & vbCrLf & _

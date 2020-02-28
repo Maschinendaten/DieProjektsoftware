@@ -115,7 +115,7 @@ Public Property Let AufAbgeschlossenAm(WERT As Date):     m_AufabgeschlossenAm =
 Public Function Laden(Auftragsnummer As Long) As Long
 'prüft ob Auftrag schon geladen wenn nicht neu laden
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 'Lädt immer neu weil sonst bei Änderungen extra trigger erfolgen muss
@@ -125,9 +125,9 @@ Dim sSql As String
 'End If
 
 sSql = "SELECT * FROM tblAufDaten WHERE ID=" & Auftragsnummer
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-    With rs1
+    With Rs1
         If Not .EOF Then
             m_ID = Nz(.Fields("ID").Value)
             m_ProNr = Nz(.Fields("ProNr").Value)
@@ -177,7 +177,7 @@ End Function
 
 Public Function Neu(Projektnummer As Long) As Long
 'Legt einen neuen Auftrag an
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 If Projektnummer < 1 Then
@@ -200,8 +200,8 @@ If MsgBox(LA("Wollen Sie einen neuen Auftrag ") _
     End If
     
     sSql = "SELECT * FROM tblAufDaten WHERE FALSE"
-    Set rs1 = CurrentDbC.OpenRecordset(sSql)
-    With rs1
+    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+    With Rs1
         .AddNew
             
         'Öffnet das Projekt zum Auftrag zur Übergabe der Daten   tblProjekte.ProjektNr AS ProNr,
@@ -236,7 +236,7 @@ If MsgBox(LA("Wollen Sie einen neuen Auftrag ") _
                 .Fields("fiAnschreibenAdresse").Value = PS.Adresse.AdressNr
                 .Fields("fiRechnungsadresse").Value = PS.Adresse.AdressNr
        
-                Neu = rs1!ID
+                Neu = Rs1!ID
                 .Update
           
           .Close
@@ -291,7 +291,7 @@ End Function
 '---------------------------------------------------------------------------------------
 Function Neu_Dokument(AuftragNr As Long, DokumentType As DokType, Optional MitDetailDaten As Boolean = True) As Long
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim Rs2 As DAO.Recordset
 'Dim BN As Long    ' Zwischenspeicher Belegnummer
 'Dim SpPNr As Long ' Zwischenspeicher Projektnummer
@@ -320,15 +320,15 @@ Dim sSql As String
    
 'Wenn Rechnung suche letzte Rechnungsnummer
 If DokumentType = DokType.tyrechnung Or DokumentType = DokType.tyGutschrift Then
-    Set rs1 = CurrentDbC.OpenRecordset("SELECT TOP 1 tblRechnung.reBelegNr2 " & _
+    Set Rs1 = CurrentDbC.OpenRecordset("SELECT TOP 1 tblRechnung.reBelegNr2 " & _
     "FROM tblRechnung " & _
     "ORDER BY tblRechnung.reBelegNr2 DESC;")
     'Wenn noch keine Rechnung vorhanden ist Startnummer fragen
-    If rs1.RecordCount <> 1 Then
+    If Rs1.RecordCount <> 1 Then
         lonReNr = Val(InputBox("Bitte geben Sie die Startnummer der Rechnungen ein. Die Nummer lauttet 20040001 für die erste Rechnung im Jahr 2004.", "Eingabe der Startrechnungsnummer", "20040001"))
     Else
         'Wenn Rechnung vorhanden Rechnungsnummer auf addieren
-        lonReNr = rs1!ReBelegNr2 + 1
+        lonReNr = Rs1!ReBelegNr2 + 1
     End If
 End If
 
@@ -408,31 +408,31 @@ Select Case DokumentType
         
         'Die Rechnung wird in der Tabelle Rechnunng angelegt
         sSql = "SELECT * FROM tblRechnung WHERE False"
-        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        Set Rs1 = CurrentDbC.OpenRecordset(sSql)
         
-            rs1.AddNew    'Neuen Datensatz anlegen
-            rs1!BelegNr = PS.Anschreiben.BelegNr
-            rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
-            rs1!ReBelegart = 1 '1 ist Rechnung
-            rs1!AufNr = m_ID  'P_Auf_Nr
-            rs1!ProjekktNr = m_ProNr    ' SpPNr
-            rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
-            rs1!AngelegtAm = Now()
-            rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
+            Rs1.AddNew    'Neuen Datensatz anlegen
+            Rs1!BelegNr = PS.Anschreiben.BelegNr
+            Rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
+            Rs1!ReBelegart = 1 '1 ist Rechnung
+            Rs1!AufNr = m_ID  'P_Auf_Nr
+            Rs1!ProjekktNr = m_ProNr    ' SpPNr
+            Rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
+            Rs1!AngelegtAm = Now()
+            Rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
             
     '#### vorbelegten Textfelder
-            rs1!SummeText = funDbText(5, "SummeText")
-            rs1!MwstText = funDbText(5, "MwstText")
-            rs1!AuftragnettoText = funDbText(5, "SummeText")
-            rs1!BereitsBezahltText = funDbText(5, "BereitsBezahltText")
-            rs1!ZuZahlenderBetragText = funDbText(5, "ZuZahlenderBetragText")
-            rs1!RechnungsbetragText = funDbText(5, "RechnungsbetragText")
-            rs1!MwstWert = Val(funDbText(5, "MwstWert"))
-            rs1!Zahlungsbedingungen = funDbText(5, "Zahlungsbedingungen")
-            rs1!Waehrung = funDbText(5, "Waehrung")
+            Rs1!SummeText = funDbText(5, "SummeText")
+            Rs1!MwstText = funDbText(5, "MwstText")
+            Rs1!AuftragnettoText = funDbText(5, "SummeText")
+            Rs1!BereitsBezahltText = funDbText(5, "BereitsBezahltText")
+            Rs1!ZuZahlenderBetragText = funDbText(5, "ZuZahlenderBetragText")
+            Rs1!RechnungsbetragText = funDbText(5, "RechnungsbetragText")
+            Rs1!MwstWert = Val(funDbText(5, "MwstWert"))
+            Rs1!Zahlungsbedingungen = funDbText(5, "Zahlungsbedingungen")
+            Rs1!Waehrung = funDbText(5, "Waehrung")
     '#### vorbelegten Textfelder
-        rs1.Update
-        rs1.Close
+        Rs1.Update
+        Rs1.Close
             
         
                             
@@ -457,20 +457,20 @@ Select Case DokumentType
          
 
         sSql = "SELECT * FROM tblRechnung WHERE False"
-        Set rs1 = CurrentDbC.OpenRecordset(sSql)
-        If rs1.Updatable Then
-            rs1.AddNew    'Neuen Datensatz anlegen
-                rs1!BelegNr = PS.Anschreiben.BelegNr
-                rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
-                rs1!ReBelegart = 2 '1 ist eine Gutschrift
-                rs1!AufNr = m_ID ' P_Auf_Nr
-                rs1!ProjekktNr = m_ProNr '  SpPNr
-                rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
-                rs1!AngelegtAm = Now
-                rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
-            rs1.Update
-            rs1.Close
-            Set rs1 = Nothing
+        Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+        If Rs1.Updatable Then
+            Rs1.AddNew    'Neuen Datensatz anlegen
+                Rs1!BelegNr = PS.Anschreiben.BelegNr
+                Rs1!ReBelegNr2 = lonReNr 'Fortlaufende Rechnungsnummer
+                Rs1!ReBelegart = 2 '1 ist eine Gutschrift
+                Rs1!AufNr = m_ID ' P_Auf_Nr
+                Rs1!ProjekktNr = m_ProNr '  SpPNr
+                Rs1!AngelegtVon = PS.User.Kurzzeichen  'Forms![frmdatenbanknutzer]![Kurzzeichen]
+                Rs1!AngelegtAm = Now
+                Rs1!SummeWert = ReBe   'Der Wert des Auftrages wird zur Rechnung übertragen
+            Rs1.Update
+            Rs1.Close
+            Set Rs1 = Nothing
         End If
 End Select
 
@@ -479,7 +479,7 @@ If DokumentType = DokType.tyGutschrift Then GoTo Ende_   'P_DA = "Gu"
 
 'Zuweisen der Unterpunkte von der Auftragsbeschreibung zu der
 'Beschreibung des Dokumentes
-Set rs1 = CurrentDbC.OpenRecordset("SELECT * FROM tblProjektbeschreibungDokumente WHERE FALSE")
+Set Rs1 = CurrentDbC.OpenRecordset("SELECT * FROM tblProjektbeschreibungDokumente WHERE FALSE")
 
 'Daten filtern und aus Angebosttabelle auslesen sortiert nach Position
 Set Rs2 = CurrentDbC.OpenRecordset("SELECT  * FROM tblAufPositionen WHERE Auftragsnummer =" & m_ID & " " & _
@@ -489,21 +489,21 @@ Set Rs2 = CurrentDbC.OpenRecordset("SELECT  * FROM tblAufPositionen WHERE Auftra
 'Hier werden die Positionen im Dokument erzeugt
 If MitDetailDaten Then
     Do Until Rs2.EOF
-        rs1.AddNew    'Neuen Datensatz anlegen
-            rs1!BelegNr = PS.Anschreiben.BelegNr         '  [1] Die Belegnummer ist die Verbindung zum Anschreiben
-            rs1!Projektnummer = m_ProNr '  [2]Hier beginnen die eigentlichen Daten
-            rs1!Pos_Nummer = Rs2!Pos_Nummer
-            rs1!Pos_Bezeichnung = Rs2!Pos_Bezeichnung
-            rs1!Pos_Beschreibung = Rs2!Pos_Beschreibung
-            rs1!ArtikelID = Rs2!ArtikelID
+        Rs1.AddNew    'Neuen Datensatz anlegen
+            Rs1!BelegNr = PS.Anschreiben.BelegNr         '  [1] Die Belegnummer ist die Verbindung zum Anschreiben
+            Rs1!Projektnummer = m_ProNr '  [2]Hier beginnen die eigentlichen Daten
+            Rs1!Pos_Nummer = Rs2!Pos_Nummer
+            Rs1!Pos_Bezeichnung = Rs2!Pos_Bezeichnung
+            Rs1!Pos_Beschreibung = Rs2!Pos_Beschreibung
+            Rs1!ArtikelID = Rs2!ArtikelID
             
             'Unterscheiden ob Preis oder ZS
-                rs1!Anzahl_Menge = Rs2!Anzahl_Menge
-                rs1!Einheit = Rs2!Einheit
-                rs1!Einzel_Kalkulation = Rs2!Einzel_Kalkulation
-                rs1!Preis_einzeln = Rs2!Preis_einzeln
-                rs1!Preis_VK = Rs2!Preis_VK
-                rs1!Preis_Summe = Rs2!Preis_Summe
+                Rs1!Anzahl_Menge = Rs2!Anzahl_Menge
+                Rs1!Einheit = Rs2!Einheit
+                Rs1!Einzel_Kalkulation = Rs2!Einzel_Kalkulation
+                Rs1!Preis_einzeln = Rs2!Preis_einzeln
+                Rs1!Preis_VK = Rs2!Preis_VK
+                Rs1!Preis_Summe = Rs2!Preis_Summe
 '                If Nz(Rs2!Anzahl_Menge, "") = 0 Then
 '                    rs1!St_Preis_VK = 0
 '                Else
@@ -511,10 +511,10 @@ If MitDetailDaten Then
 '                End If
             
             
-            rs1!Drucken_Preis = Rs2!Drucken_Preis
-            rs1!Drucken_Menge = Rs2!Drucken_Menge
-            rs1!Drucken_Position = True  'Rs2!Drucken_Position
-        rs1.Update 'Schreiben der Werte in die Datenbank
+            Rs1!Drucken_Preis = Rs2!Drucken_Preis
+            Rs1!Drucken_Menge = Rs2!Drucken_Menge
+            Rs1!Drucken_Position = True  'Rs2!Drucken_Position
+        Rs1.Update 'Schreiben der Werte in die Datenbank
     
         Rs2.MoveNext
     Loop 'Loop Do Until
@@ -523,8 +523,8 @@ If MitDetailDaten Then
 
 End If
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 'Sprungmarke wenn keine Positionen angelegt werden
 Ende_:

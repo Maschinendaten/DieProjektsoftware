@@ -66,18 +66,18 @@ Public Function FileToID(FileName_ As String) As Long
 'Liest aus dem Filenamen die ID
 
 Dim A As Long
-Dim S1 As String
+Dim s1 As String
 
 
 'Suche ein / Zeichen dann Pfad abziehen
 
 For A = Len(FileName_) To 1 Step -1
     If Mid(FileName_, A, 1) = "\" Then ' Anfang des Dateinamen gefunden
-        S1 = Mid(FileName_, A + 1)
+        s1 = Mid(FileName_, A + 1)
         If m_Use Then 'Wenn Präfix benutzt wir
-            S1 = Mid(S1, PraefixLen + 1) 'schneidet praefix ab
+            s1 = Mid(s1, PraefixLen + 1) 'schneidet praefix ab
         End If
-        FileToID = Val(S1)
+        FileToID = Val(s1)
         If FileToID = 0 Then FileToID = -1  'Fehler
         Exit Function
     End If

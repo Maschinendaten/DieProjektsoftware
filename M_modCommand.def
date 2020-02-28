@@ -192,7 +192,7 @@ End Select
 
 'Jetzt wird das PopUp angezeigt um zu wissen was dann passiert muss man
 'die beim jeweiligen menue aufgerufenen Functionen betrachten
-PSDebug "Auswahl durchlaufen" & (Timer - gloT)
+PS.DebugPrint "Auswahl durchlaufen" & (Timer - gloT)
 MenueID = 0
 
 Application.CommandBars(KontexMenueName).ShowPopup

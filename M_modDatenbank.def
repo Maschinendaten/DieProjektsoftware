@@ -13,7 +13,7 @@ End Property
 
 Function funDatensatzVorhanden(strTabellenname As String, strFeld As String, strWert As String) As Boolean
 'Die Funktion stellt fest ob ein Datensatz bereits vorhanden ist
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sqlStr As String
 'on error Goto Err_
 'Suche letzte Nummer
@@ -28,23 +28,23 @@ sqlStr = "SELECT " & strTabellenname & "." & strFeld & _
         " Where (" & strTabellenname & "." & strFeld & " like '" & strWert & "');"
 
 'Debug.Print sqlStr
-Set rs1 = CurrentDbC.OpenRecordset(sqlStr)
+Set Rs1 = CurrentDbC.OpenRecordset(sqlStr)
 'Debug.Print Rs1.RecordCount
 
-If rs1.RecordCount = 0 Then 'Not (Rs1.EOF) And Not (Rs1.BOF) Then
+If Rs1.RecordCount = 0 Then 'Not (Rs1.EOF) And Not (Rs1.BOF) Then
     funDatensatzVorhanden = False
 Else
     funDatensatzVorhanden = True
 End If
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 End Function
 
 Function funTabelleVorhanden(strTabellenname As String) As Boolean
 'Die Funktion stellt fest ob eine Tabelle vorhanden ist
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sqlStr As String
 
 On Error Resume Next
@@ -53,7 +53,7 @@ sqlStr = strTabellenname
 
 'Debug.Print sqlStr
 
-Set rs1 = CurrentDbC.OpenRecordset(sqlStr)
+Set Rs1 = CurrentDbC.OpenRecordset(sqlStr)
 
 'Debug.Print Rs1.RecordCount
 
@@ -63,8 +63,8 @@ If Err.Number = 0 Then
     funTabelleVorhanden = True
 End If
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 End Function
 
@@ -74,7 +74,7 @@ Function funNextRecord(strTabellenname As String, strZaehlfeld As String) As Lon
 'Die Function liefert die nächste frei Datensatz Nummer zurück und wird anstelle einer Autonummer verwendet
 
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sqlStr As String
 
 'on error Goto Err_
@@ -90,18 +90,18 @@ sqlStr = "SELECT TOP 1 " & strTabellenname & "." & strZaehlfeld & _
         " ORDER BY " & strTabellenname & "." & strZaehlfeld & " DESC;"
 
 
-Set rs1 = CurrentDbC.OpenRecordset(sqlStr)
+Set Rs1 = CurrentDbC.OpenRecordset(sqlStr)
     'Wenn noch keine Datensatz vorhanden ist Startnummer fragen
-If rs1.RecordCount <> 1 Then
+If Rs1.RecordCount <> 1 Then
     funNextRecord = Val(InputBox("Bitte geben Sie die Startnummer für das Feld:" & strZaehlfeld & "in der Tabelle" & strTabellenname & " ein."))
 Else
     'Wenn Datensaznummer vorhanden Nummer addieren
-    funNextRecord = rs1(strZaehlfeld) + 1
+    funNextRecord = Rs1(strZaehlfeld) + 1
 End If
 
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 Exit Function
 Err_:
@@ -113,7 +113,7 @@ End Function
 Function funAufNrPro(lonPNr As Long) As Long
 'Es wird die Auftragsnummer zum Projekt gesucht gibt es mehrere wird 0 zurück gegeben
 'Gibt es keinen wird -1 zurück gegeben
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 'on error Goto Err_
 
@@ -127,12 +127,12 @@ sSql = " SELECT ProjektNr, ID " & _
     "FROM tblProjekte INNER JOIN tblAufDaten ON tblProjekte.ProjektNr = tblAufDaten.ProNr " & _
     "WHERE ProjektNr = " & lonPNr & " AND (Not Aufabgeschlossen=True)"
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-If Not rs1.EOF Then
-    rs1.MoveLast
-    If rs1.RecordCount = 1 Then
-        funAufNrPro = rs1!ID
+If Not Rs1.EOF Then
+    Rs1.MoveLast
+    If Rs1.RecordCount = 1 Then
+        funAufNrPro = Rs1!ID
     Else
         'MsgBox ("Es ist mehr wie ein Auftrag für das Projekt aktiv wählen Sie den richtigen!")
         funAufNrPro = 0
@@ -140,8 +140,8 @@ If Not rs1.EOF Then
 Else
             funAufNrPro = -1
 End If
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 Exit_:
 Exit Function
@@ -153,7 +153,7 @@ End Function
 Function funQuickCode(strCode As String)
 'Aus der Menuetabelle wird die Funktion ausgesucht und aufgerufen
 'Die kurznummern werden direkt eingegeben
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 'on error Goto Err_
 
@@ -163,16 +163,16 @@ If strCode <> "" Then
     sSql = "SELECT MdAktion, MdTipp, MDQuick " & _
             "FROM t_MenueDat WHERE MDQuick = '" & strCode & "'"
             
-    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
             
-    If rs1.RecordCount = 1 Then
-        If Nz(rs1!MdAktion) <> "" Then
+    If Rs1.RecordCount = 1 Then
+        If Nz(Rs1!MdAktion) <> "" Then
             'If Nz(rs1!mdtipp) <> "" Then funQuickCode = rs1!mdtipp
-            Eval (Mid(rs1!MdAktion, 2, 50))
+            Eval (Mid(Rs1!MdAktion, 2, 50))
         End If
     End If
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
     
 End If
                 
@@ -256,7 +256,7 @@ Function funLetzteDatensatzNr(strDBName As String, strDBFeld As String, Optional
 
 'Die Funktion berücksichtigt gleichzeitig den Startwert 17.01.2006
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim lonHigh As Long
 
@@ -266,25 +266,25 @@ Dim lonHigh As Long
 If StartwertVerwenden Then lonHigh = funStartwert(strDBName)
 
 strSql = "SELECT max(" & strDBFeld & ") as maximum FROM " & strDBName & ";"
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 'Fehler Abfangen wenn kein Datensatz besteht 2.2.2008
-If IsNull(rs1!Maximum) Then
+If IsNull(Rs1!Maximum) Then
     funLetzteDatensatzNr = lonHigh
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
     Exit Function
 End If
 
-If lonHigh <= rs1!Maximum Then
+If lonHigh <= Rs1!Maximum Then
     'Der höchste Datensatz wird übergebn
-    funLetzteDatensatzNr = rs1!Maximum + 1
+    funLetzteDatensatzNr = Rs1!Maximum + 1
 Else
     'Die vorgabe wird eingefügt
     funLetzteDatensatzNr = lonHigh
 End If
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 Exit_:
 Exit Function
@@ -316,7 +316,7 @@ End Function
 
 Function funStartwert(strTblName As String) As Long
 'Die Funktion liest aus der Tabelle Startwerte die Werte aus 17.01.2006
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim strSp1 As String
 
@@ -327,14 +327,14 @@ strSp1 = "ST" & strTblName
 strSql = "SELECT tblIni.Kennung, tblIni.Wert1, tblIni.Wert2 FROM tblIni " & _
         "WHERE (((tblIni.Wert1) Like '" & strSp1 & "'));"
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
-If Not rs1.EOF Then
-    funStartwert = Nz(rs1!Wert2)
+If Not Rs1.EOF Then
+    funStartwert = Nz(Rs1!Wert2)
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 Exit_:
 Exit Function
 Err_:
@@ -345,7 +345,7 @@ Err_:
 End Function
 Function funDbEmail()
 'Ermittelt die Email Adresse des aktuellen Benutzers Diesr emuss bei den Benutzer Stammdaten eingegeben werden.
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim strSp1 As String
 Dim lonBenutzer As Long
@@ -354,17 +354,17 @@ Dim lonBenutzer As Long
 sSql = "SELECT AdressNr, [E-Mail] " & _
          "FROM tblAdressenPersonal WHERE AdressNr =" & funBenutzerNr()
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
 
-If Not rs1.EOF Then
-    strSp1 = Nz(rs1![E-Mail], "")
+If Not Rs1.EOF Then
+    strSp1 = Nz(Rs1![E-Mail], "")
 Else
     strSp1 = ""
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
 funDbEmail = strSp1
 
@@ -378,7 +378,7 @@ End Function
 
 Function funDbTel()
 'Ermittelt die Email Adresse des aktuellen Benutzers Diesr emuss bei den Benutzer Stammdaten eingegeben werden.
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim strSp1 As String
 Dim lonBenutzer As Long
@@ -387,17 +387,17 @@ Dim lonBenutzer As Long
 strSql = "SELECT tblAdressenPersonal.AdressNr, tblAdressenPersonal.Durchwahl " & _
          "FROM tblAdressenPersonal WHERE (((tblAdressenPersonal.AdressNr)=" & funBenutzerNr() & "));"
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 
-If Not rs1.EOF Then
-    strSp1 = Nz(rs1!Durchwahl)
+If Not Rs1.EOF Then
+    strSp1 = Nz(Rs1!Durchwahl)
 Else
     strSp1 = ""
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
 funDbTel = strSp1
 End Function
@@ -405,7 +405,7 @@ End Function
 Function fundbName() As String
 
 'Ermittelt die Email Adresse des aktuellen Benutzers Diesr emuss bei den Benutzer Stammdaten eingegeben werden.
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim strSp1 As String
 Dim lonBenutzer As Long
@@ -414,15 +414,15 @@ Dim lonBenutzer As Long
 strSql = "SELECT * " & _
          "FROM tblAdressenPersonal WHERE AdressNr =" & funBenutzerNr()
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 
-If Not rs1.EOF Then
-    strSp1 = Nz(rs1!Vorname, "") & " " & Nz(rs1!Nachname, "")
+If Not Rs1.EOF Then
+    strSp1 = Nz(Rs1!Vorname, "") & " " & Nz(Rs1!Nachname, "")
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
 fundbName = strSp1
 End Function
@@ -432,7 +432,7 @@ End Function
 Function funDbVorname() As String
 
 'Ermittelt die Email Adresse des aktuellen Benutzers Diesr emuss bei den Benutzer Stammdaten eingegeben werden.
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim strSp1 As String
 Dim lonBenutzer As Long
@@ -441,24 +441,24 @@ Dim lonBenutzer As Long
 strSql = "SELECT tblAdressenPersonal.AdressNr, tblAdressenPersonal.Vorname " & _
          "FROM tblAdressenPersonal WHERE (((tblAdressenPersonal.AdressNr)=" & funBenutzerNr() & "));"
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 
-If Not rs1.EOF Then
-    strSp1 = Nz(rs1!Vorname)
+If Not Rs1.EOF Then
+    strSp1 = Nz(Rs1!Vorname)
 Else
     strSp1 = ""
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
 funDbVorname = strSp1
 End Function
 
 Function funDbNachname()
 'Ermittelt die Email Adresse des aktuellen Benutzers Diesr emuss bei den Benutzer Stammdaten eingegeben werden.
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim strSp1 As String
 Dim lonBenutzer As Long
@@ -467,24 +467,24 @@ Dim lonBenutzer As Long
 strSql = "SELECT tblAdressenPersonal.AdressNr, tblAdressenPersonal.Nachname " & _
          "FROM tblAdressenPersonal WHERE (((tblAdressenPersonal.AdressNr)=" & funBenutzerNr() & "));"
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 
-If Not rs1.EOF Then
-    strSp1 = Nz(rs1!Nachname)
+If Not Rs1.EOF Then
+    strSp1 = Nz(Rs1!Nachname)
 Else
     strSp1 = ""
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
 funDbNachname = strSp1
 End Function
 Function funDbText(lonGruppe As Long, strFeld As String) As String
 
 'Liest einen Text als Standardtext aus den Vorgaben
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 Dim strSp1 As String
 Dim lonBenutzer As Long
@@ -493,17 +493,17 @@ Dim lonBenutzer As Long
 strSql = "SELECT tblAW.AW_Bez, tblAW.AW_Gruppe, tblAW.AW_Wert " & _
  "FROM tblAW WHERE (((tblAW.AW_Bez) Like '" & strFeld & "') AND ((tblAW.AW_Gruppe)=" & lonGruppe & "));"
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 
-If Not rs1.EOF Then
-    strSp1 = Nz(rs1!AW_Wert)
+If Not Rs1.EOF Then
+    strSp1 = Nz(Rs1!AW_Wert)
 Else
     strSp1 = ""
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
     
 funDbText = strSp1
 End Function
@@ -513,7 +513,7 @@ Function funArbeitOfline(strTabelle As String, _
                         lonWert As Long, _
                         bolNeu As Boolean, _
                         bolDel As Boolean)
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 Dim strSql As String
 Dim strSp1 As String
@@ -529,32 +529,32 @@ strSql = "SELECT tblArbeitOfline.* " & _
         "AND ((tblArbeitOfline.EaIdWert)=" & CStr(lonWert) & ");"
 
 
-Set rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql, dbOpenDynaset, dbSeeChanges)
 
 'Änderunssatzwurde nicht angelegt neuen Datensatz erzeugen
-If rs1.RecordCount = 0 Then ' (Rs1.EOF) And (Rs1.BOF) Then
-    rs1.AddNew
-    rs1!EATabelle = strTabelle
-    rs1!EaIdFeld = strFeld
-    rs1!EaIdWert = lonWert
-    rs1!EaErfasstAm = Now
-    rs1!EaErfasstvon = funBenutzerKurzzeichen
-    rs1!eaedit = True
+If Rs1.RecordCount = 0 Then ' (Rs1.EOF) And (Rs1.BOF) Then
+    Rs1.AddNew
+    Rs1!EATabelle = strTabelle
+    Rs1!EaIdFeld = strFeld
+    Rs1!EaIdWert = lonWert
+    Rs1!EaErfasstAm = Now
+    Rs1!EaErfasstvon = funBenutzerKurzzeichen
+    Rs1!eaedit = True
     'Die letze erzeugte Nr wird gesucht
-    rs1!EaID = funLetzteDatensatzNr("tblArbeitOfline", "EaId")
-    If bolNeu = True Then rs1!eaneu = True
-    rs1.Update
+    Rs1!EaID = funLetzteDatensatzNr("tblArbeitOfline", "EaId")
+    If bolNeu = True Then Rs1!eaneu = True
+    Rs1.Update
     
 Else  'Änderungssatz wurde bereits angelegt es wird nur die Änderung vermerkt
-    rs1.Edit
-    rs1!eaedit = True
-    rs1!EaErfasstAm = Now
-    rs1!EaErfasstvon = funBenutzerKurzzeichen
-    rs1.Update
+    Rs1.Edit
+    Rs1!eaedit = True
+    Rs1!EaErfasstAm = Now
+    Rs1!EaErfasstvon = funBenutzerKurzzeichen
+    Rs1.Update
 End If
     
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 Hupf01:
 
@@ -612,7 +612,7 @@ End Function
 
 Function funDBpruefen()
 'Prüft ob alle temp Tabellen vorhanden sind
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 
 'Tabelle Arbeiten extern
@@ -633,7 +633,7 @@ strSql = "(CREATE TABLE tblArbeitOfline " & _
         'Debug.Print strSql
 'CurrentDbC.Execute strsql, dbFailOnError
 End If
-Set rs1 = Nothing
+Set Rs1 = Nothing
 
 End Function
 

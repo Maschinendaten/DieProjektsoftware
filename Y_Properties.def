@@ -9,17 +9,17 @@
     <AllowSpecialKeys name="AllowSpecialKeys" type="1" value="True" sort="1"/>
     <AllowToolbarChanges name="AllowToolbarChanges" type="1" value="True" sort="1"/>
     <ANSIQueryMode name="ANSI Query Mode" type="4" value="0" sort="1"/>
-    <AppIcon name="AppIcon" type="10" value="D:\OneDrive\Projekte\PS\PS_Run\PS.ico" sort="1"/>
-    <AppTitle name="AppTitle" type="10" value="PS1.01   FR=D:\OneDrive\Projekte\PS\PS_Run\PS2_008.accdb  LOG= HAND  User=MG" sort="1"/>
+    <AppIcon name="AppIcon" type="10" value="C:\Users\Gut\OneDrive\Projekte\PS\PS_Run\PS.ico" sort="1"/>
+    <AppTitle name="AppTitle" type="10" value="PS1.01   FR=C:\Users\Gut\OneDrive\Projekte\PS\PS_Run\PS2_009.accdb  LOG= HAND  User=MG" sort="1"/>
     <AutoCompact name="Auto Compact" type="4" value="0" sort="1"/>
     <Build name="Build" type="4" value="1150" sort="1"/>
     <DesignWithData name="DesignWithData" type="1" value="True" sort="1"/>
     <HasOfflineLists name="HasOfflineLists" type="3" value="70" sort="1"/>
     <NavPaneCategory name="NavPane Category" type="4" value="0" sort="1"/>
-    <NavPaneClosed name="NavPane Closed" type="4" value="1" sort="1"/>
+    <NavPaneClosed name="NavPane Closed" type="4" value="0" sort="1"/>
     <NavPaneSortBy name="NavPane Sort By" type="4" value="1" sort="1"/>
     <NavPaneViewBy name="NavPane View By" type="4" value="0" sort="1"/>
-    <NavPaneWidth name="NavPane Width" type="4" value="210" sort="1"/>
+    <NavPaneWidth name="NavPane Width" type="4" value="322" sort="1"/>
     <PerformNameAutoCorrect name="Perform Name AutoCorrect" type="4" value="0" sort="1"/>
     <PicturePropertyStorageFormat name="Picture Property Storage Format" type="4" value="0" sort="1"/>
     <ProjVer name="ProjVer" type="3" value="141" sort="1"/>

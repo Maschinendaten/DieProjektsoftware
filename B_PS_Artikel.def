@@ -171,51 +171,5 @@
       <OnAction value="=funPopUPArtikel_20()"/>
       <FaceId value="2928"/>
     </Control>
-    <Control id="1">
-      <BeginGroup value="false"/>
-      <BuiltIn value="false"/>
-      <Caption value="Open DFT"/>
-      <DescriptionText value=""/>
-      <Enabled value="true"/>
-      <HelpContextId value="0"/>
-      <HelpFile value=""/>
-      <Id value="1"/>
-      <Index value="8"/>
-      <Parameter value=""/>
-      <Priority value="3"/>
-      <Tag value=""/>
-      <TooltipText value="Öffnet eine Zeichnung 2D Wektadt Zeichnung"/>
-      <Type value="1"/>
-      <Visible value="true"/>
-      <BuiltInFace value="true"/>
-      <Style value="3"/>
-      <ShortcutText value=""/>
-      <HyperlinkType value="0"/>
-      <OnAction value="=funPopUPArtikel_22()"/>
-      <FaceId value="2928"/>
-    </Control>
-    <Control id="1">
-      <BeginGroup value="false"/>
-      <BuiltIn value="false"/>
-      <Caption value="Open CAD 3D"/>
-      <DescriptionText value=""/>
-      <Enabled value="true"/>
-      <HelpContextId value="0"/>
-      <HelpFile value=""/>
-      <Id value="1"/>
-      <Index value="9"/>
-      <Parameter value=""/>
-      <Priority value="3"/>
-      <Tag value=""/>
-      <TooltipText value="Öffnet eine Zeichnung den 3D Tel"/>
-      <Type value="1"/>
-      <Visible value="true"/>
-      <BuiltInFace value="true"/>
-      <Style value="3"/>
-      <ShortcutText value=""/>
-      <HyperlinkType value="0"/>
-      <OnAction value="=funPopUPArtikel_24()"/>
-      <FaceId value="2928"/>
-    </Control>
   </Controls>
 </CommandBar>

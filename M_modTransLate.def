@@ -18,27 +18,27 @@ Function LA(sText As String) As String
 'umschalten der Sprache kann dann einfach der en Text ausgegeben werden
 'Der Text dient gleichzeitig als Schlüssel für die Übersetzung
 'Wenn ein Text nicht besteht wird er angelegt
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 'On Error GoTo Err_
 Dim GloLA As String
 GloLA = "DE"
 
-Set rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_LiLangwhich WHERE LatextDE ='" & sText & "'")
+Set Rs1 = CurrentDb.OpenRecordset("SELECT * FROM t_LiLangwhich WHERE LatextDE ='" & sText & "'")
 
-If rs1.EOF Then
-    rs1.AddNew
-    rs1!LaTextDE = Nz(sText)
-    rs1.Update
+If Rs1.EOF Then
+    Rs1.AddNew
+    Rs1!LaTextDE = Nz(sText)
+    Rs1.Update
     LA = sText
 Else
     
     If GloLA = "EN" Then
-        LA = Nz(rs1!LaTextEN)
-        If LA = "" Then LA = rs1!LaTextDE
+        LA = Nz(Rs1!LaTextEN)
+        If LA = "" Then LA = Rs1!LaTextDE
         
     End If
     If GloLA = "DE" Then
-        LA = rs1!LaTextDE
+        LA = Rs1!LaTextDE
     End If
     
 End If
@@ -57,17 +57,17 @@ Function laForm(frm As Form)
 'Sucht in dem Form nach Bezeichnungen die Übersetzt werden sollen
 
     Dim ctl As Control
-    Dim S1 As String
+    Dim s1 As String
     On Error Resume Next
     
  
     
     For Each ctl In frm.Controls
         If Not IsNull(frm(ctl.Name)) Then
-            S1 = ctl.ControlTipText
-            If S1 <> "" Then    'And Err.Number <> 0 Then
+            s1 = ctl.ControlTipText
+            If s1 <> "" Then    'And Err.Number <> 0 Then
                 Debug.Print ctl.Name, ctl.ControlTipText
-                ctl.ControlTipText = LA(S1)
+                ctl.ControlTipText = LA(s1)
             End If
         End If
     Next ctl

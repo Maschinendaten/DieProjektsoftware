@@ -107,7 +107,7 @@ Public Property Let SummePreis(WERT As Double):  m_SummePreis = WERT: End Proper
 '    .Fields("Lieferzeit").Value
 
 Public Function berechnen() As Boolean
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim aw As Long
 Dim sum_VK As Double
@@ -161,13 +161,13 @@ Select Case True
         
 End Select
 
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
 
-With rs1
-    Do Until rs1.EOF
+With Rs1
+    Do Until Rs1.EOF
         .Edit
-            'PS.PSDebug "SuchOptio:" & .Fields("Pos_Bezeichnung").Value
+            'PS.ps.debugprint "SuchOptio:" & .Fields("Pos_Bezeichnung").Value
             
             Select Case True
             
@@ -189,7 +189,7 @@ With rs1
                     'Gesamtpreis erkannt
                     '         Preis_VK
                     .Fields("Preis_Summe").Value = sum_VK + Aufschlag
-                    
+                    .Fields("EPreisKalk_").Value = Null
                     .Fields("Menge_").Value = Null
                     .Fields("Einheit").Value = Null
                     .Fields("EKalk_").Value = Null

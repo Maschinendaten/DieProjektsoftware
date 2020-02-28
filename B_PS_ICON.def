@@ -13,7 +13,7 @@
     <Control id="1">
       <BeginGroup value="false"/>
       <BuiltIn value="false"/>
-      <Caption value="Preis Mutte ber."/>
+      <Caption value="Druck Mandant PDF"/>
       <DescriptionText value=""/>
       <Enabled value="true"/>
       <HelpContextId value="0"/>
@@ -23,7 +23,7 @@
       <Parameter value=""/>
       <Priority value="3"/>
       <Tag value=""/>
-      <TooltipText value="nix"/>
+      <TooltipText value="Direkt PDF erzeugen mit Mandant"/>
       <Type value="1"/>
       <Visible value="true"/>
       <BuiltInFace value="true"/>
@@ -31,7 +31,7 @@
       <ShortcutText value=""/>
       <HyperlinkType value="0"/>
       <OnAction value=""/>
-      <FaceId value="384"/>
+      <FaceId value="19"/>
     </Control>
   </Controls>
 </CommandBar>

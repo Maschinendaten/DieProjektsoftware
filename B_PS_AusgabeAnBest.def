@@ -13,7 +13,7 @@
     <Control id="1">
       <BeginGroup value="false"/>
       <BuiltIn value="false"/>
-      <Caption value="Drucken"/>
+      <Caption value="Drucken EN"/>
       <DescriptionText value=""/>
       <Enabled value="true"/>
       <HelpContextId value="0"/>
@@ -36,7 +36,7 @@
     <Control id="1">
       <BeginGroup value="false"/>
       <BuiltIn value="false"/>
-      <Caption value="Begletschein 2D Code"/>
+      <Caption value="Drucken DE"/>
       <DescriptionText value=""/>
       <Enabled value="true"/>
       <HelpContextId value="0"/>
@@ -46,15 +46,61 @@
       <Parameter value=""/>
       <Priority value="3"/>
       <Tag value=""/>
-      <TooltipText value="Druckt den Begleitschein 2D Barcode"/>
+      <TooltipText value="Drucken DE"/>
       <Type value="1"/>
       <Visible value="true"/>
       <BuiltInFace value="true"/>
       <Style value="3"/>
       <ShortcutText value=""/>
       <HyperlinkType value="0"/>
-      <OnAction value="=funMenueID(20)"/>
-      <FaceId value="627"/>
+      <OnAction value="=funMenueID(11)"/>
+      <FaceId value="18"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Druck Mandant PDF"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="3"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Direkt PDF erzeugen mit Mandant"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenueID(18)"/>
+      <FaceId value="19"/>
+    </Control>
+    <Control id="1">
+      <BeginGroup value="false"/>
+      <BuiltIn value="false"/>
+      <Caption value="Druck Mandant"/>
+      <DescriptionText value=""/>
+      <Enabled value="true"/>
+      <HelpContextId value="0"/>
+      <HelpFile value=""/>
+      <Id value="1"/>
+      <Index value="4"/>
+      <Parameter value=""/>
+      <Priority value="3"/>
+      <Tag value=""/>
+      <TooltipText value="Druckt das Dokument abhängig vom Mandant"/>
+      <Type value="1"/>
+      <Visible value="true"/>
+      <BuiltInFace value="true"/>
+      <Style value="3"/>
+      <ShortcutText value=""/>
+      <HyperlinkType value="0"/>
+      <OnAction value="=funMenueID(19)"/>
+      <FaceId value="18"/>
     </Control>
   </Controls>
 </CommandBar>

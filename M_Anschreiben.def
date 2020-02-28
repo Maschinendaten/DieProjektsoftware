@@ -233,7 +233,7 @@ End Function
 'Public Function Neu(Projektnummer As Long, BelegArt As DokType, Formulartype As String) As Long
 Public Function Neu(Projektnummer As Long, Auftragsnummer As Long, BelegArt As DokType, Formulartype As String) As Long
 'Erstellt ein neues Anschreiben gibt die id des Anschreiben zurück
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 'Stop
 m_Projektnummer = Projektnummer
@@ -253,9 +253,9 @@ End Select
 If Neu < 0 Then Exit Function
 
 sSql = "SELECT * FROM tblAnschreiben WHERE FALSE"
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
    ' Stop
-   With rs1
+   With Rs1
         .AddNew
             m_BelegNr = funLetzteDatensatzNr("tblAnschreiben", "BelegNr")
             .Fields("BelegNr").Value = m_BelegNr
@@ -364,7 +364,7 @@ End Function
 Public Function Laden(BelegNr As Variant) As Boolean
 
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 If IsNull(BelegNr) Then
@@ -373,9 +373,9 @@ If IsNull(BelegNr) Then
 End If
 
 sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr=" & BelegNr
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If .EOF Then
         Laden = False
     Else
@@ -441,7 +441,7 @@ End Function
 Public Function Speichern() As Boolean
 
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 If m_BelegNr = 0 Then
@@ -450,9 +450,9 @@ If m_BelegNr = 0 Then
 End If
 
 sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr=" & m_BelegNr
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If .EOF Then
         Speichern = False
         .Close

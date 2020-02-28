@@ -212,8 +212,8 @@ Function funCopyInZwischenablage(MyString As String)
    Dim hGlobalMemory As Long, lpGlobalMemory As Long
    Dim hClipMemory As Long, X As Long
 
-Exit Function
-Stop  'Hier ein Fehler ##64Bit
+'Exit Function
+'Stop  'Hier ein Fehler ##64Bit
 
 
    ' Allocate moveable global memory.
@@ -229,13 +229,13 @@ Stop  'Hier ein Fehler ##64Bit
 
    ' Unlock the memory.
    If GlobalUnlock(hGlobalMemory) <> 0 Then
-      MsgBox "Could not unlock memory location. Copy aborted."
+      MsgBox LA("Could not unlock memory location. Copy aborted.")
       GoTo OutOfHere2
    End If
 
    ' Open the Clipboard to copy data to.
    If OpenClipboard(0&) = 0 Then
-      MsgBox "Could not open the Clipboard. Copy aborted."
+      MsgBox LA("Could not open the Clipboard. Copy aborted.")
       Exit Function
    End If
 
@@ -248,7 +248,7 @@ Stop  'Hier ein Fehler ##64Bit
 OutOfHere2:
 
    If CloseClipboard() = 0 Then
-      MsgBox "Could not close Clipboard."
+      MsgBox LA("Could not close Clipboard.")
    End If
 
    End Function
@@ -263,7 +263,7 @@ Dim prtLoop As Printer
 Dim strSp As String
 Dim strDruckername As String
 Dim BolOk As Boolean
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 If strneuerDrucker = "" Then
     funDruckerWechseln = "Der gewählte Drucker ist nicht zugewiesen."
@@ -271,19 +271,19 @@ If strneuerDrucker = "" Then
 End If
 
 'Markierten Datensatz aus Tabelle lesen und zuweisen
-Set rs1 = CurrentDbC.OpenRecordset("SELECT tblIni.* " & _
+Set Rs1 = CurrentDbC.OpenRecordset("SELECT tblIni.* " & _
                                   "FROM tblIni " & _
         "WHERE (tblIni.Kennung like '" & strneuerDrucker & "');")
         
-If rs1.RecordCount <> 0 Then
-    strDruckername = rs1!Wert2
-    rs1.Close
-    Set rs1 = Nothing
+If Rs1.RecordCount <> 0 Then
+    strDruckername = Rs1!Wert2
+    Rs1.Close
+    Set Rs1 = Nothing
 Else
     funDruckerWechseln = "Der Drucker ist nicht Datenbank."
     Exit Function
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
 End If
 
 For Each prtLoop In Application.Printers
@@ -316,7 +316,7 @@ Function funDruckerVorher() As String
 'on error Goto Err_
 If Nz(strDruckerMerken) = "" Then
     funDruckerVorher = "Zum alten Drucker kann nicht gewechselt werden!"
-    MsgBox (funDruckerVorher)
+    MsgBox LA("DruckerVorher:" & funDruckerVorher)
     Exit Function
 End If
 
@@ -353,7 +353,7 @@ Dim objOutlook As Object 'Outlook.Application
 Dim objOutlookMsg As Object 'Outlook.MailItem
 Dim objOutlookRecip As Object 'Outlook.Recipient
 Dim objOutlookAttach As Object 'Outlook.Attachment
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 'Variablen für die Übergabe
 Dim varEmpf    'An:
 Dim varCC      'CC:
@@ -372,14 +372,14 @@ If Nz(strAnhang) = "" Then 'Hier könnte der Dateinamen des Anhangs ausgewertet w
     strAnhang = ""
 End If
 'Der dem Benutzer zugeordnete Schlusstext wir ausgelesen
-Set rs1 = CurrentDbC.OpenRecordset("SELECT tblAdressenPersonal.AdressNr, tblAdressenPersonal.BriefAnhang " & _
+Set Rs1 = CurrentDbC.OpenRecordset("SELECT tblAdressenPersonal.AdressNr, tblAdressenPersonal.BriefAnhang " & _
     "FROM tblAdressenPersonal " & _
     "WHERE (((tblAdressenPersonal.AdressNr)= " & lonNrBenutzer & "));")
-    If rs1.RecordCount <> 0 Then
-        strSchlusstext = Nz(rs1!BriefAnhang)
+    If Rs1.RecordCount <> 0 Then
+        strSchlusstext = Nz(Rs1!BriefAnhang)
     End If
-    rs1.Close
-    Set rs1 = Nothing
+    Rs1.Close
+    Set Rs1 = Nothing
 
 'Es wird der Text generiert Anrede untersucht
         sP1 = strText & strSchlusstext
@@ -603,7 +603,7 @@ Dim bolHupf As Boolean
         Case 5 'als Fax
         
             If Nz(frmForm.Fax) = "" Then
-                MsgBox ("Sie müssen eine Fax Nummer eingeben.")
+                MsgBox LA("Sie müssen eine Fax Nummer eingeben.")
                 Exit Function
             End If
             'Fax Drucker zuweisen
@@ -640,38 +640,38 @@ Function berichtMandant(sBerichtname As String) As String
 'Die Funktion sucht ob es den Bericht gibt.
 'Ist ein Mandant festgelegt wird der Bericht mit dem Sufix des Mandanten gesucht gibt es diesen Nicht wird der erste Bericht zurück gegeben
 
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 'Stop
-    S1 = funMandant() 'Prüft ob Mandant beteht
-    If S1 = "" Then                                       'Prüft ob Mandant besteht und Auflistung ausgewählt
+    s1 = funMandant() 'Prüft ob Mandant beteht
+    If s1 = "" Then                                       'Prüft ob Mandant besteht und Auflistung ausgewählt
         berichtMandant = sBerichtname
         Exit Function
     End If
         
-        s2 = sBerichtname & S1
+        s2 = sBerichtname & s1
                                                                     'Sucht nach dem Bericht der Ausgewählt wurde mit Mandant
         sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
                "Name = '" & s2 & "' AND Type =-32764"
 
-        Set rs1 = CurrentDb.OpenRecordset(sSql)
+        Set Rs1 = CurrentDb.OpenRecordset(sSql)
         
-        If Not rs1.EOF Then  'Wenn Bericht vorhanden Formular schließen und Bericht anzeigen
-            gloAWStrBericht = rs1!Name
+        If Not Rs1.EOF Then  'Wenn Bericht vorhanden Formular schließen und Bericht anzeigen
+            gloAWStrBericht = Rs1!Name
             gloAWDrucker = 2  'Schließt ab mit Voransicht
-            berichtMandant = rs1!Name
+            berichtMandant = Rs1!Name
             'DoCmd.Close acForm, "frmDrucken"
-            rs1.Close
+            Rs1.Close
             Exit Function
         Else   'Der Bericht mit Mandant nicht da suche bericht ohne Mandant nimm den ersten
             sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
                "Name Like '" & sBerichtname & "*' AND Type =-32764"
-             Set rs1 = CurrentDb.OpenRecordset(sSql)
-             If Not rs1.EOF Then  'Bericht ohne Mandant gefunden
-                berichtMandant = rs1!Name
+             Set Rs1 = CurrentDb.OpenRecordset(sSql)
+             If Not Rs1.EOF Then  'Bericht ohne Mandant gefunden
+                berichtMandant = Rs1!Name
              Else   'Kein Bericht ohne Mandant
                 berichtMandant = ""
              
@@ -679,7 +679,7 @@ Dim rs1 As DAO.Recordset
              
                 
         End If
-rs1.Close
+Rs1.Close
 
 End Function
 
@@ -692,7 +692,7 @@ Function BerichtFirma(Position As EnumPosition, Optional Aenderung As String) As
 Dim sPosition As String
 Dim strSp1 As String
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim AE As String
 Dim Man  As String
 
@@ -718,13 +718,13 @@ If AE = "" Then
     BerichtFirma = strSp1
 Else
     sSql = "SELECT * FROM tblIniBericht WHERE Kennung='Bericht' and Wert2='" & Position & "'" & " and Mandant='" & Man & "'"
-    Set rs1 = CurrentDbC.OpenRecordset(sSql)
-    With rs1
+    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+    With Rs1
         If .EOF Then
             MsgBox LA("Nummer nicht vorhanden! Nr.:") & Position
         Else
             .Edit
-                rs1!Freitext = Aenderung
+                Rs1!Freitext = Aenderung
                 '.Fields(4).Value = "hfhfhg"  'AE
                 'Aenderung
             .Update
@@ -774,7 +774,7 @@ With Rs2
     sList = vbCrLf & vbCrLf
     
     If .EOF Then
-        MsgBox "Keine Daten."
+        MsgBox LA("Keine Daten.")
         .Close
         Exit Sub
     End If
@@ -794,7 +794,7 @@ With Rs2
         
     While Not .EOF
         sName = .Fields("Name").Value
-        Debug.Print sName
+        
         DoCmd.TransferDatabase acImport, "Microsoft Access", _
                            Db2, acReport, sName, sName
         

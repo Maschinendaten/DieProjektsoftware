@@ -120,21 +120,21 @@ End Function
 Function ParameterMailserver(UserNummer As Long) As tMailServer
  
  Dim sSql As String
- Dim rs1 As DAO.Recordset
+ Dim Rs1 As DAO.Recordset
  Dim mail As tMailServer
 
 sSql = "SELECT * FROM tblAdressenPersonal WHERE AdressNr= " & UserNummer
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-If Not rs1.EOF Then
-    ParameterMailserver.use = rs1!MailUse
-    ParameterMailserver.From = rs1!MailFrom
-    ParameterMailserver.Bcc = rs1!MailBCC
-    ParameterMailserver.smtpServer = rs1!MailSmtpServer
-    ParameterMailserver.smtpServerPort = rs1!MailSmtpServerPort
-    ParameterMailserver.SendUserName = rs1!MailUserName
-    ParameterMailserver.SendUserPass = rs1!MailPass
+If Not Rs1.EOF Then
+    ParameterMailserver.use = Rs1!MailUse
+    ParameterMailserver.From = Rs1!MailFrom
+    ParameterMailserver.Bcc = Rs1!MailBCC
+    ParameterMailserver.smtpServer = Rs1!MailSmtpServer
+    ParameterMailserver.smtpServerPort = Rs1!MailSmtpServerPort
+    ParameterMailserver.SendUserName = Rs1!MailUserName
+    ParameterMailserver.SendUserPass = Rs1!MailPass
     
 Else
     ParameterMailserver.use = False
@@ -143,7 +143,7 @@ End If
 
 
 
-rs1.Close
+Rs1.Close
 End Function
 
 

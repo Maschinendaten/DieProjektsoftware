@@ -67,12 +67,12 @@ Public Property Let AnzahlArtikelEK(WERT As Long):     m_AnzahlArtikelEK = WERT:
 
 Public Function Laden(Projektnummer As Long) As Long
 'Hier wird ein Datensatz geladen
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
         
         sSql = "SELECT * FROM tblprojekte WHERE ProjektNr=" & Projektnummer
-        Set rs1 = CurrentDb.OpenRecordset(sSql)
-        With rs1
+        Set Rs1 = CurrentDb.OpenRecordset(sSql)
+        With Rs1
             If .EOF Then
                 Laden = -1  ' Keine daten gefunden
             Else
@@ -105,7 +105,7 @@ Dim sSql As String
 End Function
 
 Public Function Neu()
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 'Neues Projekt anlegen
 

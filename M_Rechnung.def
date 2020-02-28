@@ -120,11 +120,11 @@ End Function
 
 Public Function Neu(DokNummer As Long) As Long
 'erzeugt einen neuen Rechnungsdatensatz
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 sSql = "SELECT * FROM tblRechnung WHERE FALSE"
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
    ' Stop  'Hier zu kalt 2.2.2020
     
 '            Rs1.AddNew    'Neuen Datensatz anlegen
@@ -151,7 +151,7 @@ Set rs1 = CurrentDbC.OpenRecordset(sSql)
     
    PS.Anschreiben.Laden (DokNummer)
     
-With rs1
+With Rs1
 'If Not .EOF Then
     .AddNew
 '    .Fields("laufendeNr").Value
@@ -199,19 +199,19 @@ End Function
 
 Public Function NeueRechnungsnummer() As Long
 'Holt die nächst mögliche Rechnungsnummer wenn nix geht wird 0 gesetzt
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim lonReNr As Long
 Dim tRn As Long
 
     sSql = "SELECT TOP 1 reBelegNr2 FROM tblRechnung ORDER BY reBelegNr2 DESC;"
-    Set rs1 = CurrentDbC.OpenRecordset(sSql)
+    Set Rs1 = CurrentDbC.OpenRecordset(sSql)
     'Wenn noch keine Rechnung vorhanden ist oder mehr wie eine Startnummer fragen
-    If rs1.RecordCount <> 1 Then
+    If Rs1.RecordCount <> 1 Then
         lonReNr = 0  'Val(InputBox("Bitte geben Sie die Startnummer der Rechnungen ein. Die Nummer lauttet 20040001 für die erste Rechnung im Jahr 2004.", "Eingabe der Startrechnungsnummer", "20040001"))
     Else
         'Wenn Rechnung vorhanden Rechnungsnummer auf addieren
-        lonReNr = rs1!ReBelegNr2 + 1
+        lonReNr = Rs1!ReBelegNr2 + 1
 
     End If
         tRn = Nz(DLookup("Wert2", "tblIni", "wert1='STtblRechnung'"), 0)

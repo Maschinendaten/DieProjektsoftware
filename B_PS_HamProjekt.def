@@ -80,29 +80,6 @@
       <FaceId value="369"/>
     </Control>
     <Control id="1">
-      <BeginGroup value="false"/>
-      <BuiltIn value="false"/>
-      <Caption value="Packliste/Liefer."/>
-      <DescriptionText value=""/>
-      <Enabled value="true"/>
-      <HelpContextId value="0"/>
-      <HelpFile value=""/>
-      <Id value="1"/>
-      <Index value="4"/>
-      <Parameter value=""/>
-      <Priority value="3"/>
-      <Tag value=""/>
-      <TooltipText value="Eine Packliste und Lieferschein zum Projekt erzeugen"/>
-      <Type value="1"/>
-      <Visible value="true"/>
-      <BuiltInFace value="true"/>
-      <Style value="3"/>
-      <ShortcutText value=""/>
-      <HyperlinkType value="0"/>
-      <OnAction value="=funFormOpen(&quot;NaviPack&quot;)"/>
-      <FaceId value="1"/>
-    </Control>
-    <Control id="1">
       <BeginGroup value="true"/>
       <BuiltIn value="false"/>
       <Caption value="Dokumente Projekt"/>
@@ -111,7 +88,7 @@
       <HelpContextId value="0"/>
       <HelpFile value=""/>
       <Id value="1"/>
-      <Index value="5"/>
+      <Index value="4"/>
       <Parameter value=""/>
       <Priority value="3"/>
       <Tag value=""/>
@@ -134,7 +111,7 @@
       <HelpContextId value="0"/>
       <HelpFile value=""/>
       <Id value="1"/>
-      <Index value="6"/>
+      <Index value="5"/>
       <Parameter value=""/>
       <Priority value="3"/>
       <Tag value=""/>
@@ -157,7 +134,7 @@
       <HelpContextId value="0"/>
       <HelpFile value=""/>
       <Id value="1"/>
-      <Index value="7"/>
+      <Index value="6"/>
       <Parameter value=""/>
       <Priority value="3"/>
       <Tag value=""/>
@@ -180,7 +157,7 @@
       <HelpContextId value="0"/>
       <HelpFile value=""/>
       <Id value="1"/>
-      <Index value="8"/>
+      <Index value="7"/>
       <Parameter value=""/>
       <Priority value="3"/>
       <Tag value=""/>
@@ -193,29 +170,6 @@
       <HyperlinkType value="0"/>
       <OnAction value="=funFormOpen(&quot;NaviNeuesProjekt&quot;)"/>
       <FaceId value="535"/>
-    </Control>
-    <Control id="1">
-      <BeginGroup value="true"/>
-      <BuiltIn value="false"/>
-      <Caption value="Aufträge im Projekt"/>
-      <DescriptionText value=""/>
-      <Enabled value="true"/>
-      <HelpContextId value="0"/>
-      <HelpFile value=""/>
-      <Id value="1"/>
-      <Index value="9"/>
-      <Parameter value=""/>
-      <Priority value="3"/>
-      <Tag value=""/>
-      <TooltipText value="Aufträge im Projekt"/>
-      <Type value="1"/>
-      <Visible value="true"/>
-      <BuiltInFace value="true"/>
-      <Style value="3"/>
-      <ShortcutText value=""/>
-      <HyperlinkType value="0"/>
-      <OnAction value="=funAufProUebersicht(&quot;berCoAuswertungProjekt01&quot;)"/>
-      <FaceId value="2522"/>
     </Control>
   </Controls>
 </CommandBar>

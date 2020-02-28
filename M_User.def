@@ -35,7 +35,7 @@ End Sub
 
 
 Private Sub Laden()
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 
@@ -44,9 +44,9 @@ m_ID = Form_frmDatenbanknutzer.Nummer
 If m_istGeladen Then Exit Sub
 
 sSql = "SELECT * FROM tblAdressenPersonal WHERE AdressNr= " & m_ID
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If Not .EOF Then
     '    .Fields("AdressNr").Value
     '    .Fields("Adresse").Value

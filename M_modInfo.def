@@ -5,41 +5,41 @@ Option Explicit
 
 
 Function InfoProjekt(ProNr As Long) As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
-Dim S1 As String
+Dim s1 As String
 
 sSql = "SELECT ProjektNr, Projektbezeichnung, AngelegtAm, Projektleiter, Rufname, Status " & _
         "FROM tblAdressen INNER JOIN tblProjekte ON tblAdressen.AdressNr = tblProjekte.AdressNr WHERE ProjektNr=" & ProNr
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If Not .EOF Then
-            S1 = S1 & "<div><font face=Calibri size=3><strong>" & _
+            s1 = s1 & "<div><font face=Calibri size=3><strong>" & _
                 LA("Projekt: ") & .Fields("ProjektNr").Value & _
                 "</strong></font></div>"
-            S1 = S1 & "<div><font face=Calibri size=3><strong>" & _
+            s1 = s1 & "<div><font face=Calibri size=3><strong>" & _
                 .Fields("Rufname").Value & _
                 "</strong></font></div>"
-            S1 = S1 & "<div><font face=Calibri size=1>" & _
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
                 .Fields("Projektbezeichnung").Value & _
                 "</font></div>"
-            S1 = S1 & "<div><font face=Calibri size=1>" & _
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
                 LA("Angelegt ") & Format(.Fields("AngelegtAm").Value, "yyyy.mm.dd") & _
                 "</font></div>"
-            S1 = S1 & "<div><font face=Calibri size=1>" & _
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
                 LA("Status      ") & .Fields("Status").Value & _
                 "</font></div>"
     Else
-        S1 = "--"
+        s1 = "--"
     End If
 
     .Close
 End With
         
         
-InfoProjekt = S1
+InfoProjekt = s1
 End Function
 
 
@@ -47,9 +47,9 @@ Function InfoAuftrag(ProNr As Long, AlleAuftraegeAnzeigen As Boolean) As String
 'Information alle Aufträge im Projekt
 'AlleAuftraegeAnzeigen wenn true zeigt alle Aufträge an
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
-Dim S1 As String
+Dim s1 As String
 
 If AlleAuftraegeAnzeigen Then
     sSql = "SELECT ID, ZuBeVon,ZuBeAm,ZuBeBez, Liefertermin, Auftragswert, AuftragsBeginn, AufBezeichnung , Aufabgeschlossen " & _
@@ -63,34 +63,34 @@ Else
     "ORDER BY ID Desc"
 End If
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If Not .EOF Then
         While Not .EOF
 
-            S1 = S1 & "<div><font face=Calibri size=1>" & _
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
                 "------------------------------" & _
                 "</strong></font></div>"
-            S1 = S1 & "<div><font face=Calibri size=3><strong>" & _
-                LA("Aufrag: ") & .Fields("ID").Value & _
+            s1 = s1 & "<div><font face=Calibri size=3><strong>" & _
+                LA("Auftrag: ") & .Fields("ID").Value & _
                 "</strong></font></div>"
-            S1 = S1 & "<div><font face=Calibri size=1><strong>" & _
+            s1 = s1 & "<div><font face=Calibri size=1><strong>" & _
                 .Fields("ZuBeVon").Value & " " & .Fields("ZuBeBez").Value & _
                 "</strong></font></div>"
             If Nz(.Fields("Liefertermin").Value, "1.1.1967") < Now() Then
-                S1 = S1 & "<div><font face=Calibri size=2 color=red><strong>" & _
+                s1 = s1 & "<div><font face=Calibri size=2 color=red><strong>" & _
                     LA("LT: ") & Format(.Fields("Liefertermin").Value, "yyyy.mm.dd") & _
                     "</strong></font></div>"
             Else
-                S1 = S1 & "<div><font face=Calibri size=2 color=green><strong>" & _
+                s1 = s1 & "<div><font face=Calibri size=2 color=green><strong>" & _
                     LA("LT: ") & Format(.Fields("Liefertermin").Value, "yyyy.mm.dd") & _
                     "</strong></font></div>"
             End If
-            S1 = S1 & "<div><font face=Calibri size=1>" & _
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
                 .Fields("AufBezeichnung").Value & _
                 "</font></div>"
-            S1 = S1 & "<div><font face=Calibri size=1>" & _
+            s1 = s1 & "<div><font face=Calibri size=1>" & _
                 LA("Angelegt ") & Format(.Fields("AuftragsBeginn").Value, "yyyy.mm.dd") & _
                 "</font></div>"
 '            S1 = S1 & "<div><font face=Calibri size=1>" & _
@@ -99,14 +99,14 @@ With rs1
          .MoveNext
          Wend
     Else
-        S1 = "--"
+        s1 = "--"
     End If
 
     .Close
 End With
         
         
-InfoAuftrag = S1
+InfoAuftrag = s1
 
 
 

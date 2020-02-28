@@ -6,7 +6,7 @@ Public tStart As Long
 Sub TestSplit()
 
 Dim Ar() As String
-Dim S1 As String
+Dim s1 As String
 Dim Sx As String
 Dim A As Long
 Dim sDateiName As String
@@ -17,14 +17,14 @@ sDateiName = CurrentProject.Path & "\Split.txt"
 Open sDateiName For Input As #1    ' Datei zum Einlesen öffnen.
 Do While Not EOF(1)    ' Schleife bis Dateiende.
     Input #1, Sx    ' Daten in zwei Variablen einlesen.
-    S1 = S1 & Sx
+    s1 = s1 & Sx
 Loop
 Close #1    ' Datei schließen.
 
 Stop
 ';S1 = "ääöö;121212;" & vbCrLf & "121212;122121;121212;"
 
-Ar = Split(S1, ";")
+Ar = Split(s1, ";")
 
 For A = 0 To UBound(Ar)
     Debug.Print Ar(A)
@@ -52,13 +52,13 @@ End Sub
 
 Sub erledigttest()
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 
 sSql = "SELECT * FROM tblAnschreiben WHERE BelegNr =20496"
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     .Edit
     .Fields("Erledigt").Value = Null
     .Update
@@ -184,7 +184,7 @@ End Sub
 
 
 
-Public Function TagErzeugen(S1 As String) As String
+Public Function TagErzeugen(s1 As String) As String
 
 'Dim olApp As Outlook.Application
 'Dim olFld As Outlook.MAPIFolder
@@ -550,7 +550,7 @@ End Function
 
 Sub testx()
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 
 sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
@@ -558,12 +558,12 @@ sSql = "SELECT msysobjects.Name FROM msysobjects WHERE " & _
                                   "((msysobjects.Type)=-32764));"
 
 
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-If Not rs1.EOF Then
-While Not rs1.EOF
-    Debug.Print rs1!Name
-    rs1.MoveNext
+If Not Rs1.EOF Then
+While Not Rs1.EOF
+    Debug.Print Rs1!Name
+    Rs1.MoveNext
 Wend
 End If
 
@@ -622,16 +622,16 @@ End Sub
 Function tblArbeitenAnpassen()
 'Neu Tabelle Arbeiten jetzt mit fiSchlüssel wegen Verrechnung neues feld fiTaetigkeit
 Dim sSql As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 MsgBox "Anpassen der Arbeitstabelle"
 
 sSql = "SELECT ArbeitNr, Taetigkeit, fiTaetigkeit " & _
        "FROM tblArbeiten ORDER BY ArbeitNr"
 
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     .MoveFirst
     While Not .EOF
         .Edit

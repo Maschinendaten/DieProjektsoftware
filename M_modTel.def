@@ -14,7 +14,7 @@ Function funTelMail(s_RufNummer As String, _
 
 Dim strMeldung As String
 Dim RetVal As Long
-Dim S1 As String
+Dim s1 As String
 'Dim s2 As String
 'Dim s3 As String
 'Dim S4 As String
@@ -31,9 +31,9 @@ If Nz(s_Bezeichnung_Nr) <> "E-Mail" Then
         'Ab 2019 es gibt immer ein Form für jede telefon Aplikation zB. NaviTelephon_SoftPhone und NaviTelephon_FreePhone
         'dem wird beim aufruf eine Nummer übergeben alle Funktionen des telephons werden in dem Form abgebildet
         
-        S1 = Replace(s_RufNummer, " ", "") 'löscht leerzeichen
+        s1 = Replace(s_RufNummer, " ", "") 'löscht leerzeichen
         
-        DoCmd.OpenForm "NaviTelephon_SoftPhone", , , , , , S1
+        DoCmd.OpenForm "NaviTelephon_SoftPhone", , , , , , s1
         
    
    If Not MenFormularOpen("frmNotizenN1") Then 'Wenn Notizen schon offen ist wird keine neue Notiz angelegt
@@ -105,7 +105,7 @@ End Function
 
 Function funNotizErstellen(lAdrID As Long, Optional lPersonID As Long, Optional lProID As Long, Optional sText As String)
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim lonDANr As Long
 Dim P1 As Long
@@ -122,27 +122,27 @@ End If
 
 sSql = "SELECT * FROM  tblNotizen Where 1=0"
 
-Set rs1 = CurrentDb.OpenRecordset(sSql)
+Set Rs1 = CurrentDb.OpenRecordset(sSql)
 
-rs1.AddNew
-    rs1.AddNew
-    rs1!NoId = lonDANr
-    rs1!NoVon = funBenutzerKurzzeichen()
-    rs1!NoAm = Now
-    rs1!NoGeVon = funBenutzerKurzzeichen()
-    rs1!NoGeAm = Now
-    rs1!NoProNr = lProID
-    rs1!NoPersNr = lPersonID
-    rs1!NoAdrNr = lAdrID
-    rs1!NoText = sText
+Rs1.AddNew
+    Rs1.AddNew
+    Rs1!NoId = lonDANr
+    Rs1!NoVon = funBenutzerKurzzeichen()
+    Rs1!NoAm = Now
+    Rs1!NoGeVon = funBenutzerKurzzeichen()
+    Rs1!NoGeAm = Now
+    Rs1!NoProNr = lProID
+    Rs1!NoPersNr = lPersonID
+    Rs1!NoAdrNr = lAdrID
+    Rs1!NoText = sText
     'Rs1!NoAufNr = Val(Me!varAufNr)
     P1 = InStr(1, Nz(sText), "#", vbBinaryCompare)
     If P1 <> 0 Then
-        rs1!NoBetreff = Mid(sText, P1, 50)
+        Rs1!NoBetreff = Mid(sText, P1, 50)
     End If
-    rs1.Update
-    rs1.Close
-Set rs1 = Nothing
+    Rs1.Update
+    Rs1.Close
+Set Rs1 = Nothing
 
 
 End Function

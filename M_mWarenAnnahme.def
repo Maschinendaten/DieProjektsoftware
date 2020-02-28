@@ -13,13 +13,13 @@ Sub CheckWeb()
 Dim IEApp 'As WebBrowserControl
 Dim IEDocument
 Dim sWWW As String
-Dim S1 As String
+Dim s1 As String
 Dim pqr As String
 
-PSDebug "checkWeb"
+PS.DebugPrint "checkWeb"
 
 pqr = funMandant()  'Holt sich das kürzel aus dem Mandant
-PSDebug "Mandant:" & pqr
+PS.DebugPrint "Mandant:" & pqr
 pqr = pqr & String(3 - Len(pqr), "X")
 
 
@@ -27,7 +27,7 @@ pqr = pqr & String(3 - Len(pqr), "X")
 sWWW = "http://www.s.g001.de/files/" & pqr & ".txt"
 
 
-PSDebug sWWW
+PS.DebugPrint sWWW
 
 
 
@@ -47,26 +47,26 @@ Do
 Loop Until IEApp.Busy = False
 Set IEDocument = IEApp.Document
 
-S1 = Mid(IEDocument.body.innerHTML, 6)
+s1 = Mid(IEDocument.body.innerHTML, 6)
 'Stop
 IEApp.quit
 
   'Debug.Print S1
-PSDebug S1
+PS.DebugPrint s1
 
-If InStr(1, S1, "alert-") <> 0 Then
+If InStr(1, s1, "alert-") <> 0 Then
     'Der Empfangene Text ist nicht die erwartete Tabelle sondern enthält einen Fehler
     MsgBox LA("Adresse stimmt nicht. f_Debug ")
     Exit Sub
 End If
-checkString (S1)
+checkString (s1)
 End Sub
 
 Private Function checkString(Sx As String) As Boolean
 'Erwartet einen String mit ; als Trennzeichne und zerlegt diesen
 '1544875412;2018.12.15 13:03:32;GFIA0012182;2a01:598:b00a:f73:71b4:6f4f:f5b0:6d50;from Bar code
 '1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim lz As Long
 Dim z1 As Long
@@ -74,7 +74,7 @@ Dim ok As Boolean
 Dim idTS As Long 'id von Web Timestamp
 Dim idEK As Long  ' id von Einkaufsliste
 Dim iDatum As Date
-Dim Zz  As Long
+Dim zz  As Long
 
 
 'Zeit auslesen
@@ -82,7 +82,7 @@ Dim Zz  As Long
 lz = 1
 
 While Not ok
-    Zz = Zz + 1 'Zeilenzähler
+    zz = zz + 1 'Zeilenzähler
     z1 = InStr(lz, Sx, Chr(10))
     
     If z1 = 0 Then
@@ -92,14 +92,14 @@ While Not ok
         idEK = Val(Mid(Sx, lz + 31 + 4, 11 - 4))   '  ID EK List
         'iDatum =
                                   
-        Debug.Print Zz, lz, z1, idTS, idEK
+        Debug.Print zz, lz, z1, idTS, idEK
         lz = z1 + 1
         ok = False
             
         sSql = "SELECT * FROM tblStuecklisteStatus WHERE SsWebid=" & idTS
-        Set rs1 = CurrentDbC.OpenRecordset(sSql)
+        Set Rs1 = CurrentDbC.OpenRecordset(sSql)
             
-        With rs1
+        With Rs1
             If .EOF Then
                 'Wenn Nummer nicht da Such EK-Listeneintag und ergänze Status
                 mPS.StatusNeu idEK, 63, 0, "", "Vom Web", idTS
@@ -116,7 +116,7 @@ While Not ok
     
     
 Wend
-rs1.Close
+Rs1.Close
 
 'Debug.Print Zz
 

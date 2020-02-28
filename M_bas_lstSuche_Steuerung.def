@@ -240,19 +240,19 @@ SpCN = Ctls.Name
 '############
 frm.FilterOn = True
 
-PSDebug "-- Filter Start:" & sFi
+PS.DebugPrint "-- Filter Start:" & sFi
 
 For Each ctl In frm.Controls
     
     If Left(ctl.Name, 9) = "Suchfeld_" Then
     'If Not frm(ctl.Name) Then    Das hier ist ganz schlecht weil das Käse macht!! 2019.05.15
         frm.varFilter.SetFocus
-        PSDebug "Control Name: " & ctl.Name
+        PS.DebugPrint "Control Name: " & ctl.Name
         Z = Z + 1
-        PSDebug "FilterFeld:" & Z & " " & ctl.Name & " " & frm(ctl.Name).Value
+        PS.DebugPrint "FilterFeld:" & Z & " " & ctl.Name & " " & frm(ctl.Name).Value
         If Nz(frm(ctl.Name).Value) = "" Then
             'frm(ctl.Name).Text = Null 'wenn leeren werden alle Felder auf null gesetzt
-            PSDebug "Leer"
+            PS.DebugPrint "Leer"
         Else
             'Die zeichen müssen in marke (Tag) stehen nicht beim Aufruf weil der Filter ja aus allen zusammen gebaut wird
 
@@ -266,12 +266,12 @@ For Each ctl In frm.Controls
             Else
                 We = ""
             End If
-            PSDebug "Wildcard :" & frm(ctl.Name).Tag & "WS:" & Ws & "WE:" & We
+            PS.DebugPrint "Wildcard :" & frm(ctl.Name).Tag & "WS:" & Ws & "WE:" & We
 
 
             sNa = Mid(ctl.Name, 10)
             'frm(ctl.Name).SetFocus
-            PSDebug "Sfi:" & sFi & "Fel--:" & frm(ctl.Name).Value
+            PS.DebugPrint "Sfi:" & sFi & "Fel--:" & frm(ctl.Name).Value
             If sFi = "" Then
                 sFi = sNa & " LIKE '" & Ws & frm(ctl.Name).Value & We & "'"
 '                If frm.RecordsetClone.RecordCount = 0 Then
@@ -293,7 +293,7 @@ For Each ctl In frm.Controls
     End If
 Next ctl
 
-PSDebug "++ Filter Ende:" & sFi
+PS.DebugPrint "++ Filter Ende:" & sFi
 
 '    If Felderleer Then
 '        'frm.FilterOn = False
@@ -325,7 +325,7 @@ If Err.Number = 2185 Then
     
 End If
 
-PSDebug "Err:" & Err.Number & i1
+PS.DebugPrint "Err:" & Err.Number & i1
 frm.varFilter = "Hallo Fehler!"
 
 

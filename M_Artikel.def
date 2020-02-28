@@ -50,10 +50,19 @@ Private m_ArtSonstiges As Boolean
 Private m_ArtMinPreis As Double
 Private m_ArtMaxPreis As Double
 Private m_PreisAuswahl As Long
+Private m_Sprache As Long   ' 1 ist deutsch 2 ist englisch dann kommen die anderen Nummern
 
 Private m_Projektnummer As Long
 
 Private m_CAD_Index As String
+
+
+Public Property Get Sprache() As Long
+    If m_Sprache = 0 Then m_Sprache = 1
+    Sprache = m_Sprache
+End Property
+
+Public Property Let Sprache(WERT As Long):     m_Sprache = WERT: End Property
 
 Public Property Get PreisAuswahl() As Long:
 '0= Preis VK 1=Peis_EK
@@ -172,16 +181,16 @@ End Property
 
 Public Function Laden(Artikelnummer As Long) As Boolean
 'der Artikel wird in das Objekt geladen
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 
 
 sSql = "SELECT * FROM tblArtikel WHERE ID = " & Artikelnummer
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
     Laden = False
-    With rs1
+    With Rs1
         If Not .EOF Then
             m_ID = Nz(.Fields("ID").Value)
             m_Lieferant = Nz(.Fields("Lieferant").Value)
@@ -228,7 +237,7 @@ Set rs1 = CurrentDbC.OpenRecordset(sSql)
         End If
         .Close
     End With
-'PSDebug "Artikel Laden" & (Timer - gloT)
+'ps.debugprint "Artikel Laden" & (Timer - gloT)
 
 End Function
 
@@ -237,7 +246,7 @@ End Function
 Public Function NeuAnlegen() As Long
 'Legt einen neuen Artikel an
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 'prüfen ob Bezeichnung eingegeben
@@ -274,9 +283,9 @@ NeuAnlegen = m_ID
 
 sSql = "SELECT * FROM tblArtikel WHERE FALSE"
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
     
-    With rs1
+    With Rs1
         .AddNew
             
             .Fields("Lieferant").Value = m_Lieferant
@@ -328,13 +337,13 @@ Set rs1 = CurrentDbC.OpenRecordset(sSql)
 End Function
 
 Public Function Kopieren(idArtikelQuelle As Long) As Long
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 
 If Not Laden(idArtikelQuelle) Then
     Kopieren = -1 '
-    PSDebug "Artikel Quelle Laden geht nicht"
+    PS.DebugPrint "Artikel Quelle Laden geht nicht"
     Exit Function
 End If
 
@@ -346,8 +355,8 @@ Kopieren = m_ID
 'Hier den vorher geladenen Artikel einfach an den neu erzeugten übergeben
 
 sSql = "SELECT * FROM tblArtikel WHERE FALSE"
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
-    With rs1
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+    With Rs1
         .AddNew
             
             .Fields("Lieferant").Value = m_Lieferant
@@ -404,7 +413,7 @@ End Function
 Public Function Speichern() As Long
 'Speichert einen geladenen Artikel
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 'On Error GoTo Err_
@@ -430,9 +439,9 @@ End If
 
 sSql = "SELECT * FROM tblArtikel WHERE ID=" & m_ID
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
     
-    With rs1
+    With Rs1
         If .EOF Then
             Speichern = -9
         Else
@@ -491,7 +500,7 @@ End Function
 
 
 Public Function MutterBerechnen(ArtikelID As Long, Optional ProjektNrStueckliste As Long) As Long
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 
 'berechnet den Preis von Müttern in den Artikeln
@@ -511,15 +520,15 @@ sSql = " SELECT Artikel_Nr_Mutter, Sum([Preis_EK_mit_Rabatt]*[menge]) AS PEK_, S
         "HAVING Artikel_Nr_Mutter=" & ArtikelID
        
 'Ändert den Preis im Artikel
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
-With rs1
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+With Rs1
     If Not .EOF Then
         m_Preis_EK = .Fields("PEK_").Value
         m_Preis_EK_mit_Rabatt = .Fields("PEK_").Value
         m_ArtMinPreis = .Fields("PMin_").Value
         m_ArtMaxPreis = .Fields("PMax_").Value
-        PS.PSDebug ("m_Preis_EK_mit_Rabatt=" & m_Preis_EK_mit_Rabatt)
-        PS.PSDebug ("Artid=" & Me.Speichern)
+        PS.DebugPrint ("m_Preis_EK_mit_Rabatt=" & m_Preis_EK_mit_Rabatt)
+        PS.DebugPrint ("Artid=" & Me.Speichern)
         MutterBerechnen = 1
     End If
 End With
@@ -528,8 +537,8 @@ End With
 
 'If ProjektNrStueckliste = 0 Then Exit Function
 sSql = "SELECT * FROM tblstueckliste WHERE Projektnummer=" & ProjektNrStueckliste & " and ArtikelID = " & ArtikelID
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
-With rs1
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
+With Rs1
     While Not .EOF
         .Edit
             .Fields("PreisStueck").Value = m_Preis_EK

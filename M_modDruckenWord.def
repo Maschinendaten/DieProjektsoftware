@@ -31,9 +31,9 @@ Dim objWord As Object
 
 Dim tTmp As String
 Dim tDoc As String
-Dim rs1  As DAO.Recordset
+Dim Rs1  As DAO.Recordset
 Dim A As Long
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
 Dim sPVorlage As String
 Dim sPAusgabe As String
@@ -73,21 +73,21 @@ With objWord
     '.ActiveDocument.SaveAs tDoc
 
     'Öffne Abfrage
-    Set rs1 = CurrentDb.OpenRecordset(sAbfrage)
-    If rs1.EOF = True Then
+    Set Rs1 = CurrentDb.OpenRecordset(sAbfrage)
+    If Rs1.EOF = True Then
         MsgBox ("Es gibt keinen Datensat in dieser Abfrage " & "a_" & sDokuName)
-        Set rs1 = Nothing
+        Set Rs1 = Nothing
         Exit Function
     End If
 
-    rs1.MoveFirst
+    Rs1.MoveFirst
     'Es werden alle Bookmarks ersetzt die einzeln vorkommen
-    For A = 0 To rs1.Fields.Count - 1
-        S1 = rs1.Fields(A).Name
-        s2 = Nz(rs1.Fields(A).Value, "")
+    For A = 0 To Rs1.Fields.Count - 1
+        s1 = Rs1.Fields(A).Name
+        s2 = Nz(Rs1.Fields(A).Value, "")
         'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
-        If .ActiveDocument.Bookmarks.Exists(S1) Then
-            .ActiveDocument.Bookmarks(S1).Range.Text = s2
+        If .ActiveDocument.Bookmarks.Exists(s1) Then
+            .ActiveDocument.Bookmarks(s1).Range.Text = s2
         End If
     Next A
     
@@ -100,21 +100,21 @@ With objWord
     End If
 
 
-    While rs1.EOF = False
+    While Rs1.EOF = False
         'Markiere die Tabelle zum kopieren
         .Selection.GoTo What:=-1, Name:="TxxTABELLE"     'wdGoToBookmark = -1
         'Kopiere die Tabelle für Später mit Bookmarks
         .Selection.copy
         
         'Ersetze die Bookmarks in der Tabelle
-        For A = 0 To rs1.Fields.Count - 1
-            S1 = "Txx" & rs1.Fields(A).Name
-            s2 = Nz(rs1.Fields(A).Value, "")
-            Debug.Print "f#D:", S1, Mid(s2, 1, 10)
+        For A = 0 To Rs1.Fields.Count - 1
+            s1 = "Txx" & Rs1.Fields(A).Name
+            s2 = Nz(Rs1.Fields(A).Value, "")
+            Debug.Print "f#D:", s1, Mid(s2, 1, 10)
             'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
-            If .ActiveDocument.Bookmarks.Exists(S1) Then
-                .ActiveDocument.Bookmarks(S1).Range.Text = s2
-                Debug.Print "T#D:", S1, Mid(s2, 1, 10)
+            If .ActiveDocument.Bookmarks.Exists(s1) Then
+                .ActiveDocument.Bookmarks(s1).Range.Text = s2
+                Debug.Print "T#D:", s1, Mid(s2, 1, 10)
             End If
         Next A
         'Markiere die Tabelle um mit dem Cursor unter diese zu springen
@@ -124,9 +124,9 @@ With objWord
         'Lösche das Bookmark der Tabelle damit es kopiert werden kann
         .ActiveDocument.Bookmarks("TxxTABELLE").Delete
         'Spring zum nächsten satz um prüfen zu können ob danach das ende ist
-        rs1.MoveNext
+        Rs1.MoveNext
         'Setze die Tabelle mit allen Bookmarks wieder ein wenn nicht das ende
-        If Not rs1.EOF Then
+        If Not Rs1.EOF Then
             .Selection.Paste
         End If
     Wend
@@ -383,7 +383,7 @@ Function funOpenWord(sDokuName As String)
 
 Dim wdDoc As Document
 Dim wdApp As Application
-Dim S1 As String
+Dim s1 As String
 
 Dim objWord
 
@@ -392,13 +392,13 @@ Dim objWord
 'nur zum testen
 'sDokuName = "C:\AA_MG\PS\Word_Berichte\Zimmermann\Ausgabe\brief.doc"
 
-S1 = sDokuName
+s1 = sDokuName
 'Set wdDoc = GetObject(S1)
 'Set wdApp = wdDoc.Application
 
 Set objWord = CreateObject("Word.Application")
 
-objWord.Documents.Add (S1)
+objWord.Documents.Add (s1)
 
 objWord.Visible = True
 'AppActivate objWord.Caption
@@ -489,9 +489,9 @@ Dim objWord As Object
 
 Dim tTmp As String
 Dim tDoc As String
-Dim rs1  As DAO.Recordset
+Dim Rs1  As DAO.Recordset
 Dim A As Long
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
 Dim sPVorlage As String
 Dim sPAusgabe As String
@@ -553,21 +553,21 @@ With objWord
 ''wdDoc.Close
 
 'Öffne Abfrage
-Set rs1 = CurrentDb.OpenRecordset(sAbfrage)
-If rs1.EOF = True Then
+Set Rs1 = CurrentDb.OpenRecordset(sAbfrage)
+If Rs1.EOF = True Then
     MsgBox ("Es gibt keinen Datensat in dieser Abfrage " & "a_" & DokuName)
-    Set rs1 = Nothing
+    Set Rs1 = Nothing
     Exit Sub
 End If
 
-rs1.MoveFirst
+Rs1.MoveFirst
 'Es werden alle Bookmarks ersetzt die einzeln vorkommen
-For A = 0 To rs1.Fields.Count - 1
-    S1 = rs1.Fields(A).Name
-    s2 = Nz(rs1.Fields(A).Value, "")
+For A = 0 To Rs1.Fields.Count - 1
+    s1 = Rs1.Fields(A).Name
+    s2 = Nz(Rs1.Fields(A).Value, "")
     'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren
-    If .ActiveDocument.Bookmarks.Exists(S1) Then
-        .ActiveDocument.Bookmarks(S1).Range.Text = s2
+    If .ActiveDocument.Bookmarks.Exists(s1) Then
+        .ActiveDocument.Bookmarks(s1).Range.Text = s2
     End If
 Next A
 
@@ -580,19 +580,19 @@ If .ActiveDocument.Bookmarks.Exists("TxxTABELLE") = False Then
 End If
 
 
-    While rs1.EOF = False
+    While Rs1.EOF = False
         'Markiere die Tabelle zum kopieren
         .Selection.GoTo What:=-1, Name:="TxxTABELLE"     'wdGoToBookmark = -1
         'Kopiere die Tabelle für Später mit Bookmarks
         .Selection.copy
         
         'Ersetze die Bookmarks in der Tabelle
-        For A = 0 To rs1.Fields.Count - 1
-            S1 = "Txx" & rs1.Fields(A).Name
-            s2 = Nz(rs1.Fields(A).Value, "")
+        For A = 0 To Rs1.Fields.Count - 1
+            s1 = "Txx" & Rs1.Fields(A).Name
+            s2 = Nz(Rs1.Fields(A).Value, "")
             'Feigheit vor dem Feind: Prüfen, ob Bookmarks existieren (hier ein notwendiges Übel)
-            If .ActiveDocument.Bookmarks.Exists(S1) Then
-                .ActiveDocument.Bookmarks(S1).Range.Text = s2
+            If .ActiveDocument.Bookmarks.Exists(s1) Then
+                .ActiveDocument.Bookmarks(s1).Range.Text = s2
             End If
         Next A
         'Markiere die Tabelle um mit dem Cursor unter diese zu springen
@@ -602,9 +602,9 @@ End If
         'Lösche das Bookmark der Tabelle damit es kopiert werden kann
         .ActiveDocument.Bookmarks("TxxTABELLE").Delete
         'Spring zum nächsten satz um prüfen zu können ob danach das ende ist
-        rs1.MoveNext
+        Rs1.MoveNext
         'Setze die Tabelle mit allen Bookmarks wieder ein wenn nicht das ende
-        If Not rs1.EOF Then
+        If Not Rs1.EOF Then
             .Selection.Paste
         End If
     Wend

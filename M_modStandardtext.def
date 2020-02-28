@@ -168,7 +168,7 @@ End Function
 '---------------------------------------------------------------------------------------
 
 Function modAuftrag(ProNr As String) As Boolean
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim strSql As String
 'on error Goto Err_
 
@@ -176,14 +176,14 @@ modAuftrag = False
 
 strSql = "SELECT tblAufDaten.ProNr FROM" & _
 " tblAufDaten WHERE (((tblAufDaten.ProNr)=" & Str(ProNr) & "));"
-Set rs1 = CurrentDbC.OpenRecordset(strSql)
+Set Rs1 = CurrentDbC.OpenRecordset(strSql)
 
-If rs1.RecordCount <> 0 Then
+If Rs1.RecordCount <> 0 Then
   modAuftrag = True
 End If
 
-rs1.Close
-Set rs1 = Nothing
+Rs1.Close
+Set Rs1 = Nothing
 
 
 Exit_:
@@ -240,41 +240,41 @@ Function funTextParser(strText As String) As String
 'Key = <Vorname> Akt=form.vorname Es werden alle geöffneten Formulare nach der Variablen Vorname durchsucht ist diese vorhanden
 '      wird derWert <Vorname> durch den gefundenen Vornamen ersetzt
 Dim a1 As Long
-Dim S1 As String
+Dim s1 As String
 Dim s2 As String
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 
 ''on error Goto err_
-S1 = Nz(strText)
+s1 = Nz(strText)
 
-Set rs1 = CurrentDb.OpenRecordset("tblAutoText")
-If Not rs1.EOF Then
-rs1.MoveFirst
+Set Rs1 = CurrentDb.OpenRecordset("tblAutoText")
+If Not Rs1.EOF Then
+Rs1.MoveFirst
     
-    For a1 = 1 To rs1.RecordCount
+    For a1 = 1 To Rs1.RecordCount
         
-        If Nz(rs1!akt) <> "" Then
+        If Nz(Rs1!akt) <> "" Then
             'Wenn der Wert aus einem Formular oder einer Funktion kommt.
-            s2 = rs1!akt
+            s2 = Rs1!akt
             If Left(s2, 5) = "form." Then 'Der Wert soll aus einem Form kommen
                 s2 = funFormsParsen(Mid$(s2, 6)) 'geöffnete Forms werden nach dem Wert durchsucht
                 If s2 <> "" Then
-                    S1 = Replace(S1, rs1!Key, s2)
+                    s1 = Replace(s1, Rs1!Key, s2)
                 End If
             Else 'Der Text stellt eine Funktion dar
-                S1 = Replace(S1, rs1!Key, Eval(s2))
+                s1 = Replace(s1, Rs1!Key, Eval(s2))
             End If
         Else
             'Text wird durch festen Text ersetzt
-            S1 = Replace(S1, rs1!Key, rs1!outtext)
+            s1 = Replace(s1, Rs1!Key, Rs1!outtext)
         End If
-        rs1.MoveNext
+        Rs1.MoveNext
     Next a1
 End If
     
     'Wenn kein Text wird der alte Wert zurück gegeben
-    If Nz(S1) <> "" Then
-        funTextParser = S1
+    If Nz(s1) <> "" Then
+        funTextParser = s1
     Else
         funTextParser = Nz(strText)
     End If
@@ -316,9 +316,9 @@ End Function
 Function modEKLBedingt(Befehl As String, WERT As String, Optional Auswahl As String) As Boolean
 'Ermöglicht in der Einkaufsliste Zeilen mit verschiedenen Funktionen zu versehen
 'dies ist abhängig von der Positionsbezeichnung die als WERT übergeben wird
-Dim S1 As String
+Dim s1 As String
 
-S1 = Right(WERT, 1)
+s1 = Right(WERT, 1)
 'If Len(s1) = 2 Then
 '    s1 = Left(s1, 1)
 'End If
@@ -327,16 +327,16 @@ modEKLBedingt = False
 Select Case Befehl
 
     Case "M" ' Mutter
-        If S1 = "M" Then modEKLBedingt = True
+        If s1 = "M" Then modEKLBedingt = True
     Case "Z" ' Zwischensumme
-        If S1 = "Z" Then modEKLBedingt = True
+        If s1 = "Z" Then modEKLBedingt = True
     Case "X" ' Option
         'Es werden alle auf Option geschalten die nicht der Auswahl entsprechen
-        If S1 = "X" Or S1 = "1" Or S1 = "2" Or S1 = "3" Or S1 = "4" Then
-            If S1 <> Auswahl Then modEKLBedingt = True
+        If s1 = "X" Or s1 = "1" Or s1 = "2" Or s1 = "3" Or s1 = "4" Then
+            If s1 <> Auswahl Then modEKLBedingt = True
         End If
     Case "S" ' Option
-        If S1 = "S" Then modEKLBedingt = True
+        If s1 = "S" Then modEKLBedingt = True
         
 End Select
 

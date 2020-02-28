@@ -41,13 +41,13 @@ Function pdfCadAnzeigen(ID As Long) As Boolean
 
 Dim oCad As CAD
 Dim sFile As String
-Dim S1 As String
+Dim s1 As String
 'Öffnet das PDF mit dem Standart PDF reader
     
     Set oCad = New CAD
     
-    S1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & oCad.Nummer(ID) & ".PDF"
-    sFile = Dir(S1)
+    s1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & oCad.Nummer(ID) & "*.PDF"
+    sFile = Dir(s1)
     
     If sFile <> "" Then
         sFile = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sFile
@@ -55,10 +55,10 @@ Dim S1 As String
         pdfCadAnzeigen = True
     Else
         pdfCadAnzeigen = False
-        MsgBox LA("Datei ") & S1 & LA(" nicht vorhanden!")
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
     End If
 
-Exit Function
+
 
 End Function
 
@@ -68,7 +68,7 @@ Function DFTCadAnzeigen(ID As Long) As Boolean
 
 Dim oCad As CAD
 Dim sFile As String
-Dim S1 As String
+Dim s1 As String
 Dim sDatei As String
 
 'Öffnet das PDF mit dem Standart PDF reader
@@ -77,8 +77,8 @@ Dim sDatei As String
     
     sDatei = oCad.Nummer(ID)
     
-    S1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sDatei & ".DFT"
-    sFile = Dir(S1)
+    s1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sDatei & ".DFT"
+    sFile = Dir(s1)
     
     If sFile <> "" Then
         sFile = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sFile
@@ -86,7 +86,7 @@ Dim sDatei As String
         'pdfCadAnzeigen = True
     Else
         'pdfCadAnzeigen = False
-        MsgBox LA("Datei ") & S1 & LA(" nicht vorhanden!")
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
     End If
 
 Exit Function
@@ -98,7 +98,7 @@ Function Cad3DAnzeigen(ID As Long) As Boolean
 
 Dim oCad As CAD
 Dim sFile As String
-Dim S1 As String
+Dim s1 As String
 Dim sDatei As String
 'Öffnet das PDF mit dem Standart PDF reader
     
@@ -110,8 +110,8 @@ Dim sDatei As String
         
          
          
-    S1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sDatei              'oCad.Nummer(ID) & ".DFT"
-    sFile = Dir(S1)
+    s1 = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sDatei              'oCad.Nummer(ID) & ".DFT"
+    sFile = Dir(s1)
     
     If sFile <> "" And sDatei <> "" Then
         'sFile = Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & sFile
@@ -119,7 +119,7 @@ Dim sDatei As String
         'pdfCadAnzeigen = True
     Else
         'pdfCadAnzeigen = False
-        MsgBox LA("Datei ") & S1 & LA(" nicht vorhanden!")
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
     End If
 
 
@@ -130,23 +130,23 @@ End Function
 Function pdfAnzeigen(sFile As String) As Boolean
 'Sucht die DAtei und versucht diese zu öffenen
 
-Dim S1 As String
+Dim s1 As String
 'Öffnet das PDF mit dem Standart PDF reader
     If Right(Nz(sFile, ""), 4) <> ".pdf" Then
         MsgBox Nz(sFile, "") & LA(" ist keine .PDF Datei!")
         Exit Function
     End If
     
-    S1 = sFile  'Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & ocad.NummerPDF(iD) & "*.PDF"
-    sFile = Dir(S1)
+    s1 = sFile  'Nz(DLookup("Wert2", "tblIni", "wert1='DirCadPdf'")) & "\" & ocad.NummerPDF(iD) & "*.PDF"
+    sFile = Dir(s1)
     
     If sFile <> "" Then
         
-        Application.FollowHyperlink S1, , False, , , , "TEST" ' True
+        Application.FollowHyperlink s1, , False, , , , "TEST" ' True
         pdfAnzeigen = True
     Else
         pdfAnzeigen = False
-        MsgBox LA("Datei ") & S1 & LA(" nicht vorhanden!")
+        MsgBox LA("Datei ") & s1 & LA(" nicht vorhanden!")
     End If
 
 Exit Function

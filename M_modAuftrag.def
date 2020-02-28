@@ -5,19 +5,19 @@ Public Function SucheNaechsteNummer(AufNr As Long, PosNr As String) As String
 '9.10.2018 es wird versucht die nächste Numme rin der Position zu finden
 ' der syntax der Positionen ist xx.nn die nn Nummer wird hochgezählt
 
-Dim rs1 As DAO.Recordset
+Dim Rs1 As DAO.Recordset
 Dim sSql As String
 Dim z1 As Long
-Dim S1 As String
+Dim s1 As String
 
 sSql = "SELECT * FROM tblAufPositionen WHERE " & _
     "Auftragsnummer=" & AufNr & _
     " AND " & "Pos_Nummer like '" & Left(PosNr, 2) & "*'" & _
     " Order By Pos_Nummer"
 
-Set rs1 = CurrentDbC.OpenRecordset(sSql)
+Set Rs1 = CurrentDbC.OpenRecordset(sSql)
 
-With rs1
+With Rs1
     If .EOF Then
         SucheNaechsteNummer = "01.00"
     Else
@@ -28,11 +28,11 @@ With rs1
         If z1 < 1 Then z1 = 1
         
         If z1 > 9 Then
-            S1 = Left(!Pos_Nummer, 2) & "." & z1
+            s1 = Left(!Pos_Nummer, 2) & "." & z1
         Else
-            S1 = Left(!Pos_Nummer, 2) & ".0" & z1
+            s1 = Left(!Pos_Nummer, 2) & ".0" & z1
         End If
-        SucheNaechsteNummer = S1
+        SucheNaechsteNummer = s1
     End If
     .Close
 
